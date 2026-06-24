@@ -5,7 +5,7 @@ import { getSiteData } from "@/lib/get-site-data";
 import { Reveal } from "@/components/ui/Reveal";
 import { Eyebrow } from "@/components/ui/Eyebrow";
 import { FinalCTA } from "@/components/ui/FinalCTA";
-import { HeroOrb } from "@/components/ui/HeroOrb";
+import { HeroSection } from "@/components/site/HeroSection";
 
 export const metadata: Metadata = {
   title: "Norvika — Présence numérique pour entreprises du Québec",
@@ -70,50 +70,12 @@ export default async function HomePage() {
   return (
     <>
       {/* HERO */}
-      <section className="relative overflow-hidden border-b border-[var(--hairline)] bg-[var(--background)]">
-        {/* Static blue halo */}
-        <div
-          aria-hidden
-          className="pointer-events-none absolute inset-0"
-          style={{
-            background:
-              "radial-gradient(ellipse 80% 60% at 50% 0%, rgba(53,87,212,0.10) 0%, transparent 70%)",
-          }}
-        />
-        {/* Mouse-following blue orb */}
-        <HeroOrb />
-        <div className="relative mx-auto max-w-5xl px-6 pb-32 pt-24 text-center md:pb-44 md:pt-32">
-          <Reveal
-            as="h1"
-            className="mx-auto max-w-[18ch] text-[2.5rem] font-semibold leading-[1.02] tracking-[-0.025em] text-[var(--foreground)] sm:text-6xl md:text-7xl lg:text-[5.5rem]"
-          >
-            {content.hero_titre}
-          </Reveal>
-          <Reveal
-            as="p"
-            delay={120}
-            className="mx-auto mt-8 max-w-xl text-base leading-relaxed text-[var(--muted-foreground)] md:text-lg"
-          >
-            {content.hero_sous_titre}
-          </Reveal>
-          <Reveal delay={240} className="mt-10 flex flex-col items-center justify-center gap-5 sm:flex-row sm:gap-8">
-            <a
-              href={rdvLink}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center justify-center rounded-full bg-[var(--primary)] px-10 py-5 text-base font-bold text-white transition-all duration-300 hover:-translate-y-0.5 hover:shadow-lg active:translate-y-0"
-            >
-              {content.hero_cta}
-            </a>
-            <a
-              href="#services"
-              className="text-sm font-medium text-[var(--muted-foreground)] underline-offset-4 hover:text-[var(--foreground)] hover:underline"
-            >
-              Voir les services
-            </a>
-          </Reveal>
-        </div>
-      </section>
+      <HeroSection
+        titre={content.hero_titre}
+        sousTitre={content.hero_sous_titre}
+        cta={content.hero_cta}
+        rdvLink={rdvLink}
+      />
 
       {/* PILLIERS */}
       <section id="services" className="scroll-mt-24 bg-[var(--cream)]">

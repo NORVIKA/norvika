@@ -3,21 +3,24 @@
 @tailwind utilities;
 
 :root {
-  --background: #ffffff;
-  --foreground: #1b2333;
-  --cream: #f4f7fc;
-  --hairline: #e3e8f0;
+  /* Norvika brand — couleurs exactes de la maquette Lovable */
+  --background: oklch(1 0 0);                    /* white */
+  --foreground: oklch(0.18 0.02 260);            /* near-black */
+  --cream: #F4F7FC;                              /* cool blue-tinted off-white */
+  --hairline: oklch(0.91 0.008 255);
 
-  --primary: #1b2a47;
-  --primary-foreground: #ffffff;
+  /* Royal blue */
+  --brand: oklch(0.48 0.15 262);
+  --brand-foreground: oklch(0.985 0 0);
+  --brand-soft: oklch(0.92 0.04 258);
 
-  --brand: #3557d4;
-  --brand-foreground: #ffffff;
-  --brand-soft: #e8effe;
+  /* Navy #1B2A47 */
+  --primary: oklch(0.27 0.058 263);
+  --primary-foreground: oklch(0.985 0 0);
 
-  --muted: #f4f7fc;
-  --muted-foreground: #6b7a99;
-  --destructive: #dc2626;
+  --muted: oklch(0.97 0.006 255);
+  --muted-foreground: oklch(0.47 0.016 260);
+  --destructive: oklch(0.577 0.245 27.325);
 }
 
 @layer base {
@@ -57,6 +60,16 @@
   }
 }
 
+/* Orbe hero animations */
+@keyframes orb-float {
+  0%, 100% { transform: translate(-50%, 0); }
+  50%       { transform: translate(-50%, -18px); }
+}
+@keyframes orb-pulse {
+  0%, 100% { opacity: 0.85; }
+  50%      { opacity: 1; }
+}
+
 @keyframes reveal-up {
   from { opacity: 0; transform: translateY(20px); }
   to   { opacity: 1; transform: translateY(0); }
@@ -71,4 +84,6 @@
 
 @layer utilities {
   .text-balance { text-wrap: balance; }
+  .animate-orb-float { animation: orb-float 9s ease-in-out infinite; }
+  .animate-orb-pulse { animation: orb-pulse 6s ease-in-out infinite; }
 }
