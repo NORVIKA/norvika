@@ -91,7 +91,7 @@ export default async function RootLayout({
         />
       </head>
       <body style={cssVars}>
-        <Header rdvLink={rdvLink} hideCtaUntilScroll={false} />
+        <Header rdvLink={rdvLink} />
         <main className="flex-1">{children}</main>
         <Footer email={email} />
       </body>

@@ -5,6 +5,7 @@ import { getSiteData } from "@/lib/get-site-data";
 import { Reveal } from "@/components/ui/Reveal";
 import { Eyebrow } from "@/components/ui/Eyebrow";
 import { FinalCTA } from "@/components/ui/FinalCTA";
+import { HeroOrb } from "@/components/ui/HeroOrb";
 
 export const metadata: Metadata = {
   title: "Norvika — Présence numérique pour entreprises du Québec",
@@ -22,9 +23,44 @@ export const metadata: Metadata = {
 export const dynamic = "force-dynamic";
 
 const PILLARS = [
-  { n: "01", key: "site", to: "/sites-web", cta: "Sites web" },
-  { n: "02", key: "temps", to: "/automatisation", cta: "Automatisation" },
-  { n: "03", key: "image", to: "/photo-video", cta: "Photo et vidéo" },
+  {
+    n: "01",
+    key: "site",
+    to: "/sites-web",
+    cta: "Voir nos sites web",
+    service: "Sites web",
+    icon: (
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5" aria-hidden>
+        <rect x="2" y="3" width="20" height="14" rx="2" />
+        <path d="M8 21h8M12 17v4" />
+      </svg>
+    ),
+  },
+  {
+    n: "02",
+    key: "temps",
+    to: "/automatisation",
+    cta: "Voir l'automatisation",
+    service: "Automatisation",
+    icon: (
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5" aria-hidden>
+        <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83" />
+      </svg>
+    ),
+  },
+  {
+    n: "03",
+    key: "image",
+    to: "/photo-video",
+    cta: "Voir la photo & vidéo",
+    service: "Photo & Vidéo",
+    icon: (
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5" aria-hidden>
+        <path d="m15 10 4.553-2.277A1 1 0 0 1 21 8.618v6.764a1 1 0 0 1-1.447.894L15 14" />
+        <rect x="1" y="6" width="14" height="12" rx="2" />
+      </svg>
+    ),
+  },
 ];
 
 export default async function HomePage() {
@@ -35,15 +71,17 @@ export default async function HomePage() {
     <>
       {/* HERO */}
       <section className="relative overflow-hidden border-b border-[var(--hairline)] bg-[var(--background)]">
-        {/* Blue halo */}
+        {/* Static blue halo */}
         <div
           aria-hidden
           className="pointer-events-none absolute inset-0"
           style={{
             background:
-              "radial-gradient(ellipse 80% 60% at 50% 0%, rgba(53,87,212,0.12) 0%, transparent 70%)",
+              "radial-gradient(ellipse 80% 60% at 50% 0%, rgba(53,87,212,0.10) 0%, transparent 70%)",
           }}
         />
+        {/* Mouse-following blue orb */}
+        <HeroOrb />
         <div className="relative mx-auto max-w-5xl px-6 pb-32 pt-24 text-center md:pb-44 md:pt-32">
           <Reveal
             as="h1"
@@ -101,20 +139,25 @@ export default async function HomePage() {
                   aria-hidden
                   className="absolute inset-x-0 top-0 h-1 origin-left scale-x-0 bg-[var(--brand)] transition-transform duration-300 group-hover:scale-x-100"
                 />
-                <div className="flex items-center justify-between">
-                  <span className="flex h-10 w-10 items-center justify-center rounded-full bg-[var(--brand-soft)] text-sm font-semibold text-[var(--brand)] transition-colors duration-300 group-hover:bg-[var(--brand)] group-hover:text-white">
-                    {p.n}
+                {/* Service badge */}
+                <div className="flex items-center gap-3">
+                  <span className="flex h-10 w-10 items-center justify-center rounded-full bg-[var(--brand-soft)] text-[var(--brand)] transition-colors duration-300 group-hover:bg-[var(--brand)] group-hover:text-white">
+                    {p.icon}
                   </span>
-                  <p className="text-xs font-medium uppercase tracking-[0.2em] text-[var(--muted-foreground)]">
-                    {content[`pillier_${i + 1}_label`]}
-                  </p>
+                  <span className="text-sm font-semibold text-[var(--foreground)]">
+                    {p.service}
+                  </span>
                 </div>
-                <p className="mt-6 flex-1 text-base leading-relaxed text-[var(--foreground)]">
+                {/* Titre pillier */}
+                <p className="mt-5 text-xs font-medium uppercase tracking-[0.18em] text-[var(--muted-foreground)]">
+                  {content[`pillier_${i + 1}_label`]}
+                </p>
+                <p className="mt-3 flex-1 text-base leading-relaxed text-[var(--foreground)]">
                   {content[`pillier_${i + 1}_desc`]}
                 </p>
                 <Link
                   href={p.to}
-                  className="mt-8 inline-flex items-center gap-2 text-sm font-medium text-[var(--primary)] transition-colors group-hover:text-[var(--brand)]"
+                  className="mt-8 inline-flex items-center gap-2 text-sm font-semibold text-[var(--brand)] transition-colors group-hover:text-[var(--primary)]"
                 >
                   {p.cta}
                   <span aria-hidden className="transition-transform duration-300 group-hover:translate-x-1">→</span>

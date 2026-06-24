@@ -15,21 +15,21 @@ const NAVY = "#1b2a47";
 
 interface HeaderProps {
   rdvLink: string;
-  hideCtaUntilScroll?: boolean;
 }
 
-export function Header({ rdvLink, hideCtaUntilScroll = false }: HeaderProps) {
+export function Header({ rdvLink }: HeaderProps) {
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const pathname = usePathname();
+  const isHome = pathname === "/";
 
   useEffect(() => {
-    if (!hideCtaUntilScroll) { setScrolled(true); return; }
+    if (!isHome) { setScrolled(true); return; }
     const onScroll = () => setScrolled(window.scrollY > window.innerHeight * 0.7);
     onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
-  }, [hideCtaUntilScroll]);
+  }, [isHome]);
 
   useEffect(() => {
     document.body.style.overflow = open ? "hidden" : "";
@@ -48,7 +48,7 @@ export function Header({ rdvLink, hideCtaUntilScroll = false }: HeaderProps) {
             href="/"
             aria-label="Norvika, accueil"
             onClick={() => setOpen(false)}
-            className="flex items-center gap-2 pl-3 pr-2"
+            className="flex cursor-pointer items-center gap-2 pl-3 pr-2"
           >
             <Image
               src="/images/logo.png"

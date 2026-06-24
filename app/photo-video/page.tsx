@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import { getSiteData } from "@/lib/get-site-data";
 import { Reveal } from "@/components/ui/Reveal";
 import { Eyebrow } from "@/components/ui/Eyebrow";
@@ -20,9 +21,9 @@ export const metadata: Metadata = {
 export const dynamic = "force-dynamic";
 
 const CLIENTS = [
-  { label: "Desjardins", bg: "#00874A", text: "#ffffff", tagline: "Desjardins" },
-  { label: "Anytime Fitness", bg: "#7B2FBE", text: "#ffffff", tagline: "Anytime Fitness" },
-  { label: "LOUD Conférences", bg: "#1a1a1a", text: "#ffffff", tagline: "LOUD — Conférences de feu" },
+  { label: "Desjardins", src: "/images/realisation-desjardins.jpg" },
+  { label: "LOUD Conférences de feu", src: "/images/realisation-loud.jpg" },
+  { label: "Anytime Fitness", src: "/images/realisation-anytime.jpg" },
 ];
 
 const USAGES = [
@@ -78,13 +79,14 @@ export default async function PhotoVideoPage() {
           <div className="mt-16 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {CLIENTS.map((c, i) => (
               <Reveal key={c.label} delay={i * 100}>
-                <div
-                  className="flex aspect-[16/9] items-center justify-center overflow-hidden rounded-xl border border-[var(--hairline)]"
-                  style={{ background: c.bg }}
-                >
-                  <span className="text-2xl font-bold tracking-tight" style={{ color: c.text }}>
-                    {c.tagline}
-                  </span>
+                <div className="group relative aspect-[16/9] overflow-hidden rounded-xl border border-[var(--hairline)] bg-[var(--cream)]">
+                  <Image
+                    src={c.src}
+                    alt={c.label}
+                    fill
+                    className="object-cover transition-transform duration-500 group-hover:scale-105"
+                    sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                  />
                 </div>
               </Reveal>
             ))}
