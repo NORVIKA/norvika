@@ -10,6 +10,23 @@ const nextConfig = {
       { protocol: "https", hostname: "www.vergerfrancoislegault.ca" },
     ],
   },
+  // En-têtes de sécurité — appliqués par Vercel (netlify.toml est ignoré sur Vercel)
+  async headers() {
+    return [
+      {
+        source: "/:path*",
+        headers: [
+          { key: "X-Frame-Options", value: "DENY" },
+          { key: "X-Content-Type-Options", value: "nosniff" },
+          { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
+          {
+            key: "Permissions-Policy",
+            value: "camera=(), microphone=(), geolocation=()",
+          },
+        ],
+      },
+    ];
+  },
 };
 
 export default nextConfig;
