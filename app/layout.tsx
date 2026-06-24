@@ -52,7 +52,7 @@ export default async function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const { siteInfo, colors } = await getSiteData();
+  const { siteInfo, colors, images } = await getSiteData();
 
   const cssVars = {
     "--primary": colors.primary,
@@ -91,9 +91,9 @@ export default async function RootLayout({
         />
       </head>
       <body style={cssVars}>
-        <Header rdvLink={rdvLink} />
+        <Header rdvLink={rdvLink} logoSrc={images.logo} />
         <main className="flex-1">{children}</main>
-        <Footer email={email} />
+        <Footer email={email} logoSrc={images.logo} description={siteInfo.description} />
       </body>
     </html>
   );

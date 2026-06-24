@@ -3,9 +3,11 @@ import Image from "next/image";
 
 interface FooterProps {
   email: string;
+  logoSrc: string;
+  description: string;
 }
 
-export function Footer({ email }: FooterProps) {
+export function Footer({ email, logoSrc, description }: FooterProps) {
   return (
     <footer className="border-t border-[var(--hairline)] bg-[var(--background)]">
       <div className="mx-auto max-w-6xl px-6 py-14">
@@ -13,15 +15,16 @@ export function Footer({ email }: FooterProps) {
           <div>
             <Link href="/">
               <Image
-                src="/images/logo.png"
+                src={logoSrc}
                 alt="Norvika"
                 width={120}
                 height={36}
                 className="h-9 w-auto brightness-0"
+                unoptimized
               />
             </Link>
             <p className="mt-5 max-w-sm text-sm leading-relaxed text-[var(--muted-foreground)]">
-              Présence numérique pour les entreprises et les travailleurs autonomes.
+              {description}
             </p>
           </div>
           <div>

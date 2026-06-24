@@ -9,7 +9,9 @@ export default async function TextesPage() {
   const { data } = await supabase.from("site_content").select("key, value");
 
   const content = { ...defaultContent };
-  data?.forEach(({ key, value }) => { if (value) content[key] = value; });
+  data?.forEach(({ key, value }) => {
+    if (value && !key.startsWith("img_")) content[key] = value;
+  });
 
   return (
     <div className="max-w-3xl">

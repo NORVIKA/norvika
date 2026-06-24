@@ -64,7 +64,7 @@ const PILLARS = [
 ];
 
 export default async function HomePage() {
-  const { content, siteInfo } = await getSiteData();
+  const { content, siteInfo, images } = await getSiteData();
   const rdvLink = siteInfo.lien_rdv || "https://calendar.app.google/W5SS5UmnJCTLXhw8A";
 
   return (
@@ -146,11 +146,12 @@ export default async function HomePage() {
                 <div aria-hidden className="absolute -inset-3 -z-10 rounded-3xl bg-[var(--brand)]/10 blur-xl" />
                 <div className="overflow-hidden rounded-2xl border border-[var(--brand)]/20 bg-[var(--cream)] shadow-[0_30px_60px_-30px_rgba(53,87,212,0.3)]">
                   <Image
-                    src="/images/fondateurs.png"
+                    src={images.fondateurs}
                     alt="Les fondateurs de Norvika"
                     width={600}
                     height={700}
                     className="w-full h-auto max-h-[600px] object-cover object-top transition-transform duration-700 ease-out hover:scale-[1.03]"
+                    unoptimized
                   />
                 </div>
               </div>

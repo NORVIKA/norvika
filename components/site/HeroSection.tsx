@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef } from "react";
+import { useEffect, useRef } from "react";
 import { Reveal } from "@/components/ui/Reveal";
 
 interface HeroSectionProps {
@@ -12,15 +12,37 @@ interface HeroSectionProps {
 
 export function HeroSection({ titre, sousTitre, cta, rdvLink }: HeroSectionProps) {
   const haloRef = useRef<HTMLDivElement | null>(null);
+  const target = useRef({ x: 50, y: 38 });
+  const current = useRef({ x: 50, y: 38 });
+  const raf = useRef<number | null>(null);
+
+  // Boucle de lissage 60fps — l'orbe rattrape la souris en douceur (lerp)
+  useEffect(() => {
+    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (reduce) return;
+
+    const tick = () => {
+      current.current.x += (target.current.x - current.current.x) * 0.06;
+      current.current.y += (target.current.y - current.current.y) * 0.06;
+      const el = haloRef.current;
+      if (el) {
+        el.style.setProperty("--hx", `${current.current.x}%`);
+        el.style.setProperty("--hy", `${current.current.y}%`);
+      }
+      raf.current = requestAnimationFrame(tick);
+    };
+    raf.current = requestAnimationFrame(tick);
+    return () => {
+      if (raf.current) cancelAnimationFrame(raf.current);
+    };
+  }, []);
 
   const handleMove = (e: React.MouseEvent<HTMLElement>) => {
-    const el = haloRef.current;
-    if (!el) return;
     const rect = e.currentTarget.getBoundingClientRect();
-    const x = ((e.clientX - rect.left) / rect.width) * 100;
-    const y = ((e.clientY - rect.top) / rect.height) * 100;
-    el.style.setProperty("--hx", `${x}%`);
-    el.style.setProperty("--hy", `${y}%`);
+    target.current = {
+      x: ((e.clientX - rect.left) / rect.width) * 100,
+      y: ((e.clientY - rect.top) / rect.height) * 100,
+    };
   };
 
   return (
@@ -51,7 +73,7 @@ export function HeroSection({ titre, sousTitre, cta, rdvLink }: HeroSectionProps
             background:
               "radial-gradient(circle, rgba(59,130,246,0.18) 0%, rgba(59,130,246,0.08) 32%, rgba(59,130,246,0) 55%)",
             filter: "blur(50px)",
-            transition: "left 400ms ease-out, top 400ms ease-out",
+            willChange: "left, top",
           }}
         />
         {/* Couche 2 — arc lumineux (le bord du cercle brillant) */}
@@ -65,7 +87,7 @@ export function HeroSection({ titre, sousTitre, cta, rdvLink }: HeroSectionProps
             background:
               "radial-gradient(circle at 50% 50%, rgba(59,130,246,0) 64%, rgba(96,165,250,0.55) 70%, rgba(59,130,246,0.32) 73%, rgba(59,130,246,0) 78%)",
             filter: "blur(6px)",
-            transition: "left 500ms ease-out, top 500ms ease-out",
+            willChange: "left, top",
           }}
         />
         {/* Couche 3 — teinture intérieure très subtile */}
@@ -78,7 +100,7 @@ export function HeroSection({ titre, sousTitre, cta, rdvLink }: HeroSectionProps
             height: "min(180vw, 1800px)",
             background:
               "radial-gradient(circle at 50% 45%, rgba(219,234,254,0.55) 0%, rgba(219,234,254,0.18) 40%, rgba(255,255,255,0) 65%)",
-            transition: "left 600ms ease-out, top 600ms ease-out",
+            willChange: "left, top",
           }}
         />
         {/* Couche 4 — poussière de particules le long du bord */}

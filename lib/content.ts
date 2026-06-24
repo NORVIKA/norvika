@@ -63,3 +63,21 @@ export const defaultColors: Record<string, string> = {
   cream: "#f4f7fc",
   accent: "#e8effe",
 };
+
+// Images gérables depuis l'admin — fallback sur les fichiers locaux
+export const defaultImages: Record<string, string> = {
+  logo: "/images/logo.png",
+  fondateurs: "/images/fondateurs.png",
+  realisation_desjardins: "/images/realisation-desjardins.jpg",
+  realisation_loud: "/images/realisation-loud.jpg",
+  realisation_anytime: "/images/realisation-anytime.jpg",
+};
+
+// Métadonnées d'affichage pour le panneau /admin/images
+export const IMAGE_FIELDS: { key: string; label: string; hint: string }[] = [
+  { key: "logo", label: "Logo (en-tête et pied de page)", hint: "PNG transparent, format large" },
+  { key: "fondateurs", label: "Photo des fondateurs (page Accueil)", hint: "Portrait vertical" },
+  { key: "realisation_desjardins", label: "Réalisation 1 — Photo/vidéo", hint: "Format paysage 16:9" },
+  { key: "realisation_loud", label: "Réalisation 2 — Photo/vidéo", hint: "Format paysage 16:9" },
+  { key: "realisation_anytime", label: "Réalisation 3 — Photo/vidéo", hint: "Format paysage 16:9" },
+];

@@ -1,6 +1,6 @@
 import "server-only";
 import { createSupabaseServerClient } from "./supabase-server";
-import { defaultContent, defaultSiteInfo, defaultColors } from "./content";
+import { defaultContent, defaultSiteInfo, defaultColors, defaultImages } from "./content";
 
 export async function getSiteData() {
   try {
@@ -13,8 +13,15 @@ export async function getSiteData() {
     ]);
 
     const content = { ...defaultContent };
+    const images = { ...defaultImages };
     contentRes.data?.forEach(({ key, value }) => {
-      if (value) content[key] = value;
+      if (!value) return;
+      if (key.startsWith("img_")) {
+        // Les images sont stockées dans site_content avec un préfixe img_
+        images[key.slice(4)] = value;
+      } else {
+        content[key] = value;
+      }
     });
 
     const siteInfo = { ...defaultSiteInfo };
@@ -27,12 +34,13 @@ export async function getSiteData() {
       if (value) colors[key] = value;
     });
 
-    return { content, siteInfo, colors };
+    return { content, siteInfo, colors, images };
   } catch {
     return {
       content: defaultContent,
       siteInfo: defaultSiteInfo,
       colors: defaultColors,
+      images: defaultImages,
     };
   }
 }

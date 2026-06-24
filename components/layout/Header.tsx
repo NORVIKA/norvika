@@ -15,9 +15,10 @@ const NAVY = "#1b2a47";
 
 interface HeaderProps {
   rdvLink: string;
+  logoSrc: string;
 }
 
-export function Header({ rdvLink }: HeaderProps) {
+export function Header({ rdvLink, logoSrc }: HeaderProps) {
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const pathname = usePathname();
@@ -51,12 +52,13 @@ export function Header({ rdvLink }: HeaderProps) {
             className="flex cursor-pointer items-center gap-2 pl-3 pr-2"
           >
             <Image
-              src="/images/logo.png"
+              src={logoSrc}
               alt="Norvika"
               width={120}
               height={40}
               className="h-8 w-auto md:h-10 brightness-0 invert"
               priority
+              unoptimized
             />
           </Link>
 

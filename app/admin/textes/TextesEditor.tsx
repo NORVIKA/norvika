@@ -9,7 +9,15 @@ const SECTIONS = [
     champs: [
       { key: "hero_titre", label: "Titre principal (H1)", type: "textarea" },
       { key: "hero_sous_titre", label: "Sous-titre hero", type: "textarea" },
+      { key: "hero_cta", label: "Texte du bouton principal", type: "text" },
       { key: "pilliers_titre", label: "Titre section trois solutions", type: "text" },
+      { key: "pilliers_sous_titre", label: "Sous-titre section trois solutions", type: "textarea" },
+      { key: "pillier_1_label", label: "Solution 1 — Titre (Votre site)", type: "text" },
+      { key: "pillier_1_desc", label: "Solution 1 — Description", type: "textarea" },
+      { key: "pillier_2_label", label: "Solution 2 — Titre (Votre temps)", type: "text" },
+      { key: "pillier_2_desc", label: "Solution 2 — Description", type: "textarea" },
+      { key: "pillier_3_label", label: "Solution 3 — Titre (Votre image)", type: "text" },
+      { key: "pillier_3_desc", label: "Solution 3 — Description", type: "textarea" },
       { key: "about_titre", label: "Titre section Pourquoi Norvika", type: "text" },
       { key: "about_texte", label: "Texte section Pourquoi Norvika", type: "textarea" },
       { key: "cta_principal_titre", label: "Titre CTA final", type: "text" },
@@ -21,8 +29,12 @@ const SECTIONS = [
     champs: [
       { key: "sites_hero_titre", label: "Titre (H1)", type: "text" },
       { key: "sites_hero_sous_titre", label: "Sous-titre", type: "textarea" },
+      { key: "sites_comment_titre", label: "Titre section Comment ça marche", type: "text" },
+      { key: "sites_realisation_titre", label: "Titre section Réalisations", type: "text" },
+      { key: "sites_offre_titre", label: "Titre section L'offre", type: "text" },
       { key: "sites_offre_prix", label: "Prix de départ", type: "text" },
       { key: "sites_cta_titre", label: "Titre CTA final", type: "text" },
+      { key: "sites_cta_sous_titre", label: "Sous-titre CTA final", type: "textarea" },
     ],
   },
   {
@@ -32,7 +44,11 @@ const SECTIONS = [
       { key: "auto_hero_sous_titre", label: "Sous-titre", type: "textarea" },
       { key: "auto_pattern_titre", label: "Titre section Le pattern", type: "text" },
       { key: "auto_pattern_texte", label: "Texte section Le pattern", type: "textarea" },
+      { key: "auto_comment_titre", label: "Titre section Comment ça marche", type: "text" },
+      { key: "auto_reassurance_titre", label: "Titre section Réassurance", type: "text" },
+      { key: "auto_reassurance_texte", label: "Texte section Réassurance", type: "textarea" },
       { key: "auto_cta_titre", label: "Titre CTA final", type: "text" },
+      { key: "auto_cta_sous_titre", label: "Sous-titre CTA final", type: "textarea" },
     ],
   },
   {
@@ -40,7 +56,10 @@ const SECTIONS = [
     champs: [
       { key: "photo_hero_titre", label: "Titre (H1)", type: "text" },
       { key: "photo_hero_sous_titre", label: "Sous-titre", type: "textarea" },
+      { key: "photo_ref_titre", label: "Titre section Références", type: "text" },
+      { key: "photo_usages_titre", label: "Titre section Usages", type: "text" },
       { key: "photo_cta_titre", label: "Titre CTA final", type: "text" },
+      { key: "photo_cta_sous_titre", label: "Sous-titre CTA final", type: "textarea" },
     ],
   },
 ];

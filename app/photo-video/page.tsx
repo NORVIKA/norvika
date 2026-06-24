@@ -20,12 +20,6 @@ export const metadata: Metadata = {
 
 export const dynamic = "force-dynamic";
 
-const CLIENTS = [
-  { label: "Desjardins", src: "/images/realisation-desjardins.jpg" },
-  { label: "LOUD Conférences de feu", src: "/images/realisation-loud.jpg" },
-  { label: "Anytime Fitness", src: "/images/realisation-anytime.jpg" },
-];
-
 const USAGES = [
   "Contenu pour vos réseaux sociaux",
   "Photos de votre lieu, vos produits, votre équipe",
@@ -34,9 +28,15 @@ const USAGES = [
 ];
 
 export default async function PhotoVideoPage() {
-  const { content, siteInfo } = await getSiteData();
+  const { content, siteInfo, images } = await getSiteData();
   const rdvLink = siteInfo.lien_rdv || "https://calendar.app.google/W5SS5UmnJCTLXhw8A";
   const portfolioLink = siteInfo.lien_portfolio || "https://norvika.myportfolio.com/";
+
+  const CLIENTS = [
+    { label: "Réalisation 1", src: images.realisation_desjardins },
+    { label: "Réalisation 2", src: images.realisation_loud },
+    { label: "Réalisation 3", src: images.realisation_anytime },
+  ];
 
   return (
     <>
@@ -86,6 +86,7 @@ export default async function PhotoVideoPage() {
                     fill
                     className="object-cover transition-transform duration-500 group-hover:scale-105"
                     sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                    unoptimized
                   />
                 </div>
               </Reveal>
