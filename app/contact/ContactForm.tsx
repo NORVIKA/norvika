@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, type FormEvent } from "react";
-import { supabase } from "@/lib/supabase";
 
 export function ContactForm({ email }: { email: string }) {
   const [nom, setNom] = useState("");
@@ -26,15 +25,14 @@ export function ContactForm({ email }: { email: string }) {
     }
 
     setEnvoi(true);
-    const { error } = await supabase.from("contact_messages").insert({
-      name: nom.trim(),
-      email: courriel.trim(),
-      phone: telephone.trim(),
-      message: message.trim(),
+    const res = await fetch("/api/contact", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ nom, courriel, telephone, message }),
     });
     setEnvoi(false);
 
-    if (error) {
+    if (!res.ok) {
       setErreur(`Une erreur est survenue. Réessayez ou écrivez-nous à ${email}.`);
       return;
     }
