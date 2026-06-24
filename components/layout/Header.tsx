@@ -11,7 +11,7 @@ const NAV_ITEMS = [
   { href: "/photo-video", label: "Photo et vidéo" },
 ] as const;
 
-const NAVY = "#1b2a47";
+const NAVY = "#19243a";
 
 interface HeaderProps {
   rdvLink: string;
