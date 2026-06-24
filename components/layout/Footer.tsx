@@ -35,6 +35,7 @@ export function Footer({ email, logoSrc, description }: FooterProps) {
               <li><Link href="/sites-web" className="text-[var(--foreground)] hover:underline">Sites web</Link></li>
               <li><Link href="/automatisation" className="text-[var(--foreground)] hover:underline">Automatisation</Link></li>
               <li><Link href="/photo-video" className="text-[var(--foreground)] hover:underline">Photo et vidéo</Link></li>
+              <li><Link href="/contact" className="text-[var(--foreground)] hover:underline">Contact</Link></li>
             </ul>
           </div>
           <div>

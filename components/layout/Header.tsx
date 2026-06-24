@@ -9,6 +9,7 @@ const NAV_ITEMS = [
   { href: "/sites-web", label: "Sites web" },
   { href: "/automatisation", label: "Automatisation" },
   { href: "/photo-video", label: "Photo et vidéo" },
+  { href: "/contact", label: "Contact" },
 ] as const;
 
 const NAVY = "#19243a";
@@ -98,20 +99,35 @@ export function Header({ rdvLink, logoSrc }: HeaderProps) {
               aria-label={open ? "Fermer le menu" : "Ouvrir le menu"}
               aria-expanded={open}
               onClick={() => setOpen((v) => !v)}
-              className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-white/15 md:hidden"
+              className="group inline-flex h-10 w-10 items-center justify-center rounded-full border border-white/15 transition-colors duration-300 hover:bg-white/10 active:scale-90 md:hidden"
             >
-              <span className="relative block h-3 w-4">
+              <span className="relative block h-[14px] w-[18px]">
+                {/* Ligne haut → branche du X */}
                 <span
-                  className="absolute left-0 top-0 h-px w-4 bg-white transition-transform duration-300"
-                  style={{ transform: open ? "translateY(6px) rotate(45deg)" : "" }}
+                  className="absolute left-0 top-0 block h-[2px] w-[18px] rounded-full bg-white"
+                  style={{
+                    transition: "transform 0.4s cubic-bezier(0.68,-0.55,0.265,1.55), top 0.3s ease",
+                    top: open ? "6px" : "0px",
+                    transform: open ? "rotate(45deg)" : "rotate(0)",
+                  }}
                 />
+                {/* Ligne milieu → glisse et disparaît */}
                 <span
-                  className="absolute left-0 top-[6px] h-px w-4 bg-white transition-opacity duration-300"
-                  style={{ opacity: open ? 0 : 1 }}
+                  className="absolute left-0 top-[6px] block h-[2px] w-[18px] rounded-full bg-white"
+                  style={{
+                    transition: "transform 0.3s ease, opacity 0.2s ease",
+                    transform: open ? "translateX(-20px)" : "translateX(0)",
+                    opacity: open ? 0 : 1,
+                  }}
                 />
+                {/* Ligne bas → branche du X */}
                 <span
-                  className="absolute left-0 top-[12px] h-px w-4 bg-white transition-transform duration-300"
-                  style={{ transform: open ? "translateY(-6px) rotate(-45deg)" : "" }}
+                  className="absolute left-0 bottom-0 block h-[2px] w-[18px] rounded-full bg-white"
+                  style={{
+                    transition: "transform 0.4s cubic-bezier(0.68,-0.55,0.265,1.55), bottom 0.3s ease",
+                    bottom: open ? "6px" : "0px",
+                    transform: open ? "rotate(-45deg)" : "rotate(0)",
+                  }}
                 />
               </span>
             </button>
