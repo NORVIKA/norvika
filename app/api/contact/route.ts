@@ -45,7 +45,7 @@ export async function POST(req: Request) {
 
   // Send email via Resend
   const { error: emailError } = await resend.emails.send({
-    from: "Norvika Contact <onboarding@resend.dev>",
+    from: "Norvika Contact <contact@norvika.ca>",
     to: [TO_EMAIL],
     replyTo: courriel.trim(),
     subject: `Nouveau message de ${nom.trim()} — Norvika`,
