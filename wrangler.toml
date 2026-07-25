@@ -1,0 +1,11 @@
+name = "norvika-site-test"
+compatibility_date = "2024-11-01"
+compatibility_flags = ["nodejs_compat"]
+pages_build_output_dir = ".vercel/output/static"
+
+# Variables publiques (clé anon + URL Supabase, publiques par design).
+# Les secrets (SUPABASE_SERVICE_KEY, RESEND_API_KEY) sont gérés via
+# `wrangler pages secret put` et ne figurent jamais dans ce fichier.
+[vars]
+NEXT_PUBLIC_SUPABASE_URL = "https://uddxvrogkknypneghkkw.supabase.co"
+NEXT_PUBLIC_SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVkZHh2cm9na2tueXBuZWdoa2t3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODIyNDQ5MjUsImV4cCI6MjA5NzgyMDkyNX0._3q8H04QdfuecQqRlLUvmIPyl46QaQGOsLBUWIppd1I"

@@ -1,9 +1,9 @@
 import { NextResponse } from "next/server";
-import { Resend } from "resend";
 import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+export const runtime = "edge";
+
 const TO_EMAIL = "info@norvika.ca";
 
 export async function POST(req: Request) {
@@ -43,13 +43,19 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "Erreur lors de la sauvegarde." }, { status: 500 });
   }
 
-  // Send email via Resend
-  const { error: emailError } = await resend.emails.send({
-    from: "Norvika Contact <contact@norvika.ca>",
-    to: [TO_EMAIL],
-    replyTo: courriel.trim(),
-    subject: `Nouveau message de ${nom.trim()} — Norvika`,
-    html: `
+  // Send email via Resend REST API (compatible edge runtime, sans SDK)
+  const emailRes = await fetch("https://api.resend.com/emails", {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${process.env.RESEND_API_KEY}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      from: "Norvika Contact <contact@norvika.ca>",
+      to: [TO_EMAIL],
+      reply_to: courriel.trim(),
+      subject: `Nouveau message de ${nom.trim()}, Norvika`,
+      html: `
       <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 24px; background: #f8f9fa; border-radius: 8px;">
         <h2 style="color: #19243a; margin-bottom: 24px;">Nouveau message via norvika.ca</h2>
         <table style="width: 100%; border-collapse: collapse;">
@@ -77,11 +83,12 @@ export async function POST(req: Request) {
         </p>
       </div>
     `,
+    }),
   });
 
-  if (emailError) {
-    // Message saved to DB even if email fails — log but don't fail the request
-    console.error("Resend error:", emailError);
+  if (!emailRes.ok) {
+    // Message saved to DB even if email fails, log but don't fail the request
+    console.error("Resend error:", await emailRes.text());
   }
 
   return NextResponse.json({ ok: true });

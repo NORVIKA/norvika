@@ -3,7 +3,7 @@ import { createClient } from "@supabase/supabase-js";
 import { createSupabaseServerClient } from "@/lib/supabase-server";
 import { defaultImages } from "@/lib/content";
 
-export const runtime = "nodejs";
+export const runtime = "edge";
 export const dynamic = "force-dynamic";
 
 const ALLOWED = ["image/png", "image/jpeg", "image/webp", "image/svg+xml"];
@@ -51,11 +51,11 @@ export async function POST(req: Request) {
 
   const ext = EXT[file.type];
   const path = `${key}-${Date.now()}.${ext}`;
-  const buffer = Buffer.from(await file.arrayBuffer());
+  const bytes = new Uint8Array(await file.arrayBuffer());
 
   const { error: upErr } = await service.storage
     .from("site-images")
-    .upload(path, buffer, { contentType: file.type, upsert: true });
+    .upload(path, bytes, { contentType: file.type, upsert: true });
 
   if (upErr) {
     return NextResponse.json({ error: upErr.message }, { status: 500 });

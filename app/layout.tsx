@@ -43,9 +43,13 @@ export const metadata: Metadata = {
     index: true,
     follow: true,
   },
+  icons: {
+    icon: "/icon.svg",
+  },
 };
 
 export const dynamic = "force-dynamic";
+export const runtime = "edge";
 
 export default async function RootLayout({
   children,

@@ -1,0 +1,246 @@
+{
+  "_schema_version": 2,
+  "_doc": "Carnet de bord du projet (source de vérité). Mis à jour à CHAQUE changement de phase. Statuts phase: a_faire|en_cours|fait|bloque. gate_statut: en_attente|approuve. Le dashboard (l'île) lit ces .builder/*/tracker.json. Schéma pensé pour migrer vers Supabase (tables projets, phases, blocages, apprentissages).",
+  "id": "norvika",
+  "nom_commerce": "Norvika",
+  "type": "vitrine",
+  "langues": [
+    "FR"
+  ],
+  "client": {
+    "nom": "",
+    "courriel": "",
+    "domaine": ""
+  },
+  "statut": "a_confirmer",
+  "phase_active": "1",
+  "liens": {
+    "maquette_lovable": "",
+    "url_prod": "",
+    "url_studio": "",
+    "github": ""
+  },
+  "dates": {
+    "cree_le": "",
+    "livre_le": ""
+  },
+  "paiement": {
+    "montant": null,
+    "depot_recu": false,
+    "solde_recu": false
+  },
+  "phases": [
+    {
+      "id": "1",
+      "nom": "Lecture (maquette Lovable)",
+      "agents": [
+        "Scout",
+        "SEO"
+      ],
+      "skills": [
+        "SKILL_SCOUT",
+        "keyword-research"
+      ],
+      "statut": "a_faire",
+      "gate": null,
+      "gate_statut": null,
+      "debut": "",
+      "fin": "",
+      "rapport": ""
+    },
+    {
+      "id": "2",
+      "nom": "Planification",
+      "agents": [
+        "Mattew"
+      ],
+      "skills": [
+        "SKILL_DETECTOR"
+      ],
+      "statut": "a_faire",
+      "gate": "GATE 1",
+      "gate_statut": null,
+      "debut": "",
+      "fin": "",
+      "rapport": ""
+    },
+    {
+      "id": "2.5",
+      "nom": "Shopify (si boutique)",
+      "agents": [
+        "Mattew"
+      ],
+      "skills": [
+        "SKILL_SHOPIFY"
+      ],
+      "statut": "a_faire",
+      "gate": null,
+      "gate_statut": null,
+      "debut": "",
+      "fin": "",
+      "rapport": ""
+    },
+    {
+      "id": "3A",
+      "nom": "Design",
+      "agents": [
+        "Florence"
+      ],
+      "skills": [
+        "ui-ux-pro-max"
+      ],
+      "statut": "a_faire",
+      "gate": "GATE 2",
+      "gate_statut": null,
+      "debut": "",
+      "fin": "",
+      "rapport": ""
+    },
+    {
+      "id": "3B",
+      "nom": "Build",
+      "agents": [
+        "Mattew",
+        "Colette",
+        "Pixel"
+      ],
+      "skills": [
+        "SKILL_BUILDER",
+        "copywriting"
+      ],
+      "statut": "a_faire",
+      "gate": null,
+      "gate_statut": null,
+      "debut": "",
+      "fin": "",
+      "rapport": ""
+    },
+    {
+      "id": "4",
+      "nom": "Admin (Sanity)",
+      "agents": [
+        "Mattew",
+        "Colette",
+        "Pixel"
+      ],
+      "skills": [
+        "SKILL_ADMIN"
+      ],
+      "statut": "a_faire",
+      "gate": null,
+      "gate_statut": null,
+      "debut": "",
+      "fin": "",
+      "rapport": ""
+    },
+    {
+      "id": "5",
+      "nom": "Déploiement",
+      "agents": [
+        "Mattew"
+      ],
+      "skills": [
+        "SKILL_DEPLOYER"
+      ],
+      "statut": "a_faire",
+      "gate": "GATE 3",
+      "gate_statut": null,
+      "debut": "",
+      "fin": "",
+      "rapport": ""
+    },
+    {
+      "id": "5.5",
+      "nom": "Audit SEO + Sécurité",
+      "agents": [
+        "SEO",
+        "Pixel",
+        "Sentinel"
+      ],
+      "skills": [
+        "seo-audit",
+        "performance-optimization",
+        "SKILL_AUDIT"
+      ],
+      "statut": "a_faire",
+      "gate": null,
+      "gate_statut": null,
+      "debut": "",
+      "fin": "",
+      "rapport": ""
+    },
+    {
+      "id": "6",
+      "nom": "Conformité",
+      "agents": [
+        "Mattew",
+        "Martin"
+      ],
+      "skills": [
+        "SKILL_COMPLIANCE",
+        "conformite-loi25"
+      ],
+      "statut": "a_faire",
+      "gate": null,
+      "gate_statut": null,
+      "debut": "",
+      "fin": "",
+      "rapport": ""
+    },
+    {
+      "id": "sentinel",
+      "nom": "Sécurité finale",
+      "agents": [
+        "Sentinel"
+      ],
+      "skills": [
+        "SKILL_SENTINEL"
+      ],
+      "statut": "a_faire",
+      "gate": null,
+      "gate_statut": null,
+      "debut": "",
+      "fin": "",
+      "rapport": ""
+    },
+    {
+      "id": "7",
+      "nom": "Livraison",
+      "agents": [
+        "Mattew"
+      ],
+      "skills": [
+        "SKILL_LIVRAISON"
+      ],
+      "statut": "a_faire",
+      "gate": "GATE 4",
+      "gate_statut": null,
+      "debut": "",
+      "fin": "",
+      "rapport": ""
+    },
+    {
+      "id": "8",
+      "nom": "Rétro & mémoire",
+      "agents": [
+        "Jarvis"
+      ],
+      "skills": [],
+      "statut": "a_faire",
+      "gate": null,
+      "gate_statut": null,
+      "debut": "",
+      "fin": "",
+      "rapport": ""
+    }
+  ],
+  "blocages": [],
+  "apprentissages": [
+    {
+      "date": "2026-07-25",
+      "sujet": "Migration Vercel -> Cloudflare Pages (test)",
+      "note": "Site Norvika deploye et valide en TEST sur https://norvika-site-test.pages.dev (branche cloudflare-pages-test). Adaptateur @cloudflare/next-on-pages@1.13.12 (la 1.13.16 exige Next>=14.3.0, incompatible avec 14.2.5). Corrections requises pour l'edge: runtime='edge' sur layout+routes API, upload passe de nodejs a edge (Buffer -> Uint8Array), route /api/contact reecrite en fetch REST Resend (le SDK importe @react-email/render absent, casse le bundle edge), icon.svg deplace de app/ vers public/, suppression du _redirects SPA (/* -> /index.html), flag nodejs_compat + compatibility_date 2024-11-01 dans wrangler.toml. BUG next-on-pages 1.13.12: la racine '/' est mappee par erreur vers not-found.txt (page d'accueil = 'Not Found' 200) alors que '/index' fonctionne. Corrige par scripts/fix-index-route.mjs (post-build, reproductible via npm run pages:build). Domaine norvika.ca NON touche, Vercel live NON touche."
+    }
+  ],
+  "backlog_post_lancement": []
+}
