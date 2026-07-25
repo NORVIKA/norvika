@@ -8,11 +8,11 @@ import { FinalCTA } from "@/components/ui/FinalCTA";
 import { HeroSection } from "@/components/site/HeroSection";
 
 export const metadata: Metadata = {
-  title: "Norvika — Présence numérique pour entreprises du Québec",
+  title: "Norvika : présence numérique pour entreprises du Québec",
   description:
     "On trouve ce qui vous freine, de votre site à vos tâches répétitives, puis on le règle avec vous.",
   openGraph: {
-    title: "Norvika — Présence numérique pour entreprises du Québec",
+    title: "Norvika : présence numérique pour entreprises du Québec",
     description:
       "On trouve ce qui vous freine, de votre site à vos tâches répétitives, puis on le règle avec vous.",
     url: "/",
@@ -20,7 +20,7 @@ export const metadata: Metadata = {
   alternates: { canonical: "https://norvika.ca" },
 };
 
-export const dynamic = "force-dynamic";
+export const revalidate = 3600;
 
 const PILLARS = [
   {

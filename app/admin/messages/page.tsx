@@ -2,6 +2,7 @@ import { createSupabaseServerClient } from "@/lib/supabase-server";
 import { MarkReadButton } from "./MarkReadButton";
 
 export const dynamic = "force-dynamic";
+export const runtime = "edge";
 
 export default async function MessagesPage() {
   const supabase = createSupabaseServerClient();

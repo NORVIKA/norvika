@@ -18,7 +18,7 @@ export const metadata: Metadata = {
   alternates: { canonical: "https://norvika.ca/automatisation" },
 };
 
-export const dynamic = "force-dynamic";
+export const revalidate = 3600;
 
 const STEPS = [
   { n: "01", title: "On regarde votre semaine.", body: "On trouve ce qui se répète chez vous, spécifiquement." },

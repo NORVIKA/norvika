@@ -31,8 +31,11 @@ if (src.includes(GOOD)) {
 }
 
 if (!src.includes(BAD)) {
-  console.error("[fix-index-route] Motif attendu introuvable. Le bug est peut-etre corrige en amont ou le format a change. Verifier manuellement le mapping \"/\" dans le worker.");
-  process.exit(1);
+  // Cas normal quand la racine est rendue en STATIQUE (ISR) : "/" est un asset
+  // prerendere (index.html), le bug d'override vers not-found.txt n'existe pas.
+  // On ne fait rien et on ne casse pas le pipeline.
+  console.log("[fix-index-route] Rien a corriger (racine statique/ISR ou deja OK).");
+  process.exit(0);
 }
 
 src = src.replace(BAD, GOOD);

@@ -1,11 +1,33 @@
 import "server-only";
-import { createSupabaseServerClient } from "./supabase-server";
+import { createClient } from "@supabase/supabase-js";
 import { defaultContent, defaultSiteInfo, defaultColors, defaultImages } from "./content";
+
+// Duree de revalidation (ISR). Les pages publiques sont prerenderees et servies
+// en cache a l'edge Cloudflare (cf-cache-status: HIT), ce qui evite de reveiller
+// le Worker a chaque requete (anti-1102). Le contenu se rafraichit au redeploiement.
+const REVALIDATE = 3600;
+
+// Client de LECTURE publique : anon key, SANS cookies (pas de next/headers), pour
+// que les pages qui l'utilisent restent prerenderables. Les requetes .select()
+// (GET) passent par le fetch de Next avec revalidation, donc cacheables.
+const supabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+  {
+    auth: { persistSession: false },
+    global: {
+      fetch: (input: RequestInfo | URL, init: RequestInit = {}) => {
+        // Retirer un eventuel `cache: 'no-store'` pose par supabase-js, puis
+        // rendre la requete cacheable via l'ISR de Next.
+        const { cache: _cache, ...rest } = init;
+        return fetch(input, { ...rest, next: { revalidate: REVALIDATE } });
+      },
+    },
+  }
+);
 
 export async function getSiteData() {
   try {
-    const supabase = createSupabaseServerClient();
-
     const [contentRes, infoRes, colorsRes] = await Promise.all([
       supabase.from("site_content").select("key, value"),
       supabase.from("site_info").select("key, value"),

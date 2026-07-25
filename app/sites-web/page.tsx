@@ -20,7 +20,7 @@ export const metadata: Metadata = {
   alternates: { canonical: "https://norvika.ca/sites-web" },
 };
 
-export const dynamic = "force-dynamic";
+export const revalidate = 3600;
 
 const STEPS = [
   { n: "01", title: "Un court appel.", body: "On comprend votre commerce et ce que vous voulez." },

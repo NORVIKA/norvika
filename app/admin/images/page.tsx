@@ -3,6 +3,7 @@ import { defaultImages, IMAGE_FIELDS } from "@/lib/content";
 import { ImagesEditor } from "./ImagesEditor";
 
 export const dynamic = "force-dynamic";
+export const runtime = "edge";
 
 export default async function ImagesPage() {
   const supabase = createSupabaseServerClient();

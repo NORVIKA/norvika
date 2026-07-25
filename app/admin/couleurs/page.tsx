@@ -3,6 +3,7 @@ import { defaultColors } from "@/lib/content";
 import { CouleursEditor } from "./CouleursEditor";
 
 export const dynamic = "force-dynamic";
+export const runtime = "edge";
 
 const COLOR_LABELS: Record<string, string> = {
   primary: "Couleur principale (navy)",

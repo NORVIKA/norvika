@@ -18,7 +18,7 @@ export const metadata: Metadata = {
   alternates: { canonical: "https://norvika.ca/photo-video" },
 };
 
-export const dynamic = "force-dynamic";
+export const revalidate = 3600;
 
 const USAGES = [
   "Contenu pour vos réseaux sociaux",

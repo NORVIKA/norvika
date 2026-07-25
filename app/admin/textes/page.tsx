@@ -3,6 +3,7 @@ import { defaultContent } from "@/lib/content";
 import { TextesEditor } from "./TextesEditor";
 
 export const dynamic = "force-dynamic";
+export const runtime = "edge";
 
 export default async function TextesPage() {
   const supabase = createSupabaseServerClient();

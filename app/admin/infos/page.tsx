@@ -3,6 +3,7 @@ import { defaultSiteInfo } from "@/lib/content";
 import { InfosEditor } from "./InfosEditor";
 
 export const dynamic = "force-dynamic";
+export const runtime = "edge";
 
 export default async function InfosPage() {
   const supabase = createSupabaseServerClient();

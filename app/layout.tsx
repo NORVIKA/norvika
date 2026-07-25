@@ -19,7 +19,7 @@ const dmSans = DM_Sans({
 
 export const metadata: Metadata = {
   title: {
-    default: "Norvika — Présence numérique pour entreprises du Québec",
+    default: "Norvika : présence numérique pour entreprises du Québec",
     template: "%s | Norvika",
   },
   description:
@@ -48,8 +48,9 @@ export const metadata: Metadata = {
   },
 };
 
-export const dynamic = "force-dynamic";
-export const runtime = "edge";
+// ISR : le layout (Header/Footer + couleurs/infos Supabase) est prerendere et
+// revalide, servi en cache a l'edge. Le contenu se rafraichit au redeploiement.
+export const revalidate = 3600;
 
 export default async function RootLayout({
   children,
