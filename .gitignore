@@ -1,8 +1,26 @@
-.env
-.env.local
-.env.production
+# Dépendances
 node_modules/
+
+# Build Next.js
 .next/
-*.log
+out/
+
+# Build Cloudflare / next-on-pages
 .vercel
+.open-next/
 .wrangler/
+
+# Variables d'environnement (secrets) — ne JAMAIS committer.
+# .env.example est la seule exception (voir la ligne de ré-inclusion).
+.env
+.env.*
+.dev.vars
+!.env.example
+
+# Logs & divers
+*.log
+.DS_Store
+*.tsbuildinfo
+
+# Artefact du cerveau Norvika (contrat de frontière) — ne fait pas partie du site
+PROJET.json

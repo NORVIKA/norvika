@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { supabase } from "@/lib/supabase";
+import { scheduleRedeploy } from "@/lib/redeploy-client";
 
 const FIELDS = [
   { key: "nom", label: "Nom de l'entreprise" },
@@ -23,7 +24,7 @@ export function InfosEditor({ initialInfo }: { initialInfo: Record<string, strin
     const upserts = Object.entries(info).map(([key, value]) => ({ key, value }));
     const { error } = await supabase.from("site_info").upsert(upserts, { onConflict: "key" });
     setSaving(false);
-    if (!error) { setSuccess(true); setTimeout(() => setSuccess(false), 3000); }
+    if (!error) { setSuccess(true); scheduleRedeploy(); setTimeout(() => setSuccess(false), 5000); }
   }
 
   return (
@@ -49,7 +50,7 @@ export function InfosEditor({ initialInfo }: { initialInfo: Record<string, strin
         >
           {saving ? "Sauvegarde…" : "Sauvegarder"}
         </button>
-        {success && <p className="text-sm font-medium text-green-600">✓ Sauvegardé</p>}
+        {success && <p className="text-sm font-medium text-green-600">✓ Sauvegardé. Publication en ligne dans ~2 min.</p>}
       </div>
     </div>
   );

@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { scheduleRedeploy } from "@/lib/redeploy-client";
 
 interface Field {
   key: string;
@@ -35,6 +36,7 @@ export function ImagesEditor({ fields }: { fields: Field[] }) {
       setUrls((u) => ({ ...u, [key]: json.url }));
       setDone(key);
       router.refresh();
+      scheduleRedeploy();
       setTimeout(() => setDone(null), 3000);
     } catch (e) {
       setError(e instanceof Error ? e.message : "Erreur inconnue");

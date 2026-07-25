@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { supabase } from "@/lib/supabase";
+import { scheduleRedeploy } from "@/lib/redeploy-client";
 
 const SECTIONS = [
   {
@@ -90,7 +91,8 @@ export function TextesEditor({ initialContent }: Props) {
     setSaving(false);
     if (!error) {
       setSuccess(true);
-      setTimeout(() => setSuccess(false), 3000);
+      scheduleRedeploy();
+      setTimeout(() => setSuccess(false), 5000);
     }
   }
 
@@ -132,7 +134,11 @@ export function TextesEditor({ initialContent }: Props) {
         >
           {saving ? "Sauvegarde en cours…" : "Sauvegarder"}
         </button>
-        {success && <p className="text-sm font-medium text-green-600">✓ Sauvegardé avec succès</p>}
+        {success && (
+          <p className="text-sm font-medium text-green-600">
+            ✓ Sauvegardé. Publication en ligne dans ~2 min.
+          </p>
+        )}
       </div>
     </div>
   );
