@@ -12,11 +12,21 @@
 
   "observability": {
     "enabled": true
-  }
+  },
 
-  // ⚠️ PAS de "routes" avec custom_domain ici pour l'instant.
-  // norvika.ca est servi par un projet Cloudflare PAGES. Attacher le domaine au
-  // Worker se fait en une étape SÉPARÉE et délibérée, après avoir vérifié le
-  // Worker sur son URL *.workers.dev. Le faire dans le même déploiement
-  // basculerait le site en production sans point de comparaison.
+  // Domaines servis par ce Worker.
+  //
+  // ⚠️ DEUX PRÉALABLES, appris à la dure le 2026-08-13 :
+  //   1. le domaine doit être RETIRÉ du projet Cloudflare Pages (un domaine
+  //      personnalisé n'est attaché qu'à une seule ressource à la fois) ;
+  //   2. son enregistrement DNS existant doit être SUPPRIMÉ. Sinon Cloudflare
+  //      refuse avec « already has externally managed DNS records » — le Worker
+  //      crée le sien. Sauter cette étape a mis www hors service une minute.
+  //
+  // Retour arrière : retirer ces routes, recréer les CNAME vers
+  // norvika-site.pages.dev (proxifiés), rattacher les domaines au projet Pages.
+  "routes": [
+    { "pattern": "norvika.ca", "custom_domain": true },
+    { "pattern": "www.norvika.ca", "custom_domain": true }
+  ]
 }
