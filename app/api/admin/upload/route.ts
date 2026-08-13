@@ -2,8 +2,6 @@ import { NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 import { createSupabaseServerClient } from "@/lib/supabase-server";
 import { defaultImages } from "@/lib/content";
-
-export const runtime = "edge";
 export const dynamic = "force-dynamic";
 
 const ALLOWED = ["image/png", "image/jpeg", "image/webp", "image/svg+xml"];
@@ -16,7 +14,7 @@ const EXT: Record<string, string> = {
 
 export async function POST(req: Request) {
   // 1. Vérifier que l'utilisateur est un admin authentifié
-  const authClient = createSupabaseServerClient();
+  const authClient = await createSupabaseServerClient();
   const {
     data: { user },
   } = await authClient.auth.getUser();

@@ -3,7 +3,6 @@ import { defaultColors } from "@/lib/content";
 import { CouleursEditor } from "./CouleursEditor";
 
 export const dynamic = "force-dynamic";
-export const runtime = "edge";
 
 const COLOR_LABELS: Record<string, string> = {
   primary: "Couleur principale (navy)",
@@ -15,7 +14,7 @@ const COLOR_LABELS: Record<string, string> = {
 };
 
 export default async function CouleursPage() {
-  const supabase = createSupabaseServerClient();
+  const supabase = await createSupabaseServerClient();
   const { data } = await supabase.from("site_colors").select("key, value");
 
   const colors = { ...defaultColors };

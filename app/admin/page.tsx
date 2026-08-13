@@ -2,10 +2,9 @@ import { createSupabaseServerClient } from "@/lib/supabase-server";
 import Link from "next/link";
 
 export const dynamic = "force-dynamic";
-export const runtime = "edge";
 
 export default async function AdminDashboard() {
-  const supabase = createSupabaseServerClient();
+  const supabase = await createSupabaseServerClient();
   const { count } = await supabase
     .from("contact_messages")
     .select("*", { count: "exact", head: true })

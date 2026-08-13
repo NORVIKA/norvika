@@ -1,10 +1,9 @@
 import { createSupabaseServerClient } from "@/lib/supabase-server";
 
 export const dynamic = "force-dynamic";
-export const runtime = "edge";
 
 export default async function LeadsPage() {
-  const supabase = createSupabaseServerClient();
+  const supabase = await createSupabaseServerClient();
   const { data: leads } = await supabase
     .from("client_leads")
     .select("*")

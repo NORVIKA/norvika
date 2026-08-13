@@ -3,10 +3,9 @@ import { defaultImages, IMAGE_FIELDS } from "@/lib/content";
 import { ImagesEditor } from "./ImagesEditor";
 
 export const dynamic = "force-dynamic";
-export const runtime = "edge";
 
 export default async function ImagesPage() {
-  const supabase = createSupabaseServerClient();
+  const supabase = await createSupabaseServerClient();
   const { data } = await supabase.from("site_content").select("key, value").like("key", "img_%");
 
   const images = { ...defaultImages };

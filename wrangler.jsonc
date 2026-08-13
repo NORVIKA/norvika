@@ -1,0 +1,22 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "norvika",
+  "main": ".open-next/worker.js",
+  "compatibility_date": "2025-03-01",
+  "compatibility_flags": ["nodejs_compat", "global_fetch_strictly_public"],
+
+  "assets": {
+    "directory": ".open-next/assets",
+    "binding": "ASSETS"
+  },
+
+  "observability": {
+    "enabled": true
+  }
+
+  // ⚠️ PAS de "routes" avec custom_domain ici pour l'instant.
+  // norvika.ca est servi par un projet Cloudflare PAGES. Attacher le domaine au
+  // Worker se fait en une étape SÉPARÉE et délibérée, après avoir vérifié le
+  // Worker sur son URL *.workers.dev. Le faire dans le même déploiement
+  // basculerait le site en production sans point de comparaison.
+}

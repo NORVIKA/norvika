@@ -1,9 +1,8 @@
-import { setupDevPlatform } from "@cloudflare/next-on-pages/next-dev";
-
-// Bindings Cloudflare disponibles en dev (next dev) via next-on-pages
-if (process.env.NODE_ENV === "development") {
-  await setupDevPlatform();
-}
+// Bindings Cloudflare disponibles en `next dev`, via OpenNext.
+// Remplace setupDevPlatform de @cloudflare/next-on-pages, qui est ABANDONNÉ
+// (npm : « Please use the OpenNext adapter instead »).
+import { initOpenNextCloudflareForDev } from "@opennextjs/cloudflare";
+initOpenNextCloudflareForDev();
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
@@ -17,7 +16,7 @@ const nextConfig = {
       { protocol: "https", hostname: "www.vergerfrancoislegault.ca" },
     ],
   },
-  // En-têtes de sécurité — appliqués par Vercel (netlify.toml est ignoré sur Vercel)
+  // En-têtes de sécurité, appliqués par le Worker Cloudflare.
   async headers() {
     return [
       {

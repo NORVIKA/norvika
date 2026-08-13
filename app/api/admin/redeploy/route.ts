@@ -1,7 +1,5 @@
 import { NextResponse } from "next/server";
 import { createSupabaseServerClient } from "@/lib/supabase-server";
-
-export const runtime = "edge";
 export const dynamic = "force-dynamic";
 
 // Déclenche un redéploiement Cloudflare Pages via le Deploy Hook.
@@ -13,7 +11,7 @@ export const dynamic = "force-dynamic";
 export async function POST() {
   // 1. Ne déclencher un build QUE pour un admin authentifié (mêmes règles que
   //    /api/admin/upload). Empêche un tiers de forcer des rebuilds (coût / abus).
-  const authClient = createSupabaseServerClient();
+  const authClient = await createSupabaseServerClient();
   const {
     data: { user },
   } = await authClient.auth.getUser();

@@ -2,8 +2,6 @@ import { NextResponse } from "next/server";
 import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
 
-export const runtime = "edge";
-
 const TO_EMAIL = "info@norvika.ca";
 
 export async function POST(req: Request) {
@@ -24,7 +22,9 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "Courriel invalide." }, { status: 400 });
   }
 
-  const cookieStore = cookies();
+  // Next 16 : cookies() est asynchrone. En 15 la version synchrone marchait
+  // encore par compatibilité temporaire, elle a été retirée en 16.
+  const cookieStore = await cookies();
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,

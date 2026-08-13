@@ -3,10 +3,9 @@ import { defaultSiteInfo } from "@/lib/content";
 import { InfosEditor } from "./InfosEditor";
 
 export const dynamic = "force-dynamic";
-export const runtime = "edge";
 
 export default async function InfosPage() {
-  const supabase = createSupabaseServerClient();
+  const supabase = await createSupabaseServerClient();
   const { data } = await supabase.from("site_info").select("key, value");
 
   const siteInfo = { ...defaultSiteInfo };
