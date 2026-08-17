@@ -4,7 +4,7 @@ import { Reveal } from "@/components/ui/Reveal";
 import { LeadForm } from "./LeadForm";
 
 export const metadata: Metadata = {
-  title: "Bienvenue — Espace client Norvika",
+  title: "Bienvenue : espace client Norvika",
   description:
     "Guide d'accueil pour les nouveaux clients de sites web Norvika. Étapes simples, expliquées sans jargon.",
   robots: { index: false, follow: false },

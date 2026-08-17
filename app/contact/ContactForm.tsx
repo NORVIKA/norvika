@@ -33,7 +33,10 @@ export function ContactForm({ email }: { email: string }) {
     setEnvoi(false);
 
     if (!res.ok) {
-      setErreur(`Une erreur est survenue. Réessayez ou écrivez-nous à ${email}.`);
+      // Le serveur explique lui-même le refus (champ invalide, ou trop de
+      // soumissions dans la dernière heure). On l'affiche tel quel.
+      const data = (await res.json().catch(() => null)) as { error?: string } | null;
+      setErreur(data?.error ?? `Une erreur est survenue. Réessayez ou écrivez-nous à ${email}.`);
       return;
     }
 

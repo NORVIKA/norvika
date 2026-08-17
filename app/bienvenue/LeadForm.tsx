@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, type FormEvent } from "react";
-import { supabase } from "@/lib/supabase";
 
 export function LeadForm() {
   const [prenom, setPrenom] = useState("");
@@ -25,15 +24,33 @@ export function LeadForm() {
     }
 
     setEnvoi(true);
-    const { error } = await supabase.from("client_leads").insert({
-      prenom: prenom.trim(),
-      courriel: courriel.trim(),
-      telephone: telephone.trim(),
-    });
+    // Passe par une route serveur (validation + limitation de débit) plutôt
+    // que d'insérer directement dans Supabase depuis le navigateur.
+    let messageErreur: string | null = null;
+    try {
+      const res = await fetch("/api/lead", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          prenom: prenom.trim(),
+          courriel: courriel.trim(),
+          telephone: telephone.trim(),
+        }),
+      });
+      if (!res.ok) {
+        const data = (await res.json().catch(() => null)) as { error?: string } | null;
+        messageErreur =
+          data?.error ??
+          "Une erreur est survenue. Veuillez réessayer ou nous écrire à info@norvika.ca.";
+      }
+    } catch {
+      messageErreur =
+        "Une erreur est survenue. Veuillez réessayer ou nous écrire à info@norvika.ca.";
+    }
     setEnvoi(false);
 
-    if (error) {
-      setErreur("Une erreur est survenue. Veuillez réessayer ou nous écrire à info@norvika.ca.");
+    if (messageErreur) {
+      setErreur(messageErreur);
       return;
     }
 

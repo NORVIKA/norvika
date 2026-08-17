@@ -77,6 +77,10 @@ export default async function RootLayout({
         {/* COOKIEYES INSERT HERE */}
         {/* GA4 INSERT HERE */}
         {/* GSC VERIFICATION INSERT HERE */}
+        {/* Sans JS, l'observateur ne pose jamais .visible et le contenu resterait invisible. */}
+        <noscript>
+          <style>{`.reveal{opacity:1 !important;animation:none !important}`}</style>
+        </noscript>
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{

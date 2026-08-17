@@ -62,8 +62,6 @@ export function Footer({ email, logoSrc, description }: FooterProps) {
             <Link href="/politique-de-confidentialite" className="hover:text-[var(--foreground)] hover:underline">
               Politique de confidentialité
             </Link>
-            <span className="opacity-40">·</span>
-            <span>Site créé par Studio W</span>
           </div>
         </div>
       </div>
