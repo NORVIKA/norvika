@@ -16,6 +16,17 @@ const nextConfig = {
       { protocol: "https", hostname: "www.vergerfrancoislegault.ca" },
     ],
   },
+
+  // Refonte du 2026-08-21 : l'ancienne URL gardait du referencement, elle part
+  // en 301 pour que le « jus SEO » suive la nouvelle page.
+  async redirects() {
+    return [
+      // statusCode 301 explicite : `permanent: true` renvoie un 308, que Google
+      // traite pareil, mais que de vieux robots et annuaires ne suivent pas.
+      { source: "/photo-video", destination: "/photo-et-video", statusCode: 301 },
+    ];
+  },
+
   // En-têtes de sécurité, appliqués par le Worker Cloudflare.
   async headers() {
     return [

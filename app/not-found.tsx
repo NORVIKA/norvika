@@ -1,21 +1,80 @@
 import Link from "next/link";
+import { SiteShell } from "@/components/site/SiteShell";
 
 export default function NotFound() {
   return (
-    <div className="flex min-h-[60vh] flex-col items-center justify-center px-6 text-center">
-      <p className="text-xs font-medium uppercase tracking-[0.2em] text-[var(--brand)]">404</p>
-      <h1 className="mt-4 text-3xl font-semibold tracking-tight text-[var(--foreground)] md:text-5xl">
-        Page introuvable.
-      </h1>
-      <p className="mt-6 max-w-md text-base leading-relaxed text-[var(--muted-foreground)]">
-        La page que vous cherchez n&apos;existe pas ou a été déplacée.
-      </p>
-      <Link
-        href="/"
-        className="mt-10 inline-flex items-center justify-center rounded-full bg-[var(--primary)] px-7 py-4 text-sm font-bold text-white transition-all duration-300 hover:-translate-y-0.5 hover:shadow-lg"
+    <SiteShell>
+      <div
+        className="nv-shell"
+        style={{
+          maxWidth: 720,
+          margin: "0 auto",
+          padding: "120px 32px",
+          textAlign: "center",
+        }}
       >
-        Retour à l&apos;accueil
-      </Link>
-    </div>
+        <p
+          style={{
+            margin: 0,
+            fontSize: 11.5,
+            letterSpacing: ".2em",
+            textTransform: "uppercase",
+            color: "rgba(12,25,47,.45)",
+          }}
+        >
+          Erreur 404
+        </p>
+        <h1
+          style={{
+            margin: "18px 0 0",
+            fontSize: "clamp(28px,3.4vw,42px)",
+            lineHeight: 1.1,
+          }}
+        >
+          Cette page n&apos;existe pas.
+        </h1>
+        <p
+          style={{
+            margin: "20px auto 0",
+            maxWidth: "48ch",
+            fontSize: 16.5,
+            lineHeight: 1.7,
+            color: "rgba(12,25,47,.6)",
+          }}
+        >
+          Elle a peut-être été déplacée ou renommée. Reprenez à l&apos;accueil,
+          ou regardez ce qu&apos;on fait pour d&apos;autres entreprises d&apos;ici.
+        </p>
+        <div
+          style={{
+            marginTop: 32,
+            display: "flex",
+            gap: 12,
+            justifyContent: "center",
+            flexWrap: "wrap",
+          }}
+        >
+          <Link
+            href="/"
+            className="nv-btn-primary"
+            style={{ padding: "15px 26px", borderRadius: 10, fontWeight: 600 }}
+          >
+            Retour à l&apos;accueil
+          </Link>
+          <Link
+            href="/realisations"
+            className="nv-cta-outline"
+            style={{
+              padding: "15px 26px",
+              borderRadius: 10,
+              fontWeight: 600,
+              border: "1px solid rgba(12,25,47,.14)",
+            }}
+          >
+            Voir nos réalisations
+          </Link>
+        </div>
+      </div>
+    </SiteShell>
   );
 }

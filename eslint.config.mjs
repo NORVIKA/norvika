@@ -9,4 +9,16 @@ import coreWebVitals from "eslint-config-next/core-web-vitals";
 export default [
   ...(Array.isArray(coreWebVitals) ? coreWebVitals : [coreWebVitals]),
   { ignores: [".next/**", ".open-next/**", "node_modules/**"] },
+  {
+    rules: {
+      // Les pages viennent de la maquette et sont ecrites en francais : les
+      // apostrophes y sont partout. React les rend correctement, la regle ne
+      // protege de rien ici et rendrait le texte illisible dans le source.
+      "react/no-unescaped-entities": "off",
+      // Le design pose ses propres dimensions en style en ligne sur chaque
+      // image. next/image reprendrait la main sur le layout et ferait deriver
+      // la maquette ; les assets sont deja redimensionnes et en WebP.
+      "@next/next/no-img-element": "off",
+    },
+  },
 ];

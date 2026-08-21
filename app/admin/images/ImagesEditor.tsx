@@ -55,7 +55,6 @@ export function ImagesEditor({ fields }: { fields: Field[] }) {
           <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
             {/* Aperçu */}
             <div className="flex h-24 w-32 shrink-0 items-center justify-center overflow-hidden rounded-lg border border-[var(--hairline)] bg-[var(--cream)]">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src={urls[f.key]}
                 alt={f.label}
