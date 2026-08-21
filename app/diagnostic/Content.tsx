@@ -635,7 +635,7 @@ function Page() {
 
       <footer className="nv-shell" style={{ padding: "56px 32px 40px", borderTop: "1px solid rgba(12,25,47,.08)" }}>
         <div className="nv-shell" style={{ maxWidth: 1240, margin: "0 auto", display: "flex", alignItems: "flex-end", justifyContent: "space-between", gap: 32 }}>
-          <img src={logoStack.url} alt="Norvika" style={{ height: 78, width: "auto", display: "block" }} />
+          <img loading="lazy" decoding="async" src={logoStack.url} alt="Norvika" style={{ height: 78, width: "auto", display: "block" }} />
           <div style={{ fontSize: 12.5, color: "rgba(12,25,47,.45)" }}>© 2026 Norvika</div>
         </div>
       </footer>

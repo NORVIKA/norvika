@@ -408,7 +408,7 @@ function Index() {
           }}
         >
           <h1
-            data-reveal
+            data-reveal="hero"
             style={{
               margin: 0,
               fontSize: "clamp(40px,5.2vw,72px)",
@@ -420,7 +420,7 @@ function Index() {
             Vos courtiers des outils numériques.
           </h1>
           <p
-            data-reveal
+            data-reveal="hero"
             style={{
               margin: "30px 0 0",
               maxWidth: "58ch",
@@ -434,7 +434,7 @@ function Index() {
             ressemble.
           </p>
           <div
-            data-reveal
+            data-reveal="hero"
             style={{
               margin: "40px 0 0",
               display: "flex",
@@ -591,7 +591,7 @@ function Index() {
             }}
           >
             <div style={{ height: 82, overflow: "hidden" }}>
-              <img
+              <img loading="lazy" decoding="async"
                 src={logoDesjardins.url}
                 alt="Desjardins"
                 style={{
@@ -610,7 +610,7 @@ function Index() {
                 borderRight: "1px solid rgba(12,25,47,.08)",
               }}
             >
-              <img
+              <img loading="lazy" decoding="async"
                 src={logoAnytime.url}
                 alt="Anytime Fitness"
                 style={{
@@ -622,7 +622,7 @@ function Index() {
               />
             </div>
             <div style={{ height: 82, overflow: "hidden" }}>
-              <img
+              <img loading="lazy" decoding="async"
                 src={logoSupergolf.url}
                 alt="Super Golf"
                 style={{
@@ -885,7 +885,7 @@ function Index() {
               border: "1px solid rgba(245,243,238,.12)",
             }}
           >
-            <img
+            <img loading="lazy" decoding="async"
               src={lauEtWill.url}
               alt="Laurianne et William, cofondateurs de Norvika"
               style={{

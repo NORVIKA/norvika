@@ -3,9 +3,11 @@ import { Sora, DM_Sans } from "next/font/google";
 import "./globals.css";
 import { getSiteData } from "@/lib/get-site-data";
 
+// Le design n'utilise Sora qu'en 600 (titres) et DM Sans qu'en 400/500/600.
+// Charger les autres graisses, c'est du poids de police pour rien.
 const sora = Sora({
   subsets: ["latin"],
-  weight: ["400", "600", "700"],
+  weight: ["600", "700"],
   variable: "--font-sora",
   display: "swap",
 });

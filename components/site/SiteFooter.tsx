@@ -99,7 +99,7 @@ export function SiteFooter() {
           }}
         >
           <div>
-            <img
+            <img loading="lazy" decoding="async"
               src={logoStack.url}
               alt="Norvika"
               style={{ height: 78, width: "auto", display: "block" }}
@@ -110,7 +110,7 @@ export function SiteFooter() {
                 maxWidth: "38ch",
                 fontSize: 14.5,
                 lineHeight: 1.6,
-                color: "rgba(12,25,47,.55)",
+                color: "rgba(12,25,47,.62)",
               }}
             >
               Présence numérique pour les entreprises et les travailleurs
@@ -124,7 +124,7 @@ export function SiteFooter() {
                 fontSize: 11.5,
                 letterSpacing: ".2em",
                 textTransform: "uppercase",
-                color: "rgba(12,25,47,.45)",
+                color: "rgba(12,25,47,.62)",
               }}
             >
               Services
@@ -153,7 +153,7 @@ export function SiteFooter() {
                 fontSize: 11.5,
                 letterSpacing: ".2em",
                 textTransform: "uppercase",
-                color: "rgba(12,25,47,.45)",
+                color: "rgba(12,25,47,.62)",
               }}
             >
               Contact
@@ -168,10 +168,10 @@ export function SiteFooter() {
               }}
             >
               <a href="mailto:info@norvika.ca">info@norvika.ca</a>
-              <Link href="/contact" style={{ color: "rgba(12,25,47,.55)" }}>
+              <Link href="/contact" style={{ color: "rgba(12,25,47,.62)" }}>
                 Nous écrire
               </Link>
-              <Link href="/diagnostic" style={{ color: "rgba(12,25,47,.55)" }}>
+              <Link href="/diagnostic" style={{ color: "rgba(12,25,47,.62)" }}>
                 Diagnostic gratuit
               </Link>
             </div>
@@ -184,7 +184,7 @@ export function SiteFooter() {
             paddingTop: 22,
             borderTop: "1px solid rgba(12,25,47,.08)",
             fontSize: 12.5,
-            color: "rgba(12,25,47,.45)",
+            color: "rgba(12,25,47,.62)",
           }}
         >
           <div
@@ -199,7 +199,7 @@ export function SiteFooter() {
             <span>© 2026 Norvika</span>
             <Link
               href="/politique-de-confidentialite"
-              style={{ color: "rgba(12,25,47,.45)" }}
+              style={{ color: "rgba(12,25,47,.62)" }}
             >
               Politique de confidentialité
             </Link>

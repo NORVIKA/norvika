@@ -84,7 +84,7 @@ export default function Page({ slug }: { slug: string }) {
                 boxShadow: "0 24px 60px -46px rgba(12,25,47,.85)",
               }}
             >
-              <img
+              <img loading="lazy" decoding="async"
                 src={client.logo}
                 alt={client.name}
                 style={{
