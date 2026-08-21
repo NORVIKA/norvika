@@ -12,17 +12,17 @@
     "courriel": "",
     "domaine": ""
   },
-  "statut": "a_confirmer",
-  "phase_active": "1",
+  "statut": "en_ligne",
+  "phase_active": "8",
   "liens": {
-    "maquette_lovable": "",
-    "url_prod": "",
+    "maquette_lovable": "https://norvika.lovable.app",
+    "url_prod": "https://norvika.ca",
     "url_studio": "",
-    "github": ""
+    "github": "https://github.com/NORVIKA/norvika (branche next16-migration)"
   },
   "dates": {
     "cree_le": "",
-    "livre_le": ""
+    "livre_le": "2026-08-21"
   },
   "paiement": {
     "montant": null,
@@ -41,12 +41,13 @@
         "SKILL_SCOUT",
         "keyword-research"
       ],
-      "statut": "a_faire",
+      "statut": "fait",
       "gate": null,
       "gate_statut": null,
       "debut": "",
       "fin": "",
-      "rapport": ""
+      "rapport": "Maquette Lovable du 2026-08-20 recuperee au Drive (Norvika.zip + logo.zip)",
+      "date": "2026-08-21"
     },
     {
       "id": "2",
@@ -57,12 +58,13 @@
       "skills": [
         "SKILL_DETECTOR"
       ],
-      "statut": "a_faire",
+      "statut": "fait",
       "gate": "GATE 1",
       "gate_statut": null,
       "debut": "",
       "fin": "",
-      "rapport": ""
+      "rapport": "Structure de la maquette conservee telle quelle, 9 pages + fiches realisations",
+      "date": "2026-08-21"
     },
     {
       "id": "2.5",
@@ -73,12 +75,12 @@
       "skills": [
         "SKILL_SHOPIFY"
       ],
-      "statut": "a_faire",
+      "statut": "sans_objet",
       "gate": null,
       "gate_statut": null,
       "debut": "",
       "fin": "",
-      "rapport": ""
+      "rapport": "Site interne Norvika : pas de boutique, pas de Sanity, pas de livraison client."
     },
     {
       "id": "3A",
@@ -89,12 +91,13 @@
       "skills": [
         "ui-ux-pro-max"
       ],
-      "statut": "a_faire",
+      "statut": "fait",
       "gate": "GATE 2",
       "gate_statut": null,
       "debut": "",
       "fin": "",
-      "rapport": ""
+      "rapport": "Design fourni par la maquette, aucune reinterpretation",
+      "date": "2026-08-21"
     },
     {
       "id": "3B",
@@ -108,12 +111,13 @@
         "SKILL_BUILDER",
         "copywriting"
       ],
-      "statut": "a_faire",
+      "statut": "fait",
       "gate": null,
       "gate_statut": null,
       "debut": "",
       "fin": "",
-      "rapport": ""
+      "rapport": "Portage TanStack Start -> Next 16, images redimensionnees et converties en WebP",
+      "date": "2026-08-21"
     },
     {
       "id": "4",
@@ -126,12 +130,12 @@
       "skills": [
         "SKILL_ADMIN"
       ],
-      "statut": "a_faire",
+      "statut": "sans_objet",
       "gate": null,
       "gate_statut": null,
       "debut": "",
       "fin": "",
-      "rapport": ""
+      "rapport": "Site interne Norvika : pas de boutique, pas de Sanity, pas de livraison client."
     },
     {
       "id": "5",
@@ -142,12 +146,13 @@
       "skills": [
         "SKILL_DEPLOYER"
       ],
-      "statut": "a_faire",
+      "statut": "fait",
       "gate": "GATE 3",
       "gate_statut": null,
       "debut": "",
       "fin": "",
-      "rapport": ""
+      "rapport": "Deploiement Cloudflare Workers, norvika.ca et www",
+      "date": "2026-08-21"
     },
     {
       "id": "5.5",
@@ -162,12 +167,13 @@
         "performance-optimization",
         "SKILL_AUDIT"
       ],
-      "statut": "a_faire",
+      "statut": "fait",
       "gate": null,
       "gate_statut": null,
       "debut": "",
       "fin": "",
-      "rapport": ""
+      "rapport": "Lighthouse prod : mobile 94 / ordinateur 100, a11y 100, 0 lien mort sur 48",
+      "date": "2026-08-21"
     },
     {
       "id": "6",
@@ -180,12 +186,13 @@
         "SKILL_COMPLIANCE",
         "conformite-loi25"
       ],
-      "statut": "a_faire",
+      "statut": "fait",
       "gate": null,
       "gate_statut": null,
       "debut": "",
       "fin": "",
-      "rapport": ""
+      "rapport": "Loi 25 cas 1 passe (aucun traceur), politique liee au pied de page de toutes les pages",
+      "date": "2026-08-21"
     },
     {
       "id": "sentinel",
@@ -196,12 +203,12 @@
       "skills": [
         "SKILL_SENTINEL"
       ],
-      "statut": "a_faire",
+      "statut": "sans_objet",
       "gate": null,
       "gate_statut": null,
       "debut": "",
       "fin": "",
-      "rapport": ""
+      "rapport": "Site interne Norvika : pas de boutique, pas de Sanity, pas de livraison client."
     },
     {
       "id": "7",
@@ -212,12 +219,12 @@
       "skills": [
         "SKILL_LIVRAISON"
       ],
-      "statut": "a_faire",
+      "statut": "sans_objet",
       "gate": "GATE 4",
       "gate_statut": null,
       "debut": "",
       "fin": "",
-      "rapport": ""
+      "rapport": "Site interne Norvika : pas de boutique, pas de Sanity, pas de livraison client."
     },
     {
       "id": "8",
@@ -240,7 +247,36 @@
       "date": "2026-07-25",
       "sujet": "Migration Vercel -> Cloudflare Pages (test)",
       "note": "Site Norvika deploye et valide en TEST sur https://norvika-site-test.pages.dev (branche cloudflare-pages-test). Adaptateur @cloudflare/next-on-pages@1.13.12 (la 1.13.16 exige Next>=14.3.0, incompatible avec 14.2.5). Corrections requises pour l'edge: runtime='edge' sur layout+routes API, upload passe de nodejs a edge (Buffer -> Uint8Array), route /api/contact reecrite en fetch REST Resend (le SDK importe @react-email/render absent, casse le bundle edge), icon.svg deplace de app/ vers public/, suppression du _redirects SPA (/* -> /index.html), flag nodejs_compat + compatibility_date 2024-11-01 dans wrangler.toml. BUG next-on-pages 1.13.12: la racine '/' est mappee par erreur vers not-found.txt (page d'accueil = 'Not Found' 200) alors que '/index' fonctionne. Corrige par scripts/fix-index-route.mjs (post-build, reproductible via npm run pages:build). Domaine norvika.ca NON touche, Vercel live NON touche."
+    },
+    {
+      "date": "2026-08-21",
+      "quoi": "Une maquette Lovable en TanStack Start se porte vers Next en une passe presque mecanique quand les pages sont ecrites en styles en ligne : le cout est dans les images (references JSON vers le CDN de Lovable) et dans l'animation d'apparition qui bloque le LCP."
     }
   ],
-  "backlog_post_lancement": []
+  "backlog_post_lancement": [
+    {
+      "titre": "Cloudflare bloque les robots d'IA sur norvika.ca",
+      "detail": "Le robots.txt servi contient un bloc « Cloudflare Managed content » qui interdit GPTBot, ClaudeBot, Google-Extended, CCBot, meta-externalagent, Applebot-Extended, Bytespider et Amazonbot. Concretement, les assistants IA ne peuvent pas citer Norvika. C'est un reglage du tableau de bord Cloudflare (AI Crawl Control), pas du depot, et c'est une decision d'affaires : a trancher par William.",
+      "qui": "will",
+      "prio": "haute"
+    },
+    {
+      "titre": "Le /admin ne pilote plus le contenu des pages",
+      "detail": "Les editeurs /admin/textes, /admin/couleurs et /admin/images alimentaient l'ancien design. Le nouveau site vient de la maquette et a son contenu dans le code. /admin/leads, /admin/messages et les routes API restent fonctionnels. A trancher : retirer les trois editeurs, ou rebrancher les nouvelles pages sur Supabase.",
+      "qui": "will",
+      "prio": "moyenne"
+    },
+    {
+      "titre": "La branche main est perimee",
+      "detail": "La production vit sur next16-migration ; main est restee en Next 14 depuis le 2026-08-12. Aligner main pour que le depot ne mente plus sur ce qui est en ligne.",
+      "qui": "will",
+      "prio": "basse"
+    },
+    {
+      "titre": "Le deploiement reste manuel",
+      "detail": "wrangler deploy ne construit rien : il faut opennextjs-cloudflare build avant, sinon on redeploie l'ancien bundle sans erreur. Piege rencontre ce jour-la. Poser une action GitHub build+deploy reglerait la question.",
+      "qui": "will",
+      "prio": "moyenne"
+    }
+  ]
 }
