@@ -6,6 +6,8 @@ initOpenNextCloudflareForDev();
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  // Ne pas annoncer le framework dans chaque reponse.
+  poweredByHeader: false,
   images: {
     remotePatterns: [
       { protocol: "https", hostname: "norvika.ca" },
@@ -34,6 +36,14 @@ const nextConfig = {
         source: "/:path*",
         headers: [
           { key: "X-Frame-Options", value: "DENY" },
+          // HSTS : une fois vu, le navigateur refuse le HTTP en clair sur ce
+          // domaine. Volontairement SANS `includeSubDomains` ni `preload` :
+          // les deux s'appliqueraient a tous les sous-domaines et le preload
+          // se defait tres difficilement.
+          {
+            key: "Strict-Transport-Security",
+            value: "max-age=31536000",
+          },
           { key: "X-Content-Type-Options", value: "nosniff" },
           { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
           {
