@@ -1,0 +1,68 @@
+# Construit et deploie norvika.ca a chaque envoi sur la branche de production.
+#
+# ⚠️ POURQUOI CETTE ACTION EXISTE
+# `wrangler deploy` NE CONSTRUIT RIEN : il envoie le contenu de .open-next/ tel
+# quel. Deployer sans avoir rebati, c'est remettre en ligne l'ancien paquet, sans
+# le moindre message d'erreur. Le piege est tombe le 2026-08-21 pendant la
+# refonte, sur une machine, avec une seule personne. A deux machines, il tombe
+# tout le temps. Ici la construction et le deploiement sont colles ensemble et
+# partent du depot, pas d'un dossier local qui peut avoir derive.
+#
+# Sur toute autre branche, on construit SANS deployer : une erreur se voit avant
+# d'atteindre le domaine.
+
+name: Construire et deployer
+
+on:
+  push:
+    branches: ["**"]
+  workflow_dispatch:
+
+concurrency:
+  # Deux envois rapproches ne doivent pas se deployer l'un par-dessus l'autre.
+  group: deploiement-norvika
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Installer les dependances
+        run: npm ci
+
+      - name: Verifier les types
+        run: npm run typecheck
+
+      - name: Verifier le style de code
+        run: npm run lint
+
+      # Construit le paquet OpenNext. Sans les variables Supabase, getSiteData()
+      # bascule sur ses valeurs par defaut, qui sont celles de la base : le HTML
+      # genere est le meme. Rien de secret n'est requis pour construire.
+      - name: Construire pour Cloudflare
+        run: npx opennextjs-cloudflare build
+
+      - name: Deployer
+        # Uniquement depuis la branche de production.
+        if: github.ref == 'refs/heads/next16-migration'
+        run: npx wrangler deploy
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+
+      - name: Verifier que le site repond
+        if: github.ref == 'refs/heads/next16-migration'
+        run: |
+          sleep 8
+          for chemin in "" "realisations" "equipe" "diagnostic"; do
+            code=$(curl -s -o /dev/null -w "%{http_code}" "https://norvika.ca/$chemin")
+            echo "$code /$chemin"
+            [ "$code" = "200" ] || exit 1
+          done
