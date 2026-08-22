@@ -330,3 +330,29 @@
 .cky-switch input[type="checkbox"]:checked {
   background-color: var(--navy) !important;
 }
+
+/* « Continuer la visite » : 3 colonnes, 2 sur tablette, 1 sur telephone. */
+@media (max-width: 1000px) { .nv-liens-grid { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; } }
+@media (max-width: 640px)  { .nv-liens-grid { grid-template-columns: minmax(0, 1fr) !important; } }
+
+/* Entete des pages de service : deux colonnes, empilees sur petit ecran. */
+@media (max-width: 900px) {
+  .nv-hero-service { grid-template-columns: minmax(0, 1fr) !important; gap: 26px !important; align-items: start !important; }
+}
+/* La bascule entre services defile horizontalement plutot que de se casser. */
+@media (max-width: 680px) {
+  .nv-service-switch { flex-wrap: nowrap !important; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  .nv-service-switch a { white-space: nowrap; }
+}
+
+/* ⚠️ La regle generique `section > .nv-shell { padding: 64px }` (heritee de la
+   maquette) s'applique aussi a l'entete des pages de service et creusait 128 px
+   entre le fil d'Ariane et le titre sur telephone. On la neutralise ici. */
+@media (max-width: 1024px) {
+  /* Deux classes pour passer devant `section > .nv-shell` : a `!important`
+     egal, c'est la specificite qui tranche, et une classe + un element (0,1,1)
+     battait une classe seule (0,1,0). */
+  .nv-shell.nv-hero-service { padding-top: 28px !important; padding-bottom: 24px !important; }
+  .nv-shell.nv-hero-fil { padding-top: 22px !important; padding-bottom: 0 !important; }
+  .nv-shell.nv-hero-onglets { padding-top: 0 !important; padding-bottom: 0 !important; }
+}

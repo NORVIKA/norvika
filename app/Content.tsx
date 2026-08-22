@@ -8,6 +8,7 @@ import { SiteFooter } from "@/components/site/SiteFooter";
 import { useReveal } from "@/lib/useReveal";
 import { Roadmap, type RoadStep } from "@/components/site/Roadmap";
 import { LIEN_RDV } from "@/lib/liens";
+import { AutresPages } from "@/components/site/AutresPages";
 const lauEtWill = { url: "/assets/lau-et-will-2.webp" };
 const logoDesjardins = { url: "/assets/logo-desjardins.webp" };
 const logoAnytime = { url: "/assets/logo-anytime.webp" };
@@ -33,6 +34,13 @@ const SERVICES = [
     to: "/photo-et-video" as const,
     lead: "Vos photos et vidéos ne rendent pas justice à ce que vous faites.",
     more: "On capte votre travail comme il mérite d'être vu.",
+  },
+  {
+    num: "04",
+    title: "Formation",
+    to: "/formation" as const,
+    lead: "Vos outils, vous aimeriez savoir les utiliser vous-mêmes.",
+    more: "On forme votre équipe sur place, sur vos vraies situations. Vous repartez autonomes, pas dépendants de nous.",
   },
 ];
 
@@ -453,7 +461,7 @@ function Index() {
                 lineHeight: 1.08,
               }}
             >
-              Trois points de friction, trois solutions.
+              Ce qu'on fait, et pour régler quoi.
             </h2>
             <p
               style={{
@@ -463,7 +471,8 @@ function Index() {
                 color: "rgba(12,25,47,.6)",
               }}
             >
-              On commence par le vrai problème, pas par une liste de services.
+              On part du problème, jamais du service. Cliquez sur une ligne pour
+              voir le détail, ou ouvrez la page complète.
             </p>
           </div>
 
@@ -524,16 +533,34 @@ function Index() {
                     {s.lead}
                   </p>
                   {open[i] && (
-                    <p
-                      style={{
-                        margin: "14px 0 0",
-                        fontSize: 16,
-                        lineHeight: 1.62,
-                        color: "rgba(12,25,47,.66)",
-                      }}
-                    >
-                      {s.more}
-                    </p>
+                    <>
+                      <p
+                        style={{
+                          margin: "14px 0 0",
+                          fontSize: 16,
+                          lineHeight: 1.62,
+                          color: "rgba(12,25,47,.66)",
+                        }}
+                      >
+                        {s.more}
+                      </p>
+                      {/* « En savoir plus » ne fait qu'ouvrir la ligne : sans ce
+                          lien, rien ne menait a la page du service depuis ici. */}
+                      <Link
+                        href={s.to}
+                        onClick={(e) => e.stopPropagation()}
+                        className="nv-link-fade"
+                        style={{
+                          display: "inline-block",
+                          marginTop: 14,
+                          fontSize: 14.5,
+                          fontWeight: 600,
+                          color: "#33496C",
+                        }}
+                      >
+                        Voir la page {s.title} →
+                      </Link>
+                    </>
                   )}
                 </div>
                 <span
@@ -544,7 +571,7 @@ function Index() {
                     color: "#33496C",
                   }}
                 >
-                  {open[i] ? "Réduire ↑" : "En savoir plus →"}
+                  {open[i] ? "Réduire ↑" : "Le détail ↓"}
                 </span>
               </div>
             ))}
@@ -962,6 +989,7 @@ function Index() {
         </div>
       </section>
 
+      <AutresPages courante="/" />
       <SiteFooter />
     </div>
   );

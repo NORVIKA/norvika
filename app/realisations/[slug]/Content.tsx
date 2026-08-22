@@ -7,6 +7,7 @@ import { SiteFooter } from "@/components/site/SiteFooter";
 import { useReveal } from "@/lib/useReveal";
 import { CATEGORIES, CLIENT_COVERS, getClient } from "@/lib/realisations";
 import { LIEN_RDV } from "@/lib/liens";
+import { AutresPages } from "@/components/site/AutresPages";
 
 const labelFor = (id: string) =>
   CATEGORIES.find((c) => c.id === id)?.label ?? id;
@@ -342,6 +343,7 @@ export default function Page({ slug }: { slug: string }) {
         </div>
       </section>
 
+      <AutresPages courante="/realisations" />
       <SiteFooter />
     </div>
   );

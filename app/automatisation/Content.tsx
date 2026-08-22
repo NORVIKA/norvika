@@ -7,6 +7,7 @@ import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
 import { Roadmap, type RoadStep } from "@/components/site/Roadmap";
 import { LIEN_RDV } from "@/lib/liens";
+import { AutresPages } from "@/components/site/AutresPages";
 
 const STEPS = [
   { title: "Un appel de 30 minutes", label: "Un appel de 30 minutes", desc: "On regarde ensemble comment votre entreprise fonctionne aujourd'hui. Gratuit, sans engagement, et vous repartez avec un document d'analyse." },
@@ -214,6 +215,7 @@ function Page() {
         </div>
       </section>
 
+      <AutresPages courante="/automatisation" />
       <SiteFooter />
     </div>
   );

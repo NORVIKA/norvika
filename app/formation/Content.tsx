@@ -8,6 +8,7 @@ import { SiteFooter } from "@/components/site/SiteFooter";
 import { Roadmap, type RoadStep } from "@/components/site/Roadmap";
 import { useReveal } from "@/lib/useReveal";
 import { LIEN_RDV } from "@/lib/liens";
+import { AutresPages } from "@/components/site/AutresPages";
 
 const CHECKS = [
   "Vous voulez publier des photos et des vidéos qui vous ressemblent, sans attendre un photographe à chaque fois.",
@@ -312,6 +313,7 @@ function Page() {
         </div>
       </section>
 
+      <AutresPages courante="/formation" />
       <SiteFooter />
     </div>
   );

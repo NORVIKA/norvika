@@ -7,6 +7,7 @@ import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
 import { Roadmap, type RoadStep } from "@/components/site/Roadmap";
 import { LIEN_RDV } from "@/lib/liens";
+import { AutresPages } from "@/components/site/AutresPages";
 const tournage = { url: "/assets/img-1079.webp" };
 const cardStyle: React.CSSProperties = {
   padding: "34px 30px",
@@ -481,6 +482,7 @@ function Page() {
       </section>
 
 
+      <AutresPages courante="/photo-et-video" />
       <SiteFooter />
     </div>
   );

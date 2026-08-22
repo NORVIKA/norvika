@@ -6,6 +6,7 @@ import { ClientLogoCard } from "@/components/site/ClientLogoCard";
 import { SiteFooter } from "@/components/site/SiteFooter";
 import { useReveal } from "@/lib/useReveal";
 import { CATEGORIES, CLIENTS, type CategoryId } from "@/lib/realisations";
+import { AutresPages } from "@/components/site/AutresPages";
 
 function Page() {
   useReveal();
@@ -183,6 +184,7 @@ function Page() {
         </div>
       </section>
 
+      <AutresPages courante="/realisations" />
       <SiteFooter />
     </div>
   );

@@ -3,6 +3,7 @@
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
 import { useReveal } from "@/lib/useReveal";
+import { AutresPages } from "@/components/site/AutresPages";
 const lauEtWill = { url: "/assets/lau-et-will-2.webp" };
 const lauPortrait = { url: "/assets/lau-2.webp" };
 const willPortrait = { url: "/assets/will.webp" };
@@ -235,6 +236,7 @@ function Page() {
         </div>
       </section>
 
+      <AutresPages courante="/equipe" />
       <SiteFooter />
     </div>
   );
