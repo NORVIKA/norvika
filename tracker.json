@@ -267,6 +267,10 @@
     {
       "date": "2026-08-22",
       "quoi": "Next hoiste le <script async src=gtag.js> AVANT les scripts en ligne dans le HTML rendu. Ca alarme a la lecture du source, mais ce n'est pas un defaut : gtag.js rejoue la file dataLayer, donc seul l'ordre des commandes compte (consent default avant config), pas la position des balises. Ne pas conclure sur le source : tester dans un navigateur."
+    },
+    {
+      "date": "2026-08-22",
+      "quoi": "Remplacer une section entiere par un composant fait perdre en silence ce qu'elle contenait en plus. Sur /photo-et-video, un bouton vers le portfolio vivait dans l'entete et n'existait nulle part ailleurs. C'est l'ECART DE VOLUME qui l'a revele : 150 lignes retirees contre une trentaine sur des pages de meme structure. Comparer `git diff --stat` entre pages jumelles avant de valider un remplacement en lot."
     }
   ],
   "backlog_post_lancement": [
@@ -321,6 +325,12 @@
     {
       "titre": "Le texte de la banniere parle de publicite, ce qui est faux",
       "detail": "Le texte par defaut de CookieYes dit « diffuser des publicites ou des contenus personnalises ». Norvika ne fait aucune publicite et ne depose aucun temoin publicitaire. A reecrire dans le tableau de bord CookieYes pour dire la verite : temoins necessaires et mesure d'audience, point. Les COULEURS de la banniere sont deja reglees (navy, dans le depot) : il ne reste que le texte a corriger dans leur tableau de bord.",
+      "qui": "will",
+      "prio": "moyenne"
+    },
+    {
+      "titre": "Trancher lequel fait foi pour le lien de rendez-vous",
+      "detail": "lib/liens.ts (les boutons du site) et site_info.lien_rdv dans Supabase (/contact et /admin/infos) portent la meme valeur en double. Changer l'un ne change pas l'autre.",
       "qui": "will",
       "prio": "moyenne"
     }
