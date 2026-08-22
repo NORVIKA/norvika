@@ -9,6 +9,7 @@ import { Roadmap, type RoadStep } from "@/components/site/Roadmap";
 import { useReveal } from "@/lib/useReveal";
 import { LIEN_RDV } from "@/lib/liens";
 import { AutresPages } from "@/components/site/AutresPages";
+import { HeroService } from "@/components/site/HeroService";
 
 const CHECKS = [
   "Vous voulez publier des photos et des vidéos qui vous ressemblent, sans attendre un photographe à chaque fois.",
@@ -114,27 +115,12 @@ function Page() {
     <div style={{ position: "relative", overflowX: "hidden", background: "#fff" }}>
       <SiteHeader />
 
-      <section style={{ position: "relative", overflow: "hidden", borderBottom: "1px solid rgba(12,25,47,.1)" }}>
-        <div aria-hidden="true" style={{ position: "absolute", inset: "-20% -10% auto", height: 800, pointerEvents: "none" }}>
-          <div style={{ position: "absolute", top: "6%", left: "8%", width: 620, height: 620, borderRadius: "50%", background: "radial-gradient(circle, rgba(51,73,108,.16) 0%, rgba(51,73,108,0) 68%)", filter: "blur(40px)" }} />
-          <div style={{ position: "absolute", top: "0%", left: "48%", width: 660, height: 660, borderRadius: "50%", background: "radial-gradient(circle, rgba(79,138,147,.15) 0%, rgba(79,138,147,0) 68%)", filter: "blur(44px)" }} />
-          <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to bottom, rgba(255,255,255,0) 40%, #ffffff 96%)" }} />
-        </div>
-        <div className="nv-shell" style={{ position: "relative", maxWidth: 920, margin: "0 auto", padding: "84px 32px 82px", textAlign: "center" }}>
-          <p style={{ margin: "0 0 18px", fontSize: 11.5, letterSpacing: ".2em", textTransform: "uppercase", color: "#33496C", fontWeight: 600 }}>Formation</p>
-          <h1 style={{ margin: 0, fontFamily: "var(--font-display)", fontWeight: 600, fontSize: "clamp(34px,4.4vw,58px)", lineHeight: 1.06, letterSpacing: "-.035em" }}>
-            Ce qui vous appartient, vous devriez le comprendre, pas juste le payer.
-          </h1>
-          <p style={{ margin: "26px auto 0", maxWidth: "62ch", fontSize: 18, lineHeight: 1.62, color: "rgba(12,25,47,.64)" }}>
-            Votre site, vos photos, vos vidéos, vos outils: tout ça est à vous. Pourtant, vous dépendez souvent de quelqu'un d'autre pour y toucher. On forme votre équipe, sur place, pour qu'elle sache le faire elle-même.
-          </p>
-          <div style={{ margin: "34px 0 0", display: "flex", justifyContent: "center" }}>
-            <a href={LIEN_RDV} className="nv-btn-primary" style={{ padding: "16px 28px", borderRadius: 10, fontSize: 15, fontWeight: 600 }} target="_blank" rel="noopener noreferrer">
-              Réserver mes 30 minutes
-            </a>
-          </div>
-        </div>
-      </section>
+      <HeroService
+        eyebrow="Formation"
+        titre="Ce qui vous appartient, vous devriez le comprendre, pas juste le payer."
+        texte="Votre site, vos photos, vos vidéos, vos outils: tout ça est à vous. Pourtant, vous dépendez souvent de quelqu'un d'autre pour y toucher. On forme votre équipe, sur place, pour qu'elle sache le faire elle-même."
+        courante="/formation"
+      />
 
       <section style={{ borderBottom: "1px solid rgba(12,25,47,.1)", background: "#ffffff" }}>
         <div className="nv-grid nv-shell" style={{ maxWidth: 1240, margin: "0 auto", padding: "88px 32px", display: "grid", gridTemplateColumns: ".85fr 1.15fr", gap: 56, alignItems: "start" }}>

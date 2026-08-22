@@ -8,6 +8,7 @@ import { SiteFooter } from "@/components/site/SiteFooter";
 import { Roadmap, type RoadStep } from "@/components/site/Roadmap";
 import { LIEN_RDV } from "@/lib/liens";
 import { AutresPages } from "@/components/site/AutresPages";
+import { HeroService } from "@/components/site/HeroService";
 const tournage = { url: "/assets/img-1079.webp" };
 const cardStyle: React.CSSProperties = {
   padding: "34px 30px",
@@ -141,149 +142,16 @@ function Page() {
     >
       <SiteHeader />
 
-      <section
-        style={{
-          position: "relative",
-          overflow: "hidden",
-          borderBottom: "1px solid rgba(12,25,47,.1)",
+      <HeroService
+        eyebrow="Photo et vidéo"
+        titre="Ce que vos clients voient devrait être à la hauteur de ce que vous faites."
+        texte="Votre travail parle de lui-même, quand on le montre bien. On capte votre entreprise telle qu'elle est: vraie, professionnelle, reconnaissable."
+        courante="/photo-et-video"
+        lienExtra={{
+          href: "https://norvika.myportfolio.com/",
+          libelle: "Voir notre portfolio →",
         }}
-      >
-        <div
-          aria-hidden="true"
-          style={{
-            position: "absolute",
-            inset: "-20% -10% auto",
-            height: 800,
-            pointerEvents: "none",
-          }}
-        >
-          <div
-            style={{
-              position: "absolute",
-              top: "6%",
-              left: "8%",
-              width: 620,
-              height: 620,
-              borderRadius: "50%",
-              background:
-                "radial-gradient(circle, rgba(51,73,108,.16) 0%, rgba(51,73,108,0) 68%)",
-              filter: "blur(40px)",
-              animation: "driftA 22s ease-in-out infinite",
-            }}
-          />
-          <div
-            style={{
-              position: "absolute",
-              top: "0%",
-              left: "48%",
-              width: 660,
-              height: 660,
-              borderRadius: "50%",
-              background:
-                "radial-gradient(circle, rgba(79,138,147,.15) 0%, rgba(79,138,147,0) 68%)",
-              filter: "blur(44px)",
-              animation: "driftB 27s ease-in-out infinite",
-            }}
-          />
-          <div
-            style={{
-              position: "absolute",
-              inset: 0,
-              background:
-                "linear-gradient(to bottom, rgba(255,255,255,0) 40%, #ffffff 96%)",
-            }}
-          />
-        </div>
-        <div className="nv-shell"
-          style={{
-            position: "relative",
-            maxWidth: 920,
-            margin: "0 auto",
-            padding: "84px 32px 82px",
-            textAlign: "center",
-          }}
-        >
-          <p
-            style={{
-              margin: "0 0 18px",
-              fontSize: 11.5,
-              letterSpacing: ".2em",
-              textTransform: "uppercase",
-              color: "#33496C",
-              fontWeight: 600,
-            }}
-          >
-            Photo et vidéo
-          </p>
-          <h1
-            style={{
-              margin: 0,
-              fontFamily: "var(--font-display)",
-              fontWeight: 600,
-              fontSize: "clamp(34px,4.4vw,58px)",
-              lineHeight: 1.06,
-              letterSpacing: "-.035em",
-              textWrap: "balance",
-            }}
-          >
-            Ce que vos clients voient devrait être à la hauteur de ce que vous
-            faites.
-          </h1>
-          <p
-            style={{
-              margin: "26px auto 0",
-              maxWidth: "60ch",
-              fontSize: 18,
-              lineHeight: 1.62,
-              color: "rgba(12,25,47,.64)",
-              textWrap: "pretty",
-            }}
-          >
-            Votre travail parle de lui-même, quand on le montre bien. On
-            capte votre entreprise telle qu'elle est: vraie, professionnelle,
-            reconnaissable.
-          </p>
-          <div
-            style={{
-              margin: "34px 0 0",
-              display: "flex",
-              flexWrap: "wrap",
-              gap: 12,
-              justifyContent: "center",
-            }}
-          >
-            <a
-              href={LIEN_RDV}
-              className="nv-btn-primary"
-              style={{
-                padding: "16px 28px",
-                borderRadius: 10,
-                fontSize: 15,
-                fontWeight: 600,
-              }}
-             target="_blank" rel="noopener noreferrer">
-              Réserver mes 30 minutes
-            </a>
-            <a
-              href="https://norvika.myportfolio.com/"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="nv-navlink"
-              style={{
-                padding: "16px 22px",
-                borderRadius: 10,
-                border: "1px solid rgba(12,25,47,.14)",
-                fontSize: 15,
-                fontWeight: 600,
-                color: "rgba(12,25,47,.76)",
-              }}
-            >
-              Voir notre portfolio photo et vidéo →
-            </a>
-
-          </div>
-        </div>
-      </section>
+      />
 
       <section
         style={{ borderBottom: "1px solid rgba(12,25,47,.1)", background: "#fff" }}

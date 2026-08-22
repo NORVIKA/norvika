@@ -32,12 +32,19 @@ export function HeroService({
   titre,
   texte,
   courante,
+  lienExtra,
 }: {
   eyebrow: string;
   titre: string;
   texte: string;
   /** Chemin de la page, pour marquer le service actif et le fil d'Ariane. */
   courante: string;
+  /**
+   * Troisieme bouton, propre a une page. Sert au lien vers le portfolio sur
+   * /photo-et-video : il vivait dans l'ancienne entete et serait parti avec
+   * elle sans ce point d'accroche.
+   */
+  lienExtra?: { href: string; libelle: string };
 }) {
   return (
     <section
@@ -151,6 +158,23 @@ export function HeroService({
             >
               Faire le quiz
             </Link>
+            {lienExtra ? (
+              <a
+                href={lienExtra.href}
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{
+                  padding: "14px 22px",
+                  borderRadius: 10,
+                  border: "1px solid rgba(245,243,238,.28)",
+                  fontSize: 14.5,
+                  fontWeight: 600,
+                  color: "#F5F3EE",
+                }}
+              >
+                {lienExtra.libelle}
+              </a>
+            ) : null}
           </div>
         </div>
       </div>
