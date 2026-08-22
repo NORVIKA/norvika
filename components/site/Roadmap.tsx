@@ -45,13 +45,48 @@ export function Roadmap({ steps }: { steps: RoadStep[] }) {
   const [box, setBox] = useState({ w: 1100, h: 220 });
 
   const wrapRef = useRef<HTMLDivElement>(null);
+  const carteRef = useRef<HTMLDivElement>(null);
   const pathRef = useRef<SVGPathElement>(null);
   const doneRef = useRef<SVGPathElement>(null);
   const pawnRef = useRef<HTMLDivElement>(null);
   const dotRefs = useRef<Array<HTMLButtonElement | null>>([]);
   const userTouched = useRef(false);
-  const fromFrac = useRef(0);
+  // Fraction REELLEMENT affichee a cet instant. Mise a jour a chaque image de
+  // l'animation, et non seulement a la fin : c'est ce qui empeche la piece et la
+  // ligne de progression de se desynchroniser si la mise en page change en plein
+  // mouvement (polices qui arrivent, redimensionnement).
+  const curFrac = useRef(0);
   const rafRef = useRef<number | null>(null);
+
+  // ⚠️ LE COMPOSANT REVELE SES PROPRES ELEMENTS.
+  // Il ne peut pas dependre de la page hote : chaque page avait son propre
+  // observateur, et celui de /sites-web ne surveillait que `[data-check]`, pas
+  // `[data-reveal]`. Resultat, en y posant cette roadmap, tout le bloc restait
+  // a opacity 0 : courbe, pastilles et carte invisibles, pas seulement la piece.
+  // Un composant qui se cache doit savoir se montrer tout seul.
+  useEffect(() => {
+    const cibles = [wrapRef.current, carteRef.current].filter(
+      (el): el is HTMLDivElement => el !== null,
+    );
+    if (!cibles.length) return;
+    if (!("IntersectionObserver" in window)) {
+      cibles.forEach((el) => el.classList.add("is-in"));
+      return;
+    }
+    const io = new IntersectionObserver(
+      (entrees) => {
+        entrees.forEach((e) => {
+          if (e.isIntersecting) {
+            e.target.classList.add("is-in");
+            io.unobserve(e.target);
+          }
+        });
+      },
+      { rootMargin: "0px 0px -8% 0px", threshold: 0.05 },
+    );
+    cibles.forEach((el) => io.observe(el));
+    return () => io.disconnect();
+  }, []);
 
   // Largeur mesuree -> orientation + hauteur de la zone.
   // Un ResizeObserver plutot que l'evenement `resize` : il capte aussi le
@@ -129,9 +164,25 @@ export function Roadmap({ steps }: { steps: RoadStep[] }) {
         lab.style.width = "150px";
       }
     });
+    // ⚠️ Poser la piece et la progression TOUT DE SUITE, sans attendre
+    // l'animation. Leur position n'etait ecrite que dans la boucle
+    // requestAnimationFrame, qui ne tourne pas tant que la page n'est pas
+    // visible (onglet en arriere-plan) et qui peut tarder sur un appareil lent.
+    // Entre-temps la piece restait collee dans le coin superieur gauche.
+    //
+    // On part de `curFrac`, la position REELLE de la piece a cet instant, et
+    // non de l'etape visee : sinon elle sauterait a l'arrivee avant que
+    // l'animation ne la fasse repartir du depart. Au montage les deux valent 0,
+    // et sur un redimensionnement ca la replace la ou elle se trouve.
+    const fCourant = curFrac.current;
     if (doneRef.current) {
       doneRef.current.style.strokeDasharray = String(L);
-      doneRef.current.style.strokeDashoffset = String(L * (1 - fracs[step]!));
+      doneRef.current.style.strokeDashoffset = String(L * (1 - fCourant));
+    }
+    if (pawnRef.current) {
+      const pt = path.getPointAtLength(L * fCourant);
+      pawnRef.current.style.left = `${pt.x}px`;
+      pawnRef.current.style.top = `${pt.y}px`;
     }
   }, [d, mode, fracs, box.w]);
 
@@ -141,16 +192,20 @@ export function Roadmap({ steps }: { steps: RoadStep[] }) {
     if (!path) return;
     const L = path.getTotalLength();
     const to = fracs[step]!;
-    const from = fromFrac.current;
+    const from = curFrac.current;
     const reduce =
       typeof window !== "undefined" &&
       window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
-    const dur = reduce ? 0 : 720;
-    const t0 = performance.now();
 
-    const frame = (now: number) => {
-      const k = dur === 0 ? 1 : Math.min(1, (now - t0) / dur);
-      const f = from + (to - from) * easeOutCubic(k);
+    // requestAnimationFrame NE TOURNE PAS quand la page est en arriere-plan.
+    // Sans ce raccourci, l'etape avancerait (le minuteur, lui, continue) mais la
+    // piece resterait figee, et le visiteur retrouverait un trace incoherent en
+    // revenant sur l'onglet. Meme raccourci si l'appareil demande moins
+    // d'animation : on place, on n'anime pas.
+    // Place la piece et la ligne a une fraction donnee. Un seul endroit qui
+    // ecrit dans le DOM : les deux ne peuvent donc pas se desynchroniser.
+    const poser = (f: number) => {
+      curFrac.current = f;
       const pt = path.getPointAtLength(L * f);
       if (pawnRef.current) {
         pawnRef.current.style.left = `${pt.x}px`;
@@ -159,11 +214,46 @@ export function Roadmap({ steps }: { steps: RoadStep[] }) {
       if (doneRef.current) {
         doneRef.current.style.strokeDashoffset = String(L * (1 - f));
       }
+    };
+
+    const sansAnimation =
+      reduce || (typeof document !== "undefined" && document.visibilityState === "hidden");
+    if (sansAnimation) {
+      poser(to);
+      return;
+    }
+
+    const dur = 720;
+    const t0 = performance.now();
+    let aDessine = false;
+
+    // ⚠️ FILET DE SECURITE. requestAnimationFrame ne produit pas toujours
+    // d'image : onglet en arriere-plan, economie d'energie, navigateur pilote
+    // par un outil de test. Sans ce filet, l'etape affichee dans la carte
+    // avancait (le minuteur, lui, tourne) pendant que la piece restait au
+    // depart : le visiteur voyait une carte qui parle de l'etape 3 et une piece
+    // a l'etape 1. Si aucune image n'est venue en 150 ms, on place sans animer.
+    const filet = window.setTimeout(() => {
+      if (!aDessine) poser(to);
+    }, 150);
+
+    const frame = (now: number) => {
+      // ⚠️ BORNER AUX DEUX BOUTS, pas seulement en haut.
+      // `now` peut etre INFERIEUR a `t0` (horloge ajustee, temps virtuel d'un
+      // navigateur de test, onglet reveille). `k` devient alors negatif et
+      // easeOutCubic, qui eleve au cube, renvoie un nombre enorme : la fraction
+      // est partie a -955, d'ou un strokeDashoffset de 325184 pour un trace de
+      // 340 de long. Et comme on memorise la fraction, l'erreur restait :
+      // la piece se figeait au depart pour de bon.
+      aDessine = true;
+      const k = Math.min(1, Math.max(0, (now - t0) / dur));
+      poser(Math.min(1, Math.max(0, from + (to - from) * easeOutCubic(k))));
       if (k < 1) rafRef.current = requestAnimationFrame(frame);
-      else fromFrac.current = to;
+      else poser(to);
     };
     rafRef.current = requestAnimationFrame(frame);
     return () => {
+      window.clearTimeout(filet);
       if (rafRef.current) cancelAnimationFrame(rafRef.current);
     };
   }, [step, d, mode, fracs]);
@@ -299,6 +389,7 @@ export function Roadmap({ steps }: { steps: RoadStep[] }) {
 
       <div
         data-reveal
+        ref={carteRef}
         style={{
           marginTop: isV ? 20 : 28,
           padding: "28px 30px",
