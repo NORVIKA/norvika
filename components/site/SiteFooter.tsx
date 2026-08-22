@@ -1,92 +1,13 @@
 "use client";
 
 import Link from "next/link";
+import { ContactCTA } from "@/components/site/ContactCTA";
 
 const logoStack = { url: "/assets/logo_stack_navy_new.webp" };
 export function SiteFooter() {
   return (
     <>
-      <section
-        id="rdv"
-        style={{
-          position: "relative",
-          overflow: "hidden",
-          background: "#0C192F",
-          color: "#F5F3EE",
-        }}
-      >
-        <div
-          aria-hidden="true"
-          style={{
-            position: "absolute",
-            top: -200,
-            left: "50%",
-            width: 900,
-            height: 600,
-            marginLeft: -450,
-            background:
-              "radial-gradient(ellipse, rgba(51,73,108,.28) 0%, rgba(51,73,108,0) 70%)",
-          }}
-        />
-        <div className="nv-shell"
-          style={{
-            position: "relative",
-            maxWidth: 1240,
-            margin: "0 auto",
-            padding: "130px 32px",
-            textAlign: "center",
-          }}
-        >
-          <span
-            aria-hidden="true"
-            style={{
-              display: "block",
-              width: 44,
-              height: 1,
-              margin: "0 auto 28px",
-              background: "rgba(245,243,238,.4)",
-            }}
-          />
-          <h2
-            style={{
-              margin: "0 auto",
-              maxWidth: "20ch",
-              fontSize: "clamp(30px,4vw,54px)",
-              lineHeight: 1.08,
-            }}
-          >
-            On regarde votre cas, gratuitement.
-          </h2>
-          <p
-            style={{
-              margin: "24px auto 0",
-              maxWidth: "60ch",
-              fontSize: 17,
-              lineHeight: 1.65,
-              color: "rgba(245,243,238,.7)",
-            }}
-          >
-            30 minutes pour comprendre ce qui vous freine et vous dire,
-            concrètement, ce qu'on ferait à votre place. Gratuit, sans
-            engagement, et vous repartez avec un document d'analyse fait pour
-            vous.
-          </p>
-          <Link
-            href="/diagnostic"
-            className="nv-btn-cream"
-            style={{
-              display: "inline-block",
-              marginTop: 36,
-              padding: "18px 36px",
-              borderRadius: 10,
-              fontSize: 15,
-              fontWeight: 600,
-            }}
-          >
-            Réserver mes 30 minutes
-          </Link>
-        </div>
-      </section>
+      <ContactCTA />
 
       <footer className="nv-shell" style={{ padding: "72px 32px 44px" }}>
         <div className="nv-shell nv-grid-3"

@@ -270,3 +270,12 @@
 @media (max-width: 900px), (prefers-reduced-motion: reduce) {
   [style*="driftA"], [style*="driftB"] { animation: none !important; }
 }
+
+/* Bandeau de contact de fin de page : deux colonnes sur grand ecran, empilees
+   sur telephone (le texte au-dessus, le formulaire dessous). */
+@media (max-width: 860px) {
+  .nv-cta-grid { grid-template-columns: minmax(0, 1fr) !important; gap: 32px !important; }
+}
+@media (max-width: 460px) {
+  .nv-cta-fields { grid-template-columns: minmax(0, 1fr) !important; }
+}

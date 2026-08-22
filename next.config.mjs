@@ -50,6 +50,36 @@ const nextConfig = {
             key: "Permissions-Policy",
             value: "camera=(), microphone=(), geolocation=()",
           },
+          // Politique de sécurité du contenu (CSP). Empeche l'injection de
+          // scripts externes, l'inclusion du site dans une iframe tierce, et le
+          // detournement des formulaires vers un autre domaine.
+          //
+          // `'unsafe-inline'` sur script-src reste necessaire : Next injecte ses
+          // scripts d'hydratation en ligne, sans nonce. Le vrai gain est
+          // ailleurs (script-src limite au domaine, form-action, base-uri,
+          // frame-ancestors, object-src). Le site n'affiche jamais de HTML
+          // fourni par un visiteur, donc la surface XSS reste minime.
+          //
+          // connect-src autorise Supabase (connexion /admin depuis le
+          // navigateur). Resend est appele cote serveur uniquement.
+          {
+            key: "Content-Security-Policy",
+            value: [
+              "default-src 'self'",
+              "script-src 'self' 'unsafe-inline'",
+              "style-src 'self' 'unsafe-inline'",
+              "img-src 'self' data: https://*.supabase.co https://cdn.sanity.io https://placehold.co https://image.thum.io",
+              "font-src 'self' data:",
+              "connect-src 'self' https://*.supabase.co",
+              "form-action 'self'",
+              "frame-ancestors 'none'",
+              "base-uri 'self'",
+              "object-src 'none'",
+              "upgrade-insecure-requests",
+            ].join("; "),
+          },
+          // Isole le contexte de navigation des fenetres ouvertes par le site.
+          { key: "Cross-Origin-Opener-Policy", value: "same-origin" },
         ],
       },
     ];

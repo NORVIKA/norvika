@@ -39,6 +39,38 @@ export default async function Page({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  if (!getClient(slug)) notFound();
-  return <Content slug={slug} />;
+  const client = getClient(slug);
+  if (!client) notFound();
+
+  // Fil d'Ariane structuré : aide Google et les moteurs IA à situer la page
+  // dans le site (Accueil > Réalisations > Client).
+  const breadcrumb = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      { "@type": "ListItem", position: 1, name: "Accueil", item: "https://norvika.ca" },
+      {
+        "@type": "ListItem",
+        position: 2,
+        name: "Réalisations",
+        item: "https://norvika.ca/realisations",
+      },
+      {
+        "@type": "ListItem",
+        position: 3,
+        name: client.name,
+        item: `https://norvika.ca/realisations/${client.slug}`,
+      },
+    ],
+  };
+
+  return (
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumb) }}
+      />
+      <Content slug={slug} />
+    </>
+  );
 }

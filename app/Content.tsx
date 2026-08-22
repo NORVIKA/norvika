@@ -6,6 +6,7 @@ import { useEffect, useRef, useState } from "react";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
 import { useReveal } from "@/lib/useReveal";
+import { Roadmap, type RoadStep } from "@/components/site/Roadmap";
 const lauEtWill = { url: "/assets/lau-et-will-2.webp" };
 const logoDesjardins = { url: "/assets/logo-desjardins.webp" };
 const logoAnytime = { url: "/assets/logo-anytime.webp" };
@@ -106,228 +107,12 @@ const AVIS = [
   },
 ];
 
-const ROAD_PATH =
-  "M60 150 C 160 40, 250 40, 324 96 C 420 168, 500 172, 588 118 C 676 64, 760 62, 852 112 C 950 166, 1030 150, 1116 74";
-const FRACS = [0, 0.25, 0.5, 0.75, 1];
-
-function Roadmap() {
-  const [step, setStep] = useState(0);
-  const wrapRef = useRef<HTMLDivElement>(null);
-  const pathRef = useRef<SVGPathElement>(null);
-  const doneRef = useRef<SVGPathElement>(null);
-  const pawnRef = useRef<HTMLDivElement>(null);
-  const dotRefs = useRef<Array<HTMLDivElement | null>>([]);
-  const userTouched = useRef(false);
-
-  useEffect(() => {
-    const id = setInterval(() => {
-      if (userTouched.current) return;
-      setStep((s) => (s + 1) % FRACS.length);
-    }, 3800);
-    return () => clearInterval(id);
-  }, []);
-
-
-  useEffect(() => {
-    const place = () => {
-      const path = pathRef.current;
-      const wrap = wrapRef.current;
-      if (!path || !wrap) return;
-      const L = path.getTotalLength();
-      const sx = wrap.clientWidth / 1176;
-      FRACS.forEach((f, i) => {
-        const pt = path.getPointAtLength(L * f);
-        const el = dotRefs.current[i];
-        if (!el) return;
-        el.style.left = `${pt.x * sx}px`;
-        el.style.top = `${pt.y}px`;
-        const ahead = path.getPointAtLength(Math.min(L, L * f + 26));
-        const behind = path.getPointAtLength(Math.max(0, L * f - 26));
-        const descend = ahead.y > pt.y || behind.y > pt.y;
-        const lab = el.querySelector("p");
-        if (lab) (lab as HTMLElement).style.top = descend ? "-52px" : "40px";
-      });
-      if (doneRef.current) {
-        doneRef.current.style.strokeDasharray = String(L);
-        doneRef.current.style.strokeDashoffset = String(L * (1 - FRACS[step]!));
-      }
-      if (pawnRef.current) {
-        const pt = path.getPointAtLength(L * FRACS[step]!);
-        pawnRef.current.style.left = `${pt.x * sx}px`;
-        pawnRef.current.style.top = `${pt.y}px`;
-      }
-    };
-    place();
-    window.addEventListener("resize", place);
-    return () => window.removeEventListener("resize", place);
-  }, [step]);
-
-  const current = ETAPES[step]!;
-
-  return (
-    <>
-      <div
-        data-reveal
-        className="nv-road"
-        ref={wrapRef}
-        style={{ position: "relative", margin: "96px 60px 0", height: 270 }}
-      >
-        <svg
-          viewBox="0 0 1176 200"
-          preserveAspectRatio="none"
-          style={{
-            position: "absolute",
-            top: 0,
-            left: 0,
-            width: "100%",
-            height: 200,
-          }}
-          aria-hidden="true"
-        >
-          <path
-            ref={pathRef}
-            d={ROAD_PATH}
-            fill="none"
-            stroke="rgba(12,25,47,.16)"
-            strokeWidth={2}
-            strokeLinecap="round"
-          />
-          <path
-            ref={doneRef}
-            d={ROAD_PATH}
-            fill="none"
-            stroke="#0C192F"
-            strokeWidth={2.5}
-            strokeLinecap="round"
-            style={{ transition: "stroke-dashoffset .8s cubic-bezier(.2,0,0,1)" }}
-          />
-        </svg>
-
-        <div
-          ref={pawnRef}
-          style={{
-            position: "absolute",
-            zIndex: 3,
-            width: 30,
-            height: 30,
-            margin: "-15px 0 0 -15px",
-            borderRadius: "50% 50% 50% 6px",
-            transform: "rotate(-45deg)",
-            background: "#0C192F",
-            boxShadow:
-              "0 10px 22px -8px rgba(12,25,47,.9), 0 0 0 6px rgba(255,255,255,.6)",
-            transition: "left .75s cubic-bezier(.2,0,0,1), top .75s cubic-bezier(.2,0,0,1)",
-          }}
-        />
-
-        {ETAPES.map((e, i) => {
-          const color =
-            step === i ? "#0C192F" : i < step ? "#33496C" : "rgba(12,25,47,.28)";
-          return (
-            <div
-              key={e.num}
-              ref={(el) => {
-                dotRefs.current[i] = el;
-              }}
-              onClick={() => {
-                userTouched.current = true;
-                setStep(i);
-              }}
-              style={{
-                position: "absolute",
-                width: 14,
-                transform: "translate(-50%,-50%)",
-                cursor: "pointer",
-                zIndex: 2,
-              }}
-            >
-              <span
-                style={{
-                  display: "block",
-                  width: 14,
-                  height: 14,
-                  margin: "0 auto",
-                  borderRadius: "50%",
-                  background: color,
-                  boxShadow:
-                    "0 0 0 6px rgba(255,255,255,.85), 0 6px 16px -8px rgba(12,25,47,.9)",
-                  transition: "background .3s cubic-bezier(.2,0,0,1)",
-                }}
-              />
-              <p
-                style={{
-                  position: "absolute",
-                  top: 40,
-                  left: "50%",
-                  transform: "translateX(-50%)",
-                  margin: 0,
-                  width: 150,
-                  padding: "5px 8px",
-                  borderRadius: 8,
-                  background: "rgba(255,255,255,.72)",
-                  backdropFilter: "blur(10px)",
-                  WebkitBackdropFilter: "blur(10px)",
-                  textAlign: "center",
-                  fontFamily: "var(--font-display)",
-                  fontSize: 13.5,
-                  letterSpacing: "-.01em",
-                  color,
-                  transition: "color .3s cubic-bezier(.2,0,0,1)",
-                }}
-              >
-                {e.label}
-              </p>
-            </div>
-          );
-        })}
-      </div>
-
-      <div
-        data-reveal
-        style={{
-          marginTop: 28,
-          padding: "32px 36px",
-          borderRadius: 22,
-          border: "1px solid rgba(255,255,255,.85)",
-          background:
-            "linear-gradient(150deg, rgba(255,255,255,.78), rgba(255,255,255,.44))",
-          backdropFilter: "blur(28px) saturate(180%)",
-          WebkitBackdropFilter: "blur(28px) saturate(180%)",
-          boxShadow:
-            "0 1px 0 rgba(255,255,255,.95) inset, 0 30px 70px -44px rgba(12,25,47,.8)",
-        }}
-      >
-        <div style={{ display: "flex", alignItems: "baseline", gap: 20 }}>
-          <span
-            style={{
-              fontFamily: "var(--font-display)",
-              fontSize: 13,
-              color: "rgba(12,25,47,.35)",
-            }}
-          >
-            {current.num}
-          </span>
-          <div>
-            <h3 style={{ margin: 0, fontSize: 22, letterSpacing: "-.02em" }}>
-              {current.title}
-            </h3>
-            <p
-              style={{
-                margin: "10px 0 0",
-                maxWidth: "62ch",
-                fontSize: 16,
-                lineHeight: 1.62,
-                color: "rgba(12,25,47,.64)",
-              }}
-            >
-              {current.text}
-            </p>
-          </div>
-        </div>
-      </div>
-    </>
-  );
-}
+const ROAD_STEPS: RoadStep[] = ETAPES.map((e) => ({
+  num: e.num,
+  label: e.label,
+  title: e.title,
+  body: e.text,
+}));
 
 function Index() {
   useReveal();
@@ -791,7 +576,7 @@ function Index() {
             animation: "driftA 24s ease-in-out infinite",
           }}
         />
-        <div className="nv-shell nv-road-scroll"
+        <div className="nv-shell"
           style={{
             position: "relative",
             maxWidth: 1240,
@@ -823,7 +608,7 @@ function Index() {
           >
             On regarde votre cas, pas un cas type.
           </h2>
-          <Roadmap />
+          <Roadmap steps={ROAD_STEPS} />
         </div>
       </section>
 

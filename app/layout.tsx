@@ -89,6 +89,30 @@ export default async function RootLayout({
                 { "@type": "Person", name: "Laurianne Plouffe" },
                 { "@type": "Person", name: "William Simard" },
               ],
+              // Note Google, affichee sur l'accueil (section « Avis Google »).
+              // Sert les extraits enrichis et les reponses des moteurs IA (GEO).
+              aggregateRating: {
+                "@type": "AggregateRating",
+                ratingValue: "5.0",
+                reviewCount: "6",
+                bestRating: "5",
+              },
+              review: [
+                {
+                  "@type": "Review",
+                  reviewRating: { "@type": "Rating", ratingValue: "5", bestRating: "5" },
+                  author: { "@type": "Person", name: "Marie-Claire Huard" },
+                  reviewBody:
+                    "Je recommande Norvika et Laurianne sans aucune hésitation. Un service humain, personnalisé et un résultat à la hauteur de nos attentes.",
+                },
+                {
+                  "@type": "Review",
+                  reviewRating: { "@type": "Rating", ratingValue: "5", bestRating: "5" },
+                  author: { "@type": "Person", name: "Mélodie Colpron" },
+                  reviewBody:
+                    "Une équipe professionnelle, dynamique et super agréable. Je recommande leurs services à 100 pour cent.",
+                },
+              ],
             }),
           }}
         />

@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
+import { Roadmap, type RoadStep } from "@/components/site/Roadmap";
 
 const STEPS = [
   { title: "Un appel de 30 minutes", label: "Un appel de 30 minutes", desc: "On regarde ensemble comment votre entreprise fonctionne aujourd'hui. Gratuit, sans engagement, et vous repartez avec un document d'analyse." },
@@ -14,7 +15,8 @@ const STEPS = [
   { title: "On reste à vos côtés", label: "On reste à vos côtés", desc: "Vos outils évoluent, votre entreprise aussi. On vous accompagne pour que la compréhension reste, et que le temps gagné reste aussi." },
 ];
 
-const FRACS = [0, 0.25, 0.5, 0.75, 1];
+const ROAD_STEPS: RoadStep[] = STEPS.map((e) => ({ label: e.label, title: e.title, body: e.desc }));
+
 
 const CHECKS = [
   "Vous payez pour des logiciels que vous utilisez à moitié.",
@@ -47,57 +49,8 @@ function useReveal() {
 }
 
 function Page() {
-  const [step, setStep] = useState(0);
-  const userTouched = useRef(false);
-  const roadRef = useRef<HTMLDivElement | null>(null);
-  const pathRef = useRef<SVGPathElement | null>(null);
-  const [positions, setPositions] = useState<{ x: number; y: number; flip: boolean }[]>([]);
-  const [pawn, setPawn] = useState({ x: 0, y: 0 });
-  const [doneOffset, setDoneOffset] = useState({ length: 0, offset: 0 });
 
   useReveal();
-
-  useEffect(() => {
-    const layout = () => {
-      const p = pathRef.current;
-      const road = roadRef.current;
-      if (!p || !road || !road.clientWidth) return;
-      const sx = road.clientWidth / 1176;
-      const L = p.getTotalLength();
-      const pts = FRACS.map((f) => {
-        const pt = p.getPointAtLength(L * f);
-        const ahead = p.getPointAtLength(Math.min(L, L * f + 26));
-        const behind = p.getPointAtLength(Math.max(0, L * f - 26));
-        return { x: pt.x * sx, y: pt.y, flip: ahead.y > pt.y || behind.y > pt.y };
-      });
-      setPositions(pts);
-      const cur = p.getPointAtLength(L * FRACS[step]!);
-      setPawn({ x: cur.x * sx, y: cur.y });
-      setDoneOffset({ length: L, offset: L * (1 - FRACS[step]!) });
-    };
-    layout();
-    window.addEventListener("resize", layout);
-    const t = setInterval(layout, 300);
-    return () => {
-      window.removeEventListener("resize", layout);
-      clearInterval(t);
-    };
-  }, [step]);
-
-  useEffect(() => {
-    const auto = setInterval(() => {
-      if (userTouched.current) return;
-      setStep((s) => (s + 1) % FRACS.length);
-    }, 4200);
-    return () => clearInterval(auto);
-  }, []);
-
-  const goTo = (i: number) => {
-    userTouched.current = true;
-    setStep(i);
-  };
-
-  const activeColor = (i: number) => (step === i ? "#0C192F" : i < step ? "#33496C" : "rgba(12,25,47,.28)");
 
   return (
     <div style={{ position: "relative", overflowX: "hidden", background: "#fff" }}>
@@ -196,135 +149,13 @@ function Page() {
       </section>
 
       <section style={{ borderBottom: "1px solid rgba(12,25,47,.1)", background: "#EEF2FA" }}>
-        <div className="nv-shell nv-road-scroll" style={{ maxWidth: 1240, margin: "0 auto", padding: "92px 32px" }}>
+        <div className="nv-shell" style={{ maxWidth: 1240, margin: "0 auto", padding: "92px 32px" }}>
           <h2 style={{ margin: 0, fontFamily: "var(--font-display)", fontWeight: 600, fontSize: "clamp(28px,3.4vw,44px)", lineHeight: 1.08, letterSpacing: "-.03em" }}>
             Comment ça se passe
           </h2>
 
-          <div className="nv-road" ref={roadRef} style={{ position: "relative", margin: "96px 60px 0", height: 270 }}>
-            <svg viewBox="0 0 1176 200" preserveAspectRatio="none" style={{ position: "absolute", top: 0, left: 0, width: "100%", height: 200 }} aria-hidden="true">
-              <path
-                d="M60 150 C 160 40, 250 40, 324 96 C 420 168, 500 172, 588 118 C 676 64, 760 62, 852 112 C 950 166, 1030 150, 1116 74"
-                fill="none"
-                stroke="rgba(12,25,47,.16)"
-                strokeWidth="2"
-                strokeLinecap="round"
-              />
-              <path
-                ref={pathRef}
-                d="M60 150 C 160 40, 250 40, 324 96 C 420 168, 500 172, 588 118 C 676 64, 760 62, 852 112 C 950 166, 1030 150, 1116 74"
-                fill="none"
-                stroke="#0C192F"
-                strokeWidth="2.5"
-                strokeLinecap="round"
-                style={{
-                  transition: "stroke-dashoffset .8s cubic-bezier(.2,0,0,1)",
-                  strokeDasharray: doneOffset.length,
-                  strokeDashoffset: doneOffset.offset,
-                }}
-              />
-            </svg>
-
-            <div
-              style={{
-                position: "absolute",
-                zIndex: 3,
-                width: 30,
-                height: 30,
-                margin: "-15px 0 0 -15px",
-                borderRadius: "50% 50% 50% 6px",
-                transform: "rotate(-45deg)",
-                background: "#0C192F",
-                boxShadow: "0 10px 22px -8px rgba(12,25,47,.9), 0 0 0 6px rgba(255,255,255,.6)",
-                left: pawn.x,
-                top: pawn.y,
-                transition: "left .75s cubic-bezier(.2,0,0,1), top .75s cubic-bezier(.2,0,0,1)",
-              }}
-            />
-
-            {STEPS.map((s, i) => {
-              const pos = positions[i] || { x: 0, y: 0, flip: false };
-              return (
-                <div
-                  key={i}
-                  onClick={() => goTo(i)}
-                  style={{
-                    position: "absolute",
-                    width: 14,
-                    transform: "translate(-50%,-50%)",
-                    cursor: "pointer",
-                    zIndex: 2,
-                    left: pos.x,
-                    top: pos.y,
-                  }}
-                >
-                  <span
-                    style={{
-                      display: "block",
-                      width: 14,
-                      height: 14,
-                      margin: "0 auto",
-                      borderRadius: "50%",
-                      background: activeColor(i),
-                      boxShadow: "0 0 0 6px rgba(255,255,255,.85), 0 6px 16px -8px rgba(12,25,47,.9)",
-                      transition: "background .3s cubic-bezier(.2,0,0,1)",
-                    }}
-                  />
-                  <p
-                    style={{
-                      position: "absolute",
-                      top: pos.flip ? -58 : 40,
-                      left: "50%",
-                      transform: "translateX(-50%)",
-                      margin: 0,
-                      width: 158,
-                      padding: "5px 8px",
-                      borderRadius: 8,
-                      background: "rgba(255,255,255,.72)",
-                      backdropFilter: "blur(10px)",
-                      WebkitBackdropFilter: "blur(10px)",
-                      textAlign: "center",
-                      fontFamily: "var(--font-display)",
-                      fontSize: 13.5,
-                      letterSpacing: "-.01em",
-                      color: activeColor(i),
-                      transition: "color .3s cubic-bezier(.2,0,0,1)",
-                    }}
-                  >
-                    {s.label}
-                  </p>
-                </div>
-              );
-            })}
+          <Roadmap steps={ROAD_STEPS} />
           </div>
-
-          <div
-            style={{
-              marginTop: 28,
-              padding: "32px 36px",
-              borderRadius: 22,
-              border: "1px solid rgba(255,255,255,.85)",
-              background: "linear-gradient(150deg, rgba(255,255,255,.78), rgba(255,255,255,.44))",
-              backdropFilter: "blur(28px) saturate(180%)",
-              WebkitBackdropFilter: "blur(28px) saturate(180%)",
-              boxShadow: "0 1px 0 rgba(255,255,255,.95) inset, 0 30px 70px -44px rgba(12,25,47,.8)",
-            }}
-          >
-            <div style={{ display: "flex", alignItems: "baseline", gap: 20 }}>
-              <span style={{ fontFamily: "var(--font-display)", fontSize: 13, color: "rgba(12,25,47,.35)" }}>
-                {String(step + 1).padStart(2, "0")}
-              </span>
-              <div>
-                <h3 style={{ margin: 0, fontFamily: "var(--font-display)", fontWeight: 600, fontSize: 22, letterSpacing: "-.02em" }}>
-                  {STEPS[step]!.title}
-                </h3>
-                <p style={{ margin: "10px 0 0", maxWidth: "66ch", fontSize: 16, lineHeight: 1.62, color: "rgba(12,25,47,.64)" }}>
-                  {STEPS[step]!.desc}
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
       </section>
 
       <section style={{ borderBottom: "1px solid rgba(12,25,47,.1)", background: "#ffffff" }}>

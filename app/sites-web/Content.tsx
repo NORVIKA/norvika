@@ -5,6 +5,7 @@ import { useEffect, useRef, useState } from "react";
 
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
+import { Roadmap, type RoadStep } from "@/components/site/Roadmap";
 
 const STEPS = [
   {
@@ -33,7 +34,8 @@ const STEPS = [
   },
 ];
 
-const FRACS = [0, 1 / 3, 2 / 3, 1];
+const ROAD_STEPS: RoadStep[] = STEPS.map((e) => ({ label: e.title, title: e.title, body: e.text }));
+
 
 function useReveal() {
   const ref = useRef<HTMLDivElement>(null);
@@ -54,22 +56,7 @@ function useReveal() {
 }
 
 function Page() {
-  const [step, setStep] = useState(0);
-  const userTouched = useRef(false);
   const containerRef = useReveal();
-
-  useEffect(() => {
-    const id = setInterval(() => {
-      if (userTouched.current) return;
-      setStep((s) => (s + 1) % FRACS.length);
-    }, 4200);
-    return () => clearInterval(id);
-  }, []);
-
-  const goTo = (i: number) => {
-    userTouched.current = true;
-    setStep(i);
-  };
 
   const cardStyle: React.CSSProperties = {
     padding: "34px 30px",
@@ -250,7 +237,7 @@ function Page() {
       </section>
 
       <section style={{ borderBottom: "1px solid rgba(12,25,47,.1)", background: "#EEF2FA" }}>
-        <div className="nv-shell nv-road-scroll" style={{ maxWidth: 1240, margin: "0 auto", padding: "92px 32px" }}>
+        <div className="nv-shell" style={{ maxWidth: 1240, margin: "0 auto", padding: "92px 32px" }}>
           <h2
             style={{
               margin: 0,
@@ -264,142 +251,8 @@ function Page() {
             Comment ça se passe
           </h2>
 
-          <div className="nv-road" style={{ position: "relative", margin: "96px 60px 0", height: 270 }}>
-            <svg
-              viewBox="0 0 1176 200"
-              preserveAspectRatio="none"
-              style={{ position: "absolute", top: 0, left: 0, width: "100%", height: 200 }}
-              aria-hidden="true"
-            >
-              <path
-                d="M60 150 C 160 40, 250 40, 324 96 C 420 168, 500 172, 588 118 C 676 64, 760 62, 852 112 C 950 166, 1030 150, 1116 74"
-                fill="none"
-                stroke="rgba(12,25,47,.16)"
-                strokeWidth="2"
-                strokeLinecap="round"
-              />
-              <path
-                d="M60 150 C 160 40, 250 40, 324 96 C 420 168, 500 172, 588 118 C 676 64, 760 62, 852 112 C 950 166, 1030 150, 1116 74"
-                fill="none"
-                stroke="#0C192F"
-                strokeWidth="2.5"
-                strokeLinecap="round"
-                pathLength={100}
-                strokeDasharray={100}
-                strokeDashoffset={100 * (1 - FRACS[step]!)}
-                style={{ transition: "stroke-dashoffset .8s cubic-bezier(.2,0,0,1)" }}
-              />
-            </svg>
-
-            <div
-              style={{
-                position: "absolute",
-                zIndex: 3,
-                width: 30,
-                height: 30,
-                left: `${(STEPS[step]!.x / 1176) * 100}%`,
-                top: STEPS[step]!.y,
-                margin: "-15px 0 0 -15px",
-                borderRadius: "50% 50% 50% 6px",
-                transform: "rotate(-45deg)",
-                background: "#0C192F",
-                boxShadow: "0 10px 22px -8px rgba(12,25,47,.9), 0 0 0 6px rgba(255,255,255,.6)",
-                transition: "left .75s cubic-bezier(.2,0,0,1), top .75s cubic-bezier(.2,0,0,1)",
-              }}
-            />
-
-            {STEPS.map((s, i) => {
-              const color = step === i ? "#0C192F" : i < step ? "#33496C" : "rgba(12,25,47,.28)";
-              const labelTop = s.y > 100 ? -58 : 40;
-              return (
-                <div
-                  key={i}
-                  onClick={() => goTo(i)}
-                  style={{
-                    position: "absolute",
-                    width: 14,
-                    left: `${(s.x / 1176) * 100}%`,
-                    top: s.y,
-                    transform: "translate(-50%,-50%)",
-                    cursor: "pointer",
-                    zIndex: 2,
-                  }}
-                >
-                  <span
-                    style={{
-                      display: "block",
-                      width: 14,
-                      height: 14,
-                      margin: "0 auto",
-                      borderRadius: "50%",
-                      background: color,
-                      boxShadow: "0 0 0 6px rgba(255,255,255,.85), 0 6px 16px -8px rgba(12,25,47,.9)",
-                      transition: "background .3s cubic-bezier(.2,0,0,1)",
-                    }}
-                  />
-                  <p
-                    style={{
-                      position: "absolute",
-                      top: labelTop,
-                      left: "50%",
-                      transform: "translateX(-50%)",
-                      margin: 0,
-                      width: 170,
-                      padding: "5px 8px",
-                      borderRadius: 8,
-                      background: "rgba(255,255,255,.72)",
-                      backdropFilter: "blur(10px)",
-                      WebkitBackdropFilter: "blur(10px)",
-                      textAlign: "center",
-                      fontFamily: "var(--font-display)",
-                      fontSize: 13.5,
-                      letterSpacing: "-.01em",
-                      color,
-                      transition: "color .3s cubic-bezier(.2,0,0,1)",
-                    }}
-                  >
-                    {s.title}
-                  </p>
-                </div>
-              );
-            })}
+          <Roadmap steps={ROAD_STEPS} />
           </div>
-
-          <div
-            style={{
-              marginTop: 28,
-              padding: "32px 36px",
-              borderRadius: 22,
-              border: "1px solid rgba(255,255,255,.85)",
-              background: "linear-gradient(150deg, rgba(255,255,255,.78), rgba(255,255,255,.44))",
-              backdropFilter: "blur(28px) saturate(180%)",
-              WebkitBackdropFilter: "blur(28px) saturate(180%)",
-              boxShadow: "0 1px 0 rgba(255,255,255,.95) inset, 0 30px 70px -44px rgba(12,25,47,.8)",
-            }}
-          >
-            <div style={{ display: "flex", alignItems: "baseline", gap: 20 }}>
-              <span style={{ fontFamily: "var(--font-display)", fontSize: 13, color: "rgba(12,25,47,.35)" }}>
-                {String(step + 1).padStart(2, "0")}
-              </span>
-              <div>
-                <h3
-                  style={{
-                    margin: 0,
-                    fontFamily: "var(--font-display)",
-                    fontWeight: 600,
-                    fontSize: 22,
-                    letterSpacing: "-.02em",
-                  }}
-                >
-                  {STEPS[step]!.title}
-                </h3>
-                <p style={{ margin: "10px 0 0", maxWidth: "66ch", fontSize: 16, lineHeight: 1.62, color: "rgba(12,25,47,.64)" }}>
-                  {STEPS[step]!.text}
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
       </section>
 
       <section style={{ borderBottom: "1px solid rgba(12,25,47,.1)", background: "#ffffff" }}>
