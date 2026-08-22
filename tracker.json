@@ -251,6 +251,10 @@
     {
       "date": "2026-08-21",
       "quoi": "Une maquette Lovable en TanStack Start se porte vers Next en une passe presque mecanique quand les pages sont ecrites en styles en ligne : le cout est dans les images (references JSON vers le CDN de Lovable) et dans l'animation d'apparition qui bloque le LCP."
+    },
+    {
+      "date": "2026-08-22",
+      "quoi": "Une piece qui se deplace le long d'une courbe SVG doit lire un point sur le trace a chaque image (getPointAtLength), pas animer left/top : sinon elle coupe en ligne droite a travers la courbe. Et une CSP ajoutee sur un domaine Cloudflare doit autoriser static.cloudflareinsights.com, sinon le beacon injecte par Cloudflare leve une erreur console."
     }
   ],
   "backlog_post_lancement": [
@@ -289,6 +293,18 @@
       "detail": "github.com/NORVIKA/norvika est en public. Aucun secret dedans, verifie, donc pas de faille immediate. Mais il expose la structure du /admin et les noms des tables Supabase. Pour le site de l'agence, le prive serait plus sain. C'est un reglage, pas un chantier.",
       "qui": "will",
       "prio": "moyenne"
+    },
+    {
+      "titre": "Le lien de reservation du diagnostic n'est pas branche",
+      "detail": "Le bandeau de fin de page et les boutons « Reserver mes 30 minutes » pointent vers la page /diagnostic (le quiz), pas vers un vrai calendrier. Si tu veux que les gens reservent directement un creneau, il faut un lien Google Calendar / Cal.com a poser. Sinon, le parcours actuel est : quiz -> formulaire, ce qui se defend.",
+      "qui": "will",
+      "prio": "moyenne"
+    },
+    {
+      "titre": "Le beacon d'analytics Cloudflare tourne sur le site",
+      "detail": "static.cloudflareinsights.com est injecte automatiquement par Cloudflare (Web Analytics). Il ne depose aucun temoin, donc il ne declenche pas d'obligation de banniere Loi 25, mais c'est un traceur que personne n'a decide d'installer. A garder ou a couper dans le tableau de bord Cloudflare, c'est ton appel.",
+      "qui": "will",
+      "prio": "basse"
     }
   ]
 }
