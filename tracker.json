@@ -191,8 +191,8 @@
       "gate_statut": null,
       "debut": "",
       "fin": "",
-      "rapport": "Loi 25 cas 1 passe (aucun traceur), politique liee au pied de page de toutes les pages",
-      "date": "2026-08-21"
+      "rapport": "Loi 25 : les TROIS cas testes dans un vrai navigateur sur la production. Cas 1 (sans interaction) aucun _ga ; cas 2 (apres refus) aucun _ga, analytics_storage=false ; cas 3 (apres acceptation) _ga et _ga_2ZB87G0FJD apparaissent et deux appels /g/collect partent. Banniere CookieYes avec « Tout rejeter » et « Accepter tout » de meme poids. Politique a jour (categories de temoins, retrait du consentement, Google et CookieYes ajoutes aux sous-traitants hors Quebec).",
+      "date": "2026-08-22"
     },
     {
       "id": "sentinel",
@@ -263,6 +263,10 @@
     {
       "date": "2026-08-22",
       "quoi": "Le dossier de marque n'avait pas de lockup horizontal navy transparent : le sous-dossier « Horizontal » contenait le meme fichier que « Wordmark » (meme MD5) et le seul horizontal etait en ivoire. Recolorer son SVG a suffi. Piege : son trace n'occupait que 44 % du viewBox, donc a hauteur egale le texte sortait deux fois trop petit ; il faut resserrer le viewBox sur la bbox reelle avant de dimensionner."
+    },
+    {
+      "date": "2026-08-22",
+      "quoi": "Next hoiste le <script async src=gtag.js> AVANT les scripts en ligne dans le HTML rendu. Ca alarme a la lecture du source, mais ce n'est pas un defaut : gtag.js rejoue la file dataLayer, donc seul l'ordre des commandes compte (consent default avant config), pas la position des balises. Ne pas conclure sur le source : tester dans un navigateur."
     }
   ],
   "backlog_post_lancement": [
@@ -313,12 +317,6 @@
       "detail": "Le beacon est deja BLOQUE par la CSP (il ne s'execute plus, aucune donnee ne part). Mais Cloudflare continue de l'injecter dans le HTML, donc le navigateur signale un refus CSP dans la console. Pour que ce soit propre : dash.cloudflare.com > Analytics & Logs > Web Analytics > norvika.ca > Manage site > desactiver l'ajout automatique du script. 30 secondes. ⚠️ Effet mesure : tant que c'est en place, « bonnes pratiques » de Lighthouse plafonne a 93 au lieu de 100 (erreur console + probleme signale). C'est la SEULE cause restante.",
       "qui": "will",
       "prio": "moyenne"
-    },
-    {
-      "titre": "GA4 : il manque l'identifiant de mesure",
-      "detail": "Toute la plomberie est posee (mode consentement refuse par defaut, CookieYes qui debloque a l'acceptation). Il manque NEXT_PUBLIC_GA_ID (format G-XXXXXXXXXX). Sans lui, aucun script de mesure n'est emis, ce qui est le defaut sain. A poser dans .env.local ET dans les variables du depot GitHub (variable NEXT_PUBLIC_*, figee a la construction).",
-      "qui": "will",
-      "prio": "haute"
     },
     {
       "titre": "Le texte de la banniere parle de publicite, ce qui est faux",
