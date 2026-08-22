@@ -273,8 +273,20 @@
       "prio": "basse"
     },
     {
-      "titre": "Le deploiement reste manuel",
-      "detail": "wrangler deploy ne construit rien : il faut opennextjs-cloudflare build avant, sinon on redeploie l'ancien bundle sans erreur. Piege rencontre ce jour-la. Poser une action GitHub build+deploy reglerait la question.",
+      "titre": "Le deploiement automatique attend un jeton Cloudflare",
+      "detail": "L'action GitHub est en place et verte jusqu'a l'etape de deploiement (types, style, construction OpenNext). Il manque le secret CLOUDFLARE_API_TOKEN dans les secrets du depot pour que la derniere etape passe. Tant qu'il manque, chaque publication reste manuelle et expose au piege du paquet non reconstruit.",
+      "qui": "will",
+      "prio": "haute"
+    },
+    {
+      "titre": "Donner a Lau ses acces, et un poste qui marche",
+      "detail": "Elle veut pouvoir tout modifier. Trois invitations a envoyer : le depot GitHub NORVIKA/norvika (compte personnel, un seul collaborateur aujourd'hui), le compte Cloudflare, et un coffre 1Password partage si elle doit un jour lancer des commandes qui touchent aux secrets du site en marche. Le mode d'emploi de sa machine est dans CONTRIBUER.md, a la racine du depot.",
+      "qui": "will",
+      "prio": "haute"
+    },
+    {
+      "titre": "Le depot du site est public",
+      "detail": "github.com/NORVIKA/norvika est en public. Aucun secret dedans, verifie, donc pas de faille immediate. Mais il expose la structure du /admin et les noms des tables Supabase. Pour le site de l'agence, le prive serait plus sain. C'est un reglage, pas un chantier.",
       "qui": "will",
       "prio": "moyenne"
     }
