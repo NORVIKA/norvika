@@ -2,7 +2,7 @@
 
 import { useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
-import { supabase } from "@/lib/supabase";
+import { getSupabase } from "@/lib/supabase";
 
 let attempts = 0;
 let lockUntil = 0;
@@ -25,7 +25,7 @@ export default function AdminLoginPage() {
     }
 
     setLoading(true);
-    const { error } = await supabase.auth.signInWithPassword({ email, password });
+    const { error } = await getSupabase().auth.signInWithPassword({ email, password });
     setLoading(false);
 
     if (error) {

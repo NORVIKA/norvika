@@ -1,12 +1,12 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { supabase } from "@/lib/supabase";
+import { getSupabase } from "@/lib/supabase";
 
 export function MarkReadButton({ id }: { id: string }) {
   const router = useRouter();
   async function mark() {
-    await supabase.from("contact_messages").update({ read: true }).eq("id", id);
+    await getSupabase().from("contact_messages").update({ read: true }).eq("id", id);
     router.refresh();
   }
   return (

@@ -1,13 +1,13 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { supabase } from "@/lib/supabase";
+import { getSupabase } from "@/lib/supabase";
 
 export function AdminLogoutButton() {
   const router = useRouter();
 
   async function handleLogout() {
-    await supabase.auth.signOut();
+    await getSupabase().auth.signOut();
     router.push("/admin/login");
     router.refresh();
   }

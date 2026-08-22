@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { supabase } from "@/lib/supabase";
+import { getSupabase } from "@/lib/supabase";
 import { scheduleRedeploy } from "@/lib/redeploy-client";
 
 interface ColorEntry { key: string; value: string; label: string; }
@@ -19,7 +19,7 @@ export function CouleursEditor({ initialColors }: { initialColors: ColorEntry[] 
     setSaving(true);
     setSuccess(false);
     const upserts = colors.map(({ key, value, label }) => ({ key, value, label }));
-    const { error } = await supabase.from("site_colors").upsert(upserts, { onConflict: "key" });
+    const { error } = await getSupabase().from("site_colors").upsert(upserts, { onConflict: "key" });
     setSaving(false);
     if (!error) { setSuccess(true); scheduleRedeploy(); setTimeout(() => setSuccess(false), 5000); }
   }

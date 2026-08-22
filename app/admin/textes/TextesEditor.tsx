@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { supabase } from "@/lib/supabase";
+import { getSupabase } from "@/lib/supabase";
 import { scheduleRedeploy } from "@/lib/redeploy-client";
 
 const SECTIONS = [
@@ -84,7 +84,7 @@ export function TextesEditor({ initialContent }: Props) {
       updated_at: new Date().toISOString(),
     }));
 
-    const { error } = await supabase
+    const { error } = await getSupabase()
       .from("site_content")
       .upsert(upserts, { onConflict: "key" });
 

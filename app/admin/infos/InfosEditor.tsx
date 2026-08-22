@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { supabase } from "@/lib/supabase";
+import { getSupabase } from "@/lib/supabase";
 import { scheduleRedeploy } from "@/lib/redeploy-client";
 
 const FIELDS = [
@@ -22,7 +22,7 @@ export function InfosEditor({ initialInfo }: { initialInfo: Record<string, strin
     setSaving(true);
     setSuccess(false);
     const upserts = Object.entries(info).map(([key, value]) => ({ key, value }));
-    const { error } = await supabase.from("site_info").upsert(upserts, { onConflict: "key" });
+    const { error } = await getSupabase().from("site_info").upsert(upserts, { onConflict: "key" });
     setSaving(false);
     if (!error) { setSuccess(true); scheduleRedeploy(); setTimeout(() => setSuccess(false), 5000); }
   }

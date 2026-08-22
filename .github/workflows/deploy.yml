@@ -43,11 +43,16 @@ jobs:
       - name: Verifier le style de code
         run: npm run lint
 
-      # Construit le paquet OpenNext. Sans les variables Supabase, getSiteData()
-      # bascule sur ses valeurs par defaut, qui sont celles de la base : le HTML
-      # genere est le meme. Rien de secret n'est requis pour construire.
+      # ⚠️ Les variables NEXT_PUBLIC_* sont FIGEES DANS LE CODE au moment de la
+      # construction. Sans elles ici, /admin partirait en ligne sans adresse de
+      # base et la connexion casserait. Ce ne sont pas des secrets : elles
+      # partent de toute facon dans le navigateur, la protection vient des
+      # regles RLS. D'ou des « variables » de depot et non des « secrets ».
       - name: Construire pour Cloudflare
         run: npx opennextjs-cloudflare build
+        env:
+          NEXT_PUBLIC_SUPABASE_URL: ${{ vars.NEXT_PUBLIC_SUPABASE_URL }}
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ vars.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
 
       - name: Deployer
         # Uniquement depuis la branche de production.
