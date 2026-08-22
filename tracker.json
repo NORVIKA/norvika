@@ -259,6 +259,10 @@
     {
       "date": "2026-08-22",
       "quoi": "Test Loi 25 des trois cas fait en prod : cas 1 (aucun temoin avant interaction) et cas 2 (refus respecte, consent:no analytics:no) passent. Le cas 3 ne sera complet qu'avec GA4. CookieYes refuse de s'afficher hors du domaine enregistre, donc la banniere ne se teste jamais en local : il faut deployer pour la valider."
+    },
+    {
+      "date": "2026-08-22",
+      "quoi": "Le dossier de marque n'avait pas de lockup horizontal navy transparent : le sous-dossier « Horizontal » contenait le meme fichier que « Wordmark » (meme MD5) et le seul horizontal etait en ivoire. Recolorer son SVG a suffi. Piege : son trace n'occupait que 44 % du viewBox, donc a hauteur egale le texte sortait deux fois trop petit ; il faut resserrer le viewBox sur la bbox reelle avant de dimensionner."
     }
   ],
   "backlog_post_lancement": [
@@ -306,7 +310,7 @@
     },
     {
       "titre": "Desactiver l'injection du beacon Cloudflare dans le tableau de bord",
-      "detail": "Le beacon est deja BLOQUE par la CSP (il ne s'execute plus, aucune donnee ne part). Mais Cloudflare continue de l'injecter dans le HTML, donc le navigateur signale un refus CSP dans la console. Pour que ce soit propre : dash.cloudflare.com > Analytics & Logs > Web Analytics > norvika.ca > Manage site > desactiver l'ajout automatique du script. 30 secondes.",
+      "detail": "Le beacon est deja BLOQUE par la CSP (il ne s'execute plus, aucune donnee ne part). Mais Cloudflare continue de l'injecter dans le HTML, donc le navigateur signale un refus CSP dans la console. Pour que ce soit propre : dash.cloudflare.com > Analytics & Logs > Web Analytics > norvika.ca > Manage site > desactiver l'ajout automatique du script. 30 secondes. ⚠️ Effet mesure : tant que c'est en place, « bonnes pratiques » de Lighthouse plafonne a 93 au lieu de 100 (erreur console + probleme signale). C'est la SEULE cause restante.",
       "qui": "will",
       "prio": "moyenne"
     },
@@ -318,7 +322,7 @@
     },
     {
       "titre": "Le texte de la banniere parle de publicite, ce qui est faux",
-      "detail": "Le texte par defaut de CookieYes dit « diffuser des publicites ou des contenus personnalises ». Norvika ne fait aucune publicite et ne depose aucun temoin publicitaire. A reecrire dans le tableau de bord CookieYes pour dire la verite : temoins necessaires et mesure d'audience, point.",
+      "detail": "Le texte par defaut de CookieYes dit « diffuser des publicites ou des contenus personnalises ». Norvika ne fait aucune publicite et ne depose aucun temoin publicitaire. A reecrire dans le tableau de bord CookieYes pour dire la verite : temoins necessaires et mesure d'audience, point. Les COULEURS de la banniere sont deja reglees (navy, dans le depot) : il ne reste que le texte a corriger dans leur tableau de bord.",
       "qui": "will",
       "prio": "moyenne"
     }
