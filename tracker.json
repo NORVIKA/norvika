@@ -255,6 +255,10 @@
     {
       "date": "2026-08-22",
       "quoi": "Une piece qui se deplace le long d'une courbe SVG doit lire un point sur le trace a chaque image (getPointAtLength), pas animer left/top : sinon elle coupe en ligne droite a travers la courbe. Et une CSP ajoutee sur un domaine Cloudflare doit autoriser static.cloudflareinsights.com, sinon le beacon injecte par Cloudflare leve une erreur console."
+    },
+    {
+      "date": "2026-08-22",
+      "quoi": "Test Loi 25 des trois cas fait en prod : cas 1 (aucun temoin avant interaction) et cas 2 (refus respecte, consent:no analytics:no) passent. Le cas 3 ne sera complet qu'avec GA4. CookieYes refuse de s'afficher hors du domaine enregistre, donc la banniere ne se teste jamais en local : il faut deployer pour la valider."
     }
   ],
   "backlog_post_lancement": [
@@ -295,16 +299,28 @@
       "prio": "moyenne"
     },
     {
-      "titre": "Le lien de reservation du diagnostic n'est pas branche",
-      "detail": "Le bandeau de fin de page et les boutons « Reserver mes 30 minutes » pointent vers la page /diagnostic (le quiz), pas vers un vrai calendrier. Si tu veux que les gens reservent directement un creneau, il faut un lien Google Calendar / Cal.com a poser. Sinon, le parcours actuel est : quiz -> formulaire, ce qui se defend.",
+      "titre": "Le lien de calendrier existe a deux endroits",
+      "detail": "Les boutons « Reserver mes 30 minutes » utilisent maintenant la constante de lib/liens.ts. La page /contact, elle, lit encore site_info.lien_rdv dans Supabase (/admin/infos). Les deux valeurs sont identiques aujourd'hui. A trancher : lequel fait foi, sinon un changement dans l'admin ne bougera pas les boutons du site.",
       "qui": "will",
       "prio": "moyenne"
     },
     {
-      "titre": "Le beacon d'analytics Cloudflare tourne sur le site",
-      "detail": "static.cloudflareinsights.com est injecte automatiquement par Cloudflare (Web Analytics). Il ne depose aucun temoin, donc il ne declenche pas d'obligation de banniere Loi 25, mais c'est un traceur que personne n'a decide d'installer. A garder ou a couper dans le tableau de bord Cloudflare, c'est ton appel.",
+      "titre": "Desactiver l'injection du beacon Cloudflare dans le tableau de bord",
+      "detail": "Le beacon est deja BLOQUE par la CSP (il ne s'execute plus, aucune donnee ne part). Mais Cloudflare continue de l'injecter dans le HTML, donc le navigateur signale un refus CSP dans la console. Pour que ce soit propre : dash.cloudflare.com > Analytics & Logs > Web Analytics > norvika.ca > Manage site > desactiver l'ajout automatique du script. 30 secondes.",
       "qui": "will",
-      "prio": "basse"
+      "prio": "moyenne"
+    },
+    {
+      "titre": "GA4 : il manque l'identifiant de mesure",
+      "detail": "Toute la plomberie est posee (mode consentement refuse par defaut, CookieYes qui debloque a l'acceptation). Il manque NEXT_PUBLIC_GA_ID (format G-XXXXXXXXXX). Sans lui, aucun script de mesure n'est emis, ce qui est le defaut sain. A poser dans .env.local ET dans les variables du depot GitHub (variable NEXT_PUBLIC_*, figee a la construction).",
+      "qui": "will",
+      "prio": "haute"
+    },
+    {
+      "titre": "Le texte de la banniere parle de publicite, ce qui est faux",
+      "detail": "Le texte par defaut de CookieYes dit « diffuser des publicites ou des contenus personnalises ». Norvika ne fait aucune publicite et ne depose aucun temoin publicitaire. A reecrire dans le tableau de bord CookieYes pour dire la verite : temoins necessaires et mesure d'audience, point.",
+      "qui": "will",
+      "prio": "moyenne"
     }
   ]
 }
