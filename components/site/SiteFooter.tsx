@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { ContactCTA } from "@/components/site/ContactCTA";
 
-const logoStack = { url: "/assets/logo_stack_navy_new.webp" };
+const logoStack = { url: "/assets/norvika-stack.svg" };
 export function SiteFooter() {
   return (
     <>

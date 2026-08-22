@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useState } from "react";
 
 import { SiteHeader } from "@/components/site/SiteHeader";
-const logoStack = { url: "/assets/logo_stack_navy_new.webp" };
+const logoStack = { url: "/assets/norvika-stack.svg" };
 type Question = {
   t: string;
   s?: string;

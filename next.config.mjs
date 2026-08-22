@@ -66,6 +66,11 @@ const nextConfig = {
             key: "Content-Security-Policy",
             value: [
               "default-src 'self'",
+              // ⚠️ `unsafe-eval` UNIQUEMENT en developpement. React s'en sert en
+              // mode dev pour reconstruire les piles d'appel ; sans lui, `npm run
+              // dev` perd ses outils de debogage. React n'utilise JAMAIS eval en
+              // production, donc la regle reste stricte sur le site en ligne.
+              //
               // ⛔ static.cloudflareinsights.com n'est VOLONTAIREMENT plus
               // autorise : le beacon d'analytics que Cloudflare injectait tout
               // seul est coupe (decision William, 2026-08-22). Tant qu'il n'est
@@ -74,7 +79,7 @@ const nextConfig = {
               //
               // cdn-cookieyes.com : la banniere de consentement.
               // googletagmanager.com : GA4, qui ne mesure qu'apres acceptation.
-              "script-src 'self' 'unsafe-inline' https://cdn-cookieyes.com https://www.googletagmanager.com",
+              `script-src 'self' 'unsafe-inline'${process.env.NODE_ENV === "development" ? " 'unsafe-eval'" : ""} https://cdn-cookieyes.com https://www.googletagmanager.com`,
               "style-src 'self' 'unsafe-inline' https://cdn-cookieyes.com",
               "img-src 'self' data: https://*.supabase.co https://cdn.sanity.io https://placehold.co https://image.thum.io https://cdn-cookieyes.com https://*.google-analytics.com https://*.googletagmanager.com",
               "font-src 'self' data: https://cdn-cookieyes.com",

@@ -4,7 +4,10 @@ import Link from "next/link";
 
 import { useState } from "react";
 import { LIEN_RDV } from "@/lib/liens";
-const wordmark = { url: "/assets/wordmark_navy.webp" };
+// Lockup horizontal de la marque : l'icone et le mot NORVIKA cote a cote.
+// En SVG : net a toutes les tailles, 2,6 Ko, et pas de version floue sur
+// les ecrans a haute densite.
+const wordmark = { url: "/assets/norvika-horizontal.svg" };
 const links = [
   { to: "/sites-web", label: "Sites web" },
   { to: "/automatisation", label: "Automatisation" },
@@ -48,7 +51,9 @@ export function SiteHeader() {
           <img
             src={wordmark.url}
             alt="Norvika"
-            style={{ height: 18, width: "auto", display: "block" }}
+            width={158}
+            height={26}
+            style={{ height: 26, width: "auto", display: "block" }}
           />
         </Link>
         <nav
