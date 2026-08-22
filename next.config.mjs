@@ -66,11 +66,14 @@ const nextConfig = {
             key: "Content-Security-Policy",
             value: [
               "default-src 'self'",
-              "script-src 'self' 'unsafe-inline'",
+              // static.cloudflareinsights.com : le beacon d'analytics sans
+              // temoin que Cloudflare injecte lui-meme sur le domaine. On
+              // l'autorise pour ne pas le casser (sinon erreur console + CSP).
+              "script-src 'self' 'unsafe-inline' https://static.cloudflareinsights.com",
               "style-src 'self' 'unsafe-inline'",
               "img-src 'self' data: https://*.supabase.co https://cdn.sanity.io https://placehold.co https://image.thum.io",
               "font-src 'self' data:",
-              "connect-src 'self' https://*.supabase.co",
+              "connect-src 'self' https://*.supabase.co https://cloudflareinsights.com",
               "form-action 'self'",
               "frame-ancestors 'none'",
               "base-uri 'self'",
