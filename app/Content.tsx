@@ -7,6 +7,7 @@ import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
 import { useReveal } from "@/lib/useReveal";
 import { Roadmap, type RoadStep } from "@/components/site/Roadmap";
+import { LIEN_RDV } from "@/lib/liens";
 const lauEtWill = { url: "/assets/lau-et-will-2.webp" };
 const logoDesjardins = { url: "/assets/logo-desjardins.webp" };
 const logoAnytime = { url: "/assets/logo-anytime.webp" };
@@ -228,8 +229,8 @@ function Index() {
               justifyContent: "center",
             }}
           >
-            <Link
-              href="/diagnostic"
+            <a
+              href={LIEN_RDV}
               className="nv-btn-primary"
               style={{
                 padding: "16px 28px",
@@ -237,9 +238,9 @@ function Index() {
                 fontSize: 15,
                 fontWeight: 600,
               }}
-            >
+             target="_blank" rel="noopener noreferrer">
               Réserver mes 30 minutes
-            </Link>
+            </a>
             <Link
               href="/realisations"
               className="nv-btn-outline"

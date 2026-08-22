@@ -6,6 +6,7 @@ import { useEffect, useRef, useState } from "react";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
 import { Roadmap, type RoadStep } from "@/components/site/Roadmap";
+import { LIEN_RDV } from "@/lib/liens";
 const tournage = { url: "/assets/img-1079.webp" };
 const cardStyle: React.CSSProperties = {
   padding: "34px 30px",
@@ -250,8 +251,8 @@ function Page() {
               justifyContent: "center",
             }}
           >
-            <Link
-              href="/diagnostic"
+            <a
+              href={LIEN_RDV}
               className="nv-btn-primary"
               style={{
                 padding: "16px 28px",
@@ -259,9 +260,9 @@ function Page() {
                 fontSize: 15,
                 fontWeight: 600,
               }}
-            >
+             target="_blank" rel="noopener noreferrer">
               Réserver mes 30 minutes
-            </Link>
+            </a>
             <a
               href="https://norvika.myportfolio.com/"
               target="_blank"

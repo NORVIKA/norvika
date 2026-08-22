@@ -45,13 +45,29 @@ export default function PolitiquePage() {
             commerciales.
           </p>
 
-          <h2 className="mt-8 text-xl font-semibold">4. Cookies et analytique</h2>
+          <h2 className="mt-8 text-xl font-semibold">4. Témoins (cookies) et mesure d&apos;audience</h2>
           <p className="mt-3 text-[var(--muted-foreground)]">
-            Ce site n&apos;utilise aucun cookie de mesure d&apos;audience, aucun outil d&apos;analytique
-            et aucun traceur publicitaire. Rien n&apos;est déposé sur votre appareil à des fins de
-            suivi, et c&apos;est pourquoi aucune bannière de consentement ne vous est présentée. Si un
-            outil de mesure était ajouté un jour, cette page serait mise à jour et votre consentement
-            serait demandé avant tout dépôt.
+            Ce site utilise deux catégories de témoins. Les témoins <strong>nécessaires</strong> font
+            fonctionner le site et mémorisent votre choix de consentement : ils sont déposés sans votre
+            accord, parce que le site ne peut pas fonctionner sans eux. Les témoins de{" "}
+            <strong>mesure d&apos;audience</strong> (Google Analytics 4) nous indiquent quelles pages
+            sont consultées, afin d&apos;améliorer le site.
+          </p>
+          <p className="mt-3 text-[var(--muted-foreground)]">
+            Aucun témoin de mesure n&apos;est déposé avant que vous l&apos;ayez accepté. Tant que vous
+            n&apos;avez pas donné votre accord, Google Analytics est désactivé et ne reçoit rien.
+            Refuser est aussi simple qu&apos;accepter : les deux choix sont offerts dès la première
+            visite, au même endroit et avec la même facilité.
+          </p>
+          <p className="mt-3 text-[var(--muted-foreground)]">
+            Vous pouvez changer d&apos;idée en tout temps en rouvrant la fenêtre de consentement depuis
+            le lien de gestion des témoins affiché sur le site, ou en effaçant les témoins de votre
+            navigateur. Nous n&apos;utilisons aucun témoin publicitaire et ne faisons aucun ciblage
+            publicitaire.
+          </p>
+          <p className="mt-3 text-[var(--muted-foreground)]">
+            La bannière de consentement est fournie par CookieYes. La mesure d&apos;audience est
+            fournie par Google Analytics 4, avec l&apos;anonymisation des adresses IP activée.
           </p>
 
           <h2 className="mt-8 text-xl font-semibold">5. Conservation des données</h2>
@@ -122,6 +138,14 @@ export default function PolitiquePage() {
             <li>
               <strong className="text-[var(--foreground)]">Cloudflare</strong> : hébergement et
               diffusion du site
+            </li>
+            <li>
+              <strong className="text-[var(--foreground)]">Google (Analytics 4)</strong> : mesure
+              d&apos;audience, uniquement si vous l&apos;avez acceptée
+            </li>
+            <li>
+              <strong className="text-[var(--foreground)]">CookieYes</strong> : affichage de la
+              bannière de consentement et conservation de votre choix
             </li>
           </ul>
           <p className="mt-3 text-[var(--muted-foreground)]">

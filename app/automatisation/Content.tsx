@@ -6,6 +6,7 @@ import { useEffect, useRef, useState } from "react";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
 import { Roadmap, type RoadStep } from "@/components/site/Roadmap";
+import { LIEN_RDV } from "@/lib/liens";
 
 const STEPS = [
   { title: "Un appel de 30 minutes", label: "Un appel de 30 minutes", desc: "On regarde ensemble comment votre entreprise fonctionne aujourd'hui. Gratuit, sans engagement, et vous repartez avec un document d'analyse." },
@@ -71,9 +72,9 @@ function Page() {
             La plupart des entreprises ont déjà des outils. Le problème, c'est qu'elles ne les comprennent pas vraiment, alors elles compensent à la main. On vous aide à comprendre ce que vous avez, à choisir ce qui manque, et à retrouver du temps pour ce qui compte.
           </p>
           <div style={{ margin: "34px 0 0", display: "flex", flexWrap: "wrap", gap: 12, justifyContent: "center" }}>
-            <Link href="/diagnostic" className="nv-btn-primary" style={{ padding: "16px 28px", borderRadius: 10, fontSize: 15, fontWeight: 600 }}>
+            <a href={LIEN_RDV} className="nv-btn-primary" style={{ padding: "16px 28px", borderRadius: 10, fontSize: 15, fontWeight: 600 }} target="_blank" rel="noopener noreferrer">
               Réserver mes 30 minutes
-            </Link>
+            </a>
             <Link href="/diagnostic" style={{ padding: "16px 22px", borderRadius: 10, border: "1px solid rgba(12,25,47,.14)", fontSize: 15, fontWeight: 600, color: "rgba(12,25,47,.76)" }}>
               Faire le quiz →
             </Link>

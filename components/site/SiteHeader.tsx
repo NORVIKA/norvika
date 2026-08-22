@@ -3,6 +3,7 @@
 import Link from "next/link";
 
 import { useState } from "react";
+import { LIEN_RDV } from "@/lib/liens";
 const wordmark = { url: "/assets/wordmark_navy.webp" };
 const links = [
   { to: "/sites-web", label: "Sites web" },
@@ -60,8 +61,8 @@ export function SiteHeader() {
             </Link>
           ))}
         </nav>
-        <Link
-          href="/diagnostic"
+        <a
+          href={LIEN_RDV}
           className="nv-btn-primary nv-header-cta"
           style={{
             padding: "11px 20px",
@@ -69,9 +70,9 @@ export function SiteHeader() {
             fontSize: 13.5,
             fontWeight: 600,
           }}
-        >
+         target="_blank" rel="noopener noreferrer">
           Réserver mes 30 minutes
-        </Link>
+        </a>
         <button
           type="button"
           className="nv-burger"
@@ -133,8 +134,8 @@ export function SiteHeader() {
               {l.label}
             </Link>
           ))}
-          <Link
-            href="/diagnostic"
+          <a
+            href={LIEN_RDV}
             onClick={() => setOpen(false)}
             className="nv-btn-primary"
             style={{
@@ -145,9 +146,11 @@ export function SiteHeader() {
               fontWeight: 600,
               textAlign: "center",
             }}
+            target="_blank"
+            rel="noopener noreferrer"
           >
             Réserver mes 30 minutes
-          </Link>
+          </a>
         </nav>
       ) : null}
     </header>

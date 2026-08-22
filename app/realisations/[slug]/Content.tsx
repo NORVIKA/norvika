@@ -6,6 +6,7 @@ import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
 import { useReveal } from "@/lib/useReveal";
 import { CATEGORIES, CLIENT_COVERS, getClient } from "@/lib/realisations";
+import { LIEN_RDV } from "@/lib/liens";
 
 const labelFor = (id: string) =>
   CATEGORIES.find((c) => c.id === id)?.label ?? id;
@@ -324,8 +325,8 @@ export default function Page({ slug }: { slug: string }) {
             Un projet comme celui-ci?
           </h2>
           <div style={{ marginTop: 26 }}>
-            <Link
-              href="/diagnostic"
+            <a
+              href={LIEN_RDV}
               className="nv-btn-primary"
               style={{
                 display: "inline-block",
@@ -334,9 +335,9 @@ export default function Page({ slug }: { slug: string }) {
                 fontSize: 15,
                 fontWeight: 600,
               }}
-            >
+             target="_blank" rel="noopener noreferrer">
               Réserver mes 30 minutes
-            </Link>
+            </a>
           </div>
         </div>
       </section>

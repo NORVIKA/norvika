@@ -44,6 +44,12 @@ export const metadata: Metadata = {
   icons: { icon: [{ url: "/favicon.png", type: "image/png" }, { url: "/icon.svg", type: "image/svg+xml" }] },
 };
 
+// Identifiant GA4. Absent = aucun script de mesure n'est emis du tout, ce qui
+// est le defaut sain : on n'installe un traceur que si quelqu'un l'a demande.
+// ⚠️ Variable NEXT_PUBLIC_*, donc FIGEE AU MOMENT DE LA CONSTRUCTION : elle doit
+// exister dans les variables du depot pour que l'action GitHub la voie.
+const GA_ID = process.env.NEXT_PUBLIC_GA_ID;
+
 // ISR : le shell est prerendere et servi en cache a l'edge, le Worker ne
 // rebatit pas la page a chaque visite (c'est ce qui declenche l'erreur 1102).
 export const revalidate = 3600;
@@ -60,7 +66,58 @@ export default async function RootLayout({
     <html lang="fr" className={`${sora.variable} ${dmSans.variable}`}>
       <head>
         {/* COOKIEYES INSERT HERE */}
+        {/* Banniere de consentement. Doit venir EN PREMIER dans le <head> :
+            c'est elle qui debloque les traceurs, donc elle doit exister avant
+            qu'un traceur puisse se declencher. */}
+        {/* eslint-disable-next-line @next/next/no-sync-scripts --
+            Le chargement synchrone est VOULU et ne doit pas etre « corrige ».
+            La banniere doit exister avant qu'un traceur puisse se declencher ;
+            en `async`, GA4 pourrait partir avant elle et deposer un temoin sans
+            consentement, ce qui est exactement ce que la Loi 25 interdit. */}
+        <script
+          id="cookieyes"
+          type="text/javascript"
+          src="https://cdn-cookieyes.com/client_data/6581bcd9cee3517fb2a568c0bccd08d2/script.js"
+        />
+
         {/* GA4 INSERT HERE */}
+        {/* ⛔ LOI 25, art. 8.1 : AUCUN temoin de mesure avant un consentement
+            explicite. Le mode consentement de Google est donc pose a « refuse »
+            par defaut, AVANT le chargement de gtag. Sans ce bloc, GA4 depose
+            _ga des la premiere visite et le cas 2 du test (refuser, verifier
+            qu'il n'y a toujours rien) echoue.
+            CookieYes envoie ensuite un `consent: update` quand le visiteur
+            accepte, et seulement a ce moment-la GA4 se met a mesurer. */}
+        {GA_ID ? (
+          <>
+            <script
+              dangerouslySetInnerHTML={{
+                __html: `
+window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);}
+gtag('consent', 'default', {
+  ad_storage: 'denied',
+  ad_user_data: 'denied',
+  ad_personalization: 'denied',
+  analytics_storage: 'denied',
+  functionality_storage: 'granted',
+  security_storage: 'granted',
+  wait_for_update: 500
+});
+gtag('set', 'ads_data_redaction', true);`,
+              }}
+            />
+            <script async src={`https://www.googletagmanager.com/gtag/js?id=${GA_ID}`} />
+            <script
+              dangerouslySetInnerHTML={{
+                __html: `
+gtag('js', new Date());
+gtag('config', '${GA_ID}', { anonymize_ip: true });`,
+              }}
+            />
+          </>
+        ) : null}
+
         {/* GSC VERIFICATION INSERT HERE */}
         {/* Sans JS, l'observateur ne pose jamais .is-in et le contenu resterait invisible. */}
         <noscript>

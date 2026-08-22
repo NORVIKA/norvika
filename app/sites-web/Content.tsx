@@ -6,6 +6,7 @@ import { useEffect, useRef, useState } from "react";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
 import { Roadmap, type RoadStep } from "@/components/site/Roadmap";
+import { LIEN_RDV } from "@/lib/liens";
 
 const STEPS = [
   {
@@ -132,13 +133,13 @@ function Page() {
             et vous repartez en sachant comment il fonctionne.
           </p>
           <div style={{ margin: "34px 0 0", display: "flex", flexWrap: "wrap", gap: 12, justifyContent: "center" }}>
-            <Link
-              href="/diagnostic"
+            <a
+              href={LIEN_RDV}
               className="nv-btn-primary"
               style={{ padding: "16px 28px", borderRadius: 10, fontSize: 15, fontWeight: 600 }}
-            >
+             target="_blank" rel="noopener noreferrer">
               Réserver mes 30 minutes
-            </Link>
+            </a>
             <Link
               href="/realisations"
               className="nv-cta-outline"

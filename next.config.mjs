@@ -66,14 +66,19 @@ const nextConfig = {
             key: "Content-Security-Policy",
             value: [
               "default-src 'self'",
-              // static.cloudflareinsights.com : le beacon d'analytics sans
-              // temoin que Cloudflare injecte lui-meme sur le domaine. On
-              // l'autorise pour ne pas le casser (sinon erreur console + CSP).
-              "script-src 'self' 'unsafe-inline' https://static.cloudflareinsights.com",
-              "style-src 'self' 'unsafe-inline'",
-              "img-src 'self' data: https://*.supabase.co https://cdn.sanity.io https://placehold.co https://image.thum.io",
-              "font-src 'self' data:",
-              "connect-src 'self' https://*.supabase.co https://cloudflareinsights.com",
+              // ⛔ static.cloudflareinsights.com n'est VOLONTAIREMENT plus
+              // autorise : le beacon d'analytics que Cloudflare injectait tout
+              // seul est coupe (decision William, 2026-08-22). Tant qu'il n'est
+              // pas aussi desactive dans le tableau de bord Cloudflare, la CSP
+              // l'empeche de s'executer.
+              //
+              // cdn-cookieyes.com : la banniere de consentement.
+              // googletagmanager.com : GA4, qui ne mesure qu'apres acceptation.
+              "script-src 'self' 'unsafe-inline' https://cdn-cookieyes.com https://www.googletagmanager.com",
+              "style-src 'self' 'unsafe-inline' https://cdn-cookieyes.com",
+              "img-src 'self' data: https://*.supabase.co https://cdn.sanity.io https://placehold.co https://image.thum.io https://cdn-cookieyes.com https://*.google-analytics.com https://*.googletagmanager.com",
+              "font-src 'self' data: https://cdn-cookieyes.com",
+              "connect-src 'self' https://*.supabase.co https://cdn-cookieyes.com https://log.cookieyes.com https://directives.cookieyes.com https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com",
               "form-action 'self'",
               "frame-ancestors 'none'",
               "base-uri 'self'",

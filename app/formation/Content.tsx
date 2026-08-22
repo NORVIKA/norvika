@@ -7,6 +7,7 @@ import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
 import { Roadmap, type RoadStep } from "@/components/site/Roadmap";
 import { useReveal } from "@/lib/useReveal";
+import { LIEN_RDV } from "@/lib/liens";
 
 const CHECKS = [
   "Vous voulez publier des photos et des vidéos qui vous ressemblent, sans attendre un photographe à chaque fois.",
@@ -127,9 +128,9 @@ function Page() {
             Votre site, vos photos, vos vidéos, vos outils: tout ça est à vous. Pourtant, vous dépendez souvent de quelqu'un d'autre pour y toucher. On forme votre équipe, sur place, pour qu'elle sache le faire elle-même.
           </p>
           <div style={{ margin: "34px 0 0", display: "flex", justifyContent: "center" }}>
-            <Link href="/diagnostic" className="nv-btn-primary" style={{ padding: "16px 28px", borderRadius: 10, fontSize: 15, fontWeight: 600 }}>
+            <a href={LIEN_RDV} className="nv-btn-primary" style={{ padding: "16px 28px", borderRadius: 10, fontSize: 15, fontWeight: 600 }} target="_blank" rel="noopener noreferrer">
               Réserver mes 30 minutes
-            </Link>
+            </a>
           </div>
         </div>
       </section>

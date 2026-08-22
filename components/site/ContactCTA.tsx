@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useState, type FormEvent } from "react";
+import { LIEN_RDV } from "@/lib/liens";
 
 /**
  * Bandeau de fin de page (present sur TOUTES les pages via SiteFooter).
@@ -141,12 +142,12 @@ export function ContactCTA() {
             Dites-nous en deux lignes ce qui vous freine. On vous revient vite,
             par courriel ou par téléphone, avec une première piste concrète.
             Vous préférez un appel tout de suite ?{" "}
-            <Link
-              href="/diagnostic"
+            <a
+              href={LIEN_RDV}
               style={{ color: "#F5F3EE", textDecoration: "underline", textUnderlineOffset: 3 }}
-            >
+             target="_blank" rel="noopener noreferrer">
               Réservez vos 30 minutes
-            </Link>
+            </a>
             .
           </p>
         </div>
