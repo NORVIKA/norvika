@@ -279,3 +279,54 @@
 @media (max-width: 460px) {
   .nv-cta-fields { grid-template-columns: minmax(0, 1fr) !important; }
 }
+
+/* ===== Banniere de consentement (CookieYes) aux couleurs de la marque =====
+   Par defaut elle sort en bleu #1863DC, qui n'est pas notre navy. On la
+   recolore ici plutot que dans leur tableau de bord : le style reste dans le
+   depot, versionne, et il suit le site si la banniere est reconfiguree.
+   ⚠️ « Tout rejeter » et « Accepter tout » gardent EXACTEMENT le meme poids
+   visuel : c'est ce que la Loi 25 exige (refuser aussi simple qu'accepter).
+   Ne jamais rendre le refus plus discret que l'acceptation. */
+.cky-btn-accept,
+.cky-btn-reject {
+  background: var(--navy) !important;
+  border-color: var(--navy) !important;
+  color: #fff !important;
+  font-family: var(--font-body) !important;
+  font-weight: 600 !important;
+}
+.cky-btn-accept:hover,
+.cky-btn-reject:hover {
+  background: #16294a !important;
+  border-color: #16294a !important;
+}
+.cky-btn-customize {
+  color: var(--navy) !important;
+  border-color: rgba(12, 25, 47, .28) !important;
+  font-family: var(--font-body) !important;
+  font-weight: 600 !important;
+}
+.cky-btn-customize:hover {
+  border-color: var(--navy) !important;
+  background: rgba(12, 25, 47, .04) !important;
+}
+.cky-consent-container .cky-consent-bar,
+.cky-modal {
+  border-radius: 16px !important;
+  border: 1px solid rgba(12, 25, 47, .12) !important;
+  box-shadow: 0 30px 70px -40px rgba(12, 25, 47, .6) !important;
+  font-family: var(--font-body) !important;
+}
+.cky-title,
+.cky-preference-title {
+  font-family: var(--font-display) !important;
+  color: var(--navy) !important;
+}
+.cky-notice-des,
+.cky-preference-content-wrapper {
+  color: rgba(12, 25, 47, .68) !important;
+}
+/* L'interrupteur actif reprend le navy plutot que le bleu par defaut. */
+.cky-switch input[type="checkbox"]:checked {
+  background-color: var(--navy) !important;
+}
