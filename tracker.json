@@ -279,6 +279,10 @@
     {
       "date": "2026-08-24",
       "quoi": "Un jeton Cloudflare « Account · Workers Scripts · Edit » NE SUFFIT PAS a deployer un Worker dont le wrangler.jsonc declare des domaines personnalises : wrangler interroge /zones/<zone>/workers/routes et echoue en « Authentication error [code: 10000] ». Il faut AUSSI « Zone · Workers Routes · Edit » sur la zone. Toujours pas de DNS pour autant : la distinction jeton de lancement / jeton d'entretien tient."
+    },
+    {
+      "date": "2026-08-24",
+      "quoi": "Le jeton fine-grained du compte NORVIKA peut changer les REGLAGES du depot (branche par defaut, via PATCH /repos) mais PAS gerer les ACCES (ajout de collaborateur, 403 « Resource not accessible by personal access token »). Deux permissions distinctes : la seconde demande Administration."
     }
   ],
   "backlog_post_lancement": [
@@ -293,12 +297,6 @@
       "detail": "Les editeurs /admin/textes, /admin/couleurs et /admin/images alimentaient l'ancien design. Le nouveau site vient de la maquette et a son contenu dans le code. /admin/leads, /admin/messages et les routes API restent fonctionnels. A trancher : retirer les trois editeurs, ou rebrancher les nouvelles pages sur Supabase.",
       "qui": "will",
       "prio": "moyenne"
-    },
-    {
-      "titre": "La branche main est perimee",
-      "detail": "La production vit sur next16-migration ; main est restee en Next 14 depuis le 2026-08-12. Aligner main pour que le depot ne mente plus sur ce qui est en ligne.",
-      "qui": "will",
-      "prio": "basse"
     },
     {
       "titre": "Donner a Lau ses acces, et un poste qui marche",
@@ -343,10 +341,10 @@
       "prio": "moyenne"
     },
     {
-      "titre": "Faire de next16-migration la branche par defaut",
-      "detail": "Sur github.com, on arrive par defaut sur `main`, qui est perimee et d'ou RIEN ne se deploie. Lau devra basculer de branche a chaque fois et va l'oublier : elle croira ses changements perdus. Le reglage prend 10 secondes mais change ce que voit quiconque clone le depot, donc c'est une decision de William.",
+      "titre": "Que faire de la branche main, maintenant perimee",
+      "detail": "La branche par defaut est passee a next16-migration le 2026-08-24 : on arrive dessus en ouvrant le depot, et c'est bien d'ou le site se deploie. `main` existe toujours mais est restee en Next 14 depuis le 2026-08-12 et ne sert plus a rien. A trancher : la supprimer, ou la faire pointer sur le meme etat pour qu'elle cesse de mentir. Aucune urgence, plus personne n'y atterrit par defaut.",
       "qui": "will",
-      "prio": "haute"
+      "prio": "basse"
     }
   ]
 }
