@@ -356,3 +356,73 @@
   .nv-shell.nv-hero-fil { padding-top: 22px !important; padding-bottom: 0 !important; }
   .nv-shell.nv-hero-onglets { padding-top: 0 !important; padding-bottom: 0 !important; }
 }
+
+/* Avis Google : deux colonnes quand il y a de la place, UNE SEULE sur mobile.
+   Le decoupage etait en style en ligne, donc impossible a defaire ici : le
+   texte se coupait en colonnes de deux mots sur telephone. */
+.nv-avis-2col {
+  column-count: 2;
+  column-gap: 44px;
+  column-rule: 1px solid rgba(12, 25, 47, .08);
+}
+@media (max-width: 900px) {
+  .nv-avis-2col { column-count: 1; column-gap: 0; column-rule: none; }
+}
+
+/* ===== Bande de logos clients (accueil) =====
+   Disposition VOLONTAIREMENT differente selon l'ecran :
+   - ordinateur : une rangee de six logos, respirante, sur une carte de verre ;
+   - telephone  : deux colonnes de deux, les logos surnumeraires masques.
+   Les logos sont en `contain` et jamais rognes : la version precedente les
+   coupait avec `object-fit: cover`. */
+.nv-logos-bande {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  align-items: center;
+  gap: 4px;
+  padding: 22px 26px;
+  border-radius: 16px;
+  border: 1px solid rgba(255, 255, 255, .8);
+  background: linear-gradient(150deg, rgba(255,255,255,.7), rgba(255,255,255,.4));
+  backdrop-filter: blur(26px) saturate(180%);
+  -webkit-backdrop-filter: blur(26px) saturate(180%);
+  box-shadow: 0 1px 0 rgba(255,255,255,.95) inset, 0 26px 60px -44px rgba(12,25,47,.9);
+}
+.nv-logos-bande > span {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px 10px;
+  min-height: 52px;
+}
+.nv-logos-bande img {
+  max-width: 100%;
+  max-height: 34px;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+  opacity: .78;
+  transition: opacity .25s ease;
+}
+.nv-logos-bande:hover img { opacity: 1; }
+
+@media (max-width: 1000px) {
+  .nv-logos-bande { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+}
+@media (max-width: 640px) {
+  .nv-logos-bande { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; padding: 18px; }
+  .nv-logos-bande img { max-height: 30px; }
+  /* Six logos sur deux colonnes feraient trois rangees et pousseraient le
+     reste de la page trop bas : on n'en garde que quatre. */
+  .nv-logo-cache-mobile { display: none !important; }
+}
+
+/* Avis Google, sur telephone : la grille reservait 68 px de marge et le bloc de
+   citation 84 px pour le guillemet geant. Sur 375 px d'ecran, il ne restait que
+   185 px pour le texte. On recupere cette place. */
+@media (max-width: 900px) {
+  .nv-grid.nv-avis-grille { padding: 8px 16px !important; }
+  .nv-avis-corps { padding: 26px 0 30px !important; min-height: 0 !important; }
+  /* Le guillemet passe derriere le texte au lieu de lui voler une colonne. */
+  .nv-avis-corps > span:first-child { font-size: 64px !important; opacity: .6; }
+}

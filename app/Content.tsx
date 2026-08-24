@@ -10,9 +10,19 @@ import { Roadmap, type RoadStep } from "@/components/site/Roadmap";
 import { LIEN_RDV } from "@/lib/liens";
 import { AutresPages } from "@/components/site/AutresPages";
 const lauEtWill = { url: "/assets/lau-et-will-2.webp" };
-const logoDesjardins = { url: "/assets/logo-desjardins.webp" };
-const logoAnytime = { url: "/assets/logo-anytime.webp" };
-const logoSupergolf = { url: "/assets/logo-supergolf.webp" };
+// Bande de logos clients. On prend les versions DETOUREES (fond transparent) :
+// les versions « brand » sont des visuels carres qu'il fallait rogner, ce qui
+// coupait les logos. Six sur ordinateur, quatre sur telephone (les deux
+// derniers sont masques par CSS plutot que retires du HTML, pour que le
+// maillage vers /realisations reste identique partout).
+const LOGOS_CLIENTS = [
+  { src: "/assets/clean-enfin-libre.webp", nom: "Enfin Libre" },
+  { src: "/assets/clean-le-roi-des-cartes.webp", nom: "Roi des Cartes" },
+  { src: "/assets/clean-titan-diamond-tools.webp", nom: "Titan Diamond Tools" },
+  { src: "/assets/clean-agence-allies.webp", nom: "Agence Alliés" },
+  { src: "/assets/clean-garno.webp", nom: "Garno Photographe" },
+  { src: "/assets/clean-piment-szechuan.webp", nom: "Le Piment Szechuan" },
+];
 const SERVICES = [
   {
     num: "01",
@@ -365,69 +375,34 @@ function Index() {
           >
             Quelques entreprises avec qui nous avons collaboré
           </p>
-          <div className="nv-grid-3"
+          <div
             data-reveal
+            className="nv-logos-bande"
+            style={{ width: "100%", maxWidth: 900 }}
+          >
+            {LOGOS_CLIENTS.map((l, i) => (
+              <span key={l.nom} className={i >= 4 ? "nv-logo-cache-mobile" : undefined}>
+                <img
+                  loading="lazy"
+                  decoding="async"
+                  src={l.src}
+                  alt={l.nom}
+                  title={l.nom}
+                />
+              </span>
+            ))}
+          </div>
+          <Link
+            href="/realisations"
+            className="nv-link-fade"
             style={{
-              width: "100%",
-              maxWidth: 780,
-              display: "grid",
-              gridTemplateColumns: "repeat(3, 1fr)",
-              alignItems: "stretch",
-              overflow: "hidden",
-              borderRadius: 16,
-              border: "1px solid rgba(255,255,255,.8)",
-              background:
-                "linear-gradient(150deg, rgba(255,255,255,.7), rgba(255,255,255,.4))",
-              backdropFilter: "blur(26px) saturate(180%)",
-              WebkitBackdropFilter: "blur(26px) saturate(180%)",
-              boxShadow:
-                "0 1px 0 rgba(255,255,255,.95) inset, 0 26px 60px -44px rgba(12,25,47,.9)",
+              fontSize: 14.5,
+              fontWeight: 600,
+              color: "#33496C",
             }}
           >
-            <div style={{ height: 82, overflow: "hidden" }}>
-              <img loading="lazy" decoding="async"
-                src={logoDesjardins.url}
-                alt="Desjardins"
-                style={{
-                  width: "100%",
-                  height: "100%",
-                  objectFit: "cover",
-                  display: "block",
-                }}
-              />
-            </div>
-            <div
-              style={{
-                height: 82,
-                overflow: "hidden",
-                borderLeft: "1px solid rgba(12,25,47,.08)",
-                borderRight: "1px solid rgba(12,25,47,.08)",
-              }}
-            >
-              <img loading="lazy" decoding="async"
-                src={logoAnytime.url}
-                alt="Anytime Fitness"
-                style={{
-                  width: "100%",
-                  height: "100%",
-                  objectFit: "cover",
-                  display: "block",
-                }}
-              />
-            </div>
-            <div style={{ height: 82, overflow: "hidden" }}>
-              <img loading="lazy" decoding="async"
-                src={logoSupergolf.url}
-                alt="Super Golf"
-                style={{
-                  width: "100%",
-                  height: "100%",
-                  objectFit: "cover",
-                  display: "block",
-                }}
-              />
-            </div>
-          </div>
+            Voir toutes nos réalisations →
+          </Link>
         </div>
       </section>
 
@@ -795,7 +770,7 @@ function Index() {
             </span>
           </div>
 
-          <div className="nv-grid"
+          <div className="nv-grid nv-avis-grille"
             data-reveal
             style={{
               display: "grid",
@@ -868,6 +843,7 @@ function Index() {
             </div>
 
             <div
+              className="nv-avis-corps"
               style={{
                 position: "relative",
                 padding: "40px 0 40px 84px",
@@ -889,12 +865,15 @@ function Index() {
               </span>
               <div style={{ position: "relative" }}>
                 <blockquote
+                  // ⚠️ `columnCount` etait pose en style EN LIGNE, donc aucune
+                  // media query ne pouvait le defaire : sur telephone, l'avis
+                  // se coupait en deux colonnes de deux mots qui se
+                  // chevauchaient. Le decoupage passe par une classe, qui
+                  // retombe a une seule colonne sous 900 px.
+                  className={selected.body.length > 2 ? "nv-avis-2col" : undefined}
                   style={{
                     margin: 0,
                     maxWidth: selected.body.length > 2 ? "62ch" : "56ch",
-                    columnCount: selected.body.length > 2 ? 2 : 1,
-                    columnGap: 44,
-                    columnRule: "1px solid rgba(12,25,47,.08)",
                     fontSize: 15.5,
                     lineHeight: 1.72,
                     color: "rgba(12,25,47,.74)",
