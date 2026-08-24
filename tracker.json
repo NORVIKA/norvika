@@ -287,6 +287,10 @@
     {
       "date": "2026-08-24",
       "quoi": "Le site s'affichait sans ses couleurs tant qu'on ne rafraichissait pas. Cause : un 'next: { revalidate: 3600 }' cache dans lib/get-site-data.ts rendait toutes les pages ISR, alors que notre cache incrementiel est en LECTURE SEULE. Elles restaient donc perimees pour de bon (x-nextjs-cache: STALE), et Next annoncait 'stale-while-revalidate=2592000' : un navigateur pouvait afficher une page vieille de 30 jours, qui reclamait un fichier CSS supprime au deploiement suivant (404), donc plus aucune variable CSS. Corrige aux deux bouts : revalidate a false (pages vraiment statiques, HIT) et /_next/static/* en immutable dans public/_headers. Chercher 'revalidate' partout, pas seulement dans app/."
+    },
+    {
+      "date": "2026-08-24",
+      "quoi": "Bande de photos a hauteur constante : calculer la hauteur en FLUIDE, pas par paliers. La somme des largeurs vaut (somme des ratios) x hauteur ; avec un @media par palier, chaque largeur d'ecran juste sous le palier fait deborder la rangee, et un parent en overflow:hidden rogne les extremites SANS AUCUN signe visible. Formule utilisee : height: clamp(min, calc(17.2vw - 18px), max). Et deux fois le meme piege de specificite : une classe seule (0,1,0) ne bat pas '.conteneur img' (0,1,1) -- il faut repeter le selecteur pour masquer une image ou annuler un transform en media query."
     }
   ],
   "backlog_post_lancement": [
@@ -355,6 +359,12 @@
       "detail": "Depuis le passage en statique, les pages annoncent 'cache-control: s-maxage=31536000'. Sans max-age ni Last-Modified, le navigateur revalide a chaque visite : aucun risque cote visiteur, et Cloudflare ne met pas le HTML en cache (aucun cf-cache-status sur la reponse). MAIS si quelqu'un active un jour une Cache Rule sur le HTML de la zone, l'edge figerait les pages un an et le meme bug reviendrait, cette fois pour tout le monde d'un coup. A verifier avant d'ajouter la moindre regle de cache sur norvika.ca.",
       "qui": "will",
       "prio": "basse"
+    },
+    {
+      "titre": "Brancher la video du hero quand elle sera prete",
+      "detail": "En attendant, le creneau est occupe par cinq photos du portfolio (bande sur ordinateur, mosaique 2x2 sur telephone). Tout est dans components/site/BandeTravail.tsx : remplacer le contenu de ce fichier par le lecteur video, rien d'autre a toucher. Garder les memes proportions (bande large, ~190px de haut sur ordinateur) pour eviter un saut de mise en page. Rappels : pas de lecture automatique avec son, prevoir une affiche (poster) sinon le LCP tombe, et le domaine de la video doit etre ajoute a la CSP dans next.config.mjs sinon elle sera bloquee.",
+      "qui": "will",
+      "prio": "moyenne"
     }
   ]
 }
