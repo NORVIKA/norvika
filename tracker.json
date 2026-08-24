@@ -335,6 +335,18 @@
       "detail": "lib/liens.ts (les boutons du site) et site_info.lien_rdv dans Supabase (/contact et /admin/infos) portent la meme valeur en double. Changer l'un ne change pas l'autre.",
       "qui": "will",
       "prio": "moyenne"
+    },
+    {
+      "titre": "Donner a Lau son propre compte GitHub",
+      "detail": "Elle utilise aujourd'hui le compte partage NORVIKA, ce qui fonctionne mais efface toute trace de qui a change quoi. Demande envoyee sur Slack le 2026-08-24 : elle cree un compte et transmet son nom d'utilisateur. Ensuite, l'inviter en Write depuis github.com/NORVIKA/norvika/settings/access. ⚠️ Le jeton gh actuel (fine-grained) NE PEUT PAS ajouter de collaborateur : « Resource not accessible by personal access token ». Il faudrait lui ajouter la permission Administration, ou faire l'invitation dans le navigateur.",
+      "qui": "will",
+      "prio": "moyenne"
+    },
+    {
+      "titre": "Faire de next16-migration la branche par defaut",
+      "detail": "Sur github.com, on arrive par defaut sur `main`, qui est perimee et d'ou RIEN ne se deploie. Lau devra basculer de branche a chaque fois et va l'oublier : elle croira ses changements perdus. Le reglage prend 10 secondes mais change ce que voit quiconque clone le depot, donc c'est une decision de William.",
+      "qui": "will",
+      "prio": "haute"
     }
   ]
 }
