@@ -271,6 +271,10 @@
     {
       "date": "2026-08-22",
       "quoi": "Remplacer une section entiere par un composant fait perdre en silence ce qu'elle contenait en plus. Sur /photo-et-video, un bouton vers le portfolio vivait dans l'entete et n'existait nulle part ailleurs. C'est l'ECART DE VOLUME qui l'a revele : 150 lignes retirees contre une trentaine sur des pages de meme structure. Comparer `git diff --stat` entre pages jumelles avant de valider un remplacement en lot."
+    },
+    {
+      "date": "2026-08-24",
+      "quoi": "Test Loi 25 des trois cas COMPLET avec GA4 reellement actif : sans interaction et apres refus, aucun _ga et analytics_storage reste 'denied' ; apres acceptation, _ga et _ga_<id> apparaissent avec 'granted'. Le montage CookieYes + mode consentement par defaut refuse tient la route."
     }
   ],
   "backlog_post_lancement": [
@@ -293,8 +297,8 @@
       "prio": "basse"
     },
     {
-      "titre": "Le deploiement automatique attend un jeton Cloudflare",
-      "detail": "L'action GitHub est en place et verte jusqu'a l'etape de deploiement (types, style, construction OpenNext). Il manque le secret CLOUDFLARE_API_TOKEN dans les secrets du depot pour que la derniere etape passe. Tant qu'il manque, chaque publication reste manuelle et expose au piege du paquet non reconstruit.",
+      "titre": "Le jeton Cloudflare a besoin d'une permission de plus",
+      "detail": "Le jeton cree avec « Account · Workers Scripts · Edit » ne suffit pas : wrangler interroge /zones/<zone>/workers/routes parce que wrangler.jsonc declare les domaines personnalises. Erreur « Authentication error [code: 10000] ». Ajouter « Zone · Workers Routes · Edit » sur la zone norvika.ca. Toujours PAS de DNS : c'est bien le jeton d'entretien. Le reste de l'action est vert (types, style, construction, identifiant de compte).",
       "qui": "will",
       "prio": "haute"
     },
