@@ -2,10 +2,22 @@ import "server-only";
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 import { defaultContent, defaultSiteInfo, defaultColors, defaultImages } from "./content";
 
-// Duree de revalidation (ISR). Les pages publiques sont prerenderees et servies
-// en cache a l'edge Cloudflare (cf-cache-status: HIT), ce qui evite de reveiller
-// le Worker a chaque requete (anti-1102). Le contenu se rafraichit au redeploiement.
-const REVALIDATE = 3600;
+// Le contenu est fige au moment de la construction, pas revalide a l'execution.
+//
+// ⚠️ C'ETAIT 3600, et c'est ce chiffre qui cassait l'affichage du site.
+// Une revalidation par fetch remonte jusqu'a la page : la page devenait ISR et
+// Next la declarait perimee au bout d'une heure. Or notre cache incrementiel est
+// en LECTURE SEULE (open-next.config.ts), donc rien ne pouvait jamais etre
+// reecrit : la page restait perimee pour de bon, et Next annoncait alors
+// « stale-while-revalidate=2592000 », ce qui autorise un navigateur a afficher
+// une page vieille de 30 jours sans rien verifier. Cette vieille page reclamait
+// des fichiers CSS supprimes par le dernier deploiement, d'ou le site sans ses
+// couleurs tant qu'on ne rafraichissait pas.
+//
+// `false` = mis en cache indefiniment, donc page VRAIMENT statique. Le contenu
+// se rafraichit au redeploiement, ce qui etait deja le seul comportement reel :
+// c'est ce que fait le bouton Publier de /admin.
+const REVALIDATE = false as const;
 
 // Client de LECTURE publique : anon key, SANS cookies (pas de next/headers), pour
 // que les pages qui l'utilisent restent prerenderables. Les requetes .select()
@@ -28,7 +40,7 @@ function clientLecture(): SupabaseClient | null {
     global: {
       fetch: (input: RequestInfo | URL, init: RequestInit = {}) => {
         // Retirer un eventuel `cache: 'no-store'` pose par supabase-js, puis
-        // rendre la requete cacheable via l'ISR de Next.
+        // rendre la requete cacheable au moment de la construction.
         const { cache: _cache, ...rest } = init;
         return fetch(input, { ...rest, next: { revalidate: REVALIDATE } });
       },

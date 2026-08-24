@@ -50,9 +50,28 @@ export const metadata: Metadata = {
 // exister dans les variables du depot pour que l'action GitHub la voie.
 const GA_ID = process.env.NEXT_PUBLIC_GA_ID;
 
-// ISR : le shell est prerendere et servi en cache a l'edge, le Worker ne
-// rebatit pas la page a chaque visite (c'est ce qui declenche l'erreur 1102).
-export const revalidate = 3600;
+// Pages entierement statiques, batties une fois au deploiement.
+//
+// ⚠️ C'ETAIT « export const revalidate = 3600 », et ce reglage mentait.
+// Il met les pages en mode ISR : Next les considere perimees apres une heure et
+// tente de les rebatir. Sauf que notre cache incrementiel
+// (staticAssetsIncrementalCache, voir open-next.config.ts) est en LECTURE SEULE :
+// il ne peut RIEN reecrire. La page restait donc « perimee » a perpetuite.
+//
+// Deux degats, tous les deux invisibles en test :
+// 1. Next annoncait « s-maxage=2, stale-while-revalidate=2592000 », ce qui
+//    autorise un navigateur a afficher une page vieille de 30 JOURS avant
+//    d'aller verifier. Cette vieille page pointe vers des fichiers CSS qui
+//    n'existent plus depuis le dernier deploiement : le site s'affichait sans
+//    ses couleurs jusqu'a ce qu'on rafraichisse.
+// 2. Chaque visite declenchait une reconstruction de la page dans le Worker,
+//    pour un resultat jamais conserve. C'est la charge par rendu qui mene a
+//    l'erreur 1102.
+//
+// « force-static » dit la verite : le contenu vient de Supabase au moment de la
+// construction et ne change que lorsqu'on redeploie (bouton Publier de /admin).
+// Resultat mesurable : x-nextjs-cache passe de STALE a HIT.
+export const dynamic = "force-static";
 
 export default async function RootLayout({
   children,

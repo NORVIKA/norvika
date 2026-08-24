@@ -3,3 +3,32 @@
   X-Content-Type-Options: nosniff
   Referrer-Policy: strict-origin-when-cross-origin
   Permissions-Policy: camera=(), microphone=(), geolocation=()
+
+# ⚠️ Ces regles reparent un vrai bug, pas une optimisation de confort.
+#
+# Par defaut, Cloudflare sert TOUS les fichiers statiques avec
+# « public, max-age=0, must-revalidate ». Le navigateur ne garde donc rien :
+# il redemande la feuille de style et chaque script a chaque page.
+#
+# Le probleme, c'est ce qui arrive apres un deploiement. Next nomme ses fichiers
+# avec une empreinte du contenu (3tctjkxxcg3gr.css) ; un nouveau deploiement en
+# cree de nouveaux et les anciens DISPARAISSENT. Si le navigateur affiche une
+# page HTML gardee en cache, elle pointe vers l'ancienne empreinte, la demande
+# revient en 404, et le site s'affiche SANS SES COULEURS : toutes les variables
+# CSS (--navy, --cream, les polices) viennent de ce fichier-la.
+#
+# C'est exactement le symptome rapporte : « j'arrive sur le site, les fonds ne
+# chargent pas, je rafraichis et c'est correct ».
+#
+# Avec « immutable », le navigateur garde l'ancien fichier au lieu d'aller
+# chercher un fichier qui n'existe plus. La page gardee en cache s'affiche
+# correctement. C'est le reglage prevu pour des noms de fichiers qui contiennent
+# deja leur empreinte : le contenu ne peut pas changer sans que le nom change.
+/_next/static/*
+  Cache-Control: public, max-age=31536000, immutable
+
+# Logos et images du build. Le nom, lui, ne change PAS quand on remplace une
+# image : pas d'immutable ici, sinon un logo corrige mettrait un an a paraitre.
+# Frais une heure, puis affiche tout de suite pendant qu'on verifie en arriere-plan.
+/assets/*
+  Cache-Control: public, max-age=3600, stale-while-revalidate=604800

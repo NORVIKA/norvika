@@ -15,6 +15,9 @@ import { supabaseService, verifierDebit } from "@/lib/rate-limit";
 
 const MAX = { prenom: 100, courriel: 255, telephone: 50 } as const;
 
+// Formulaire : jamais mis en cache, jamais prerendu.
+export const dynamic = "force-dynamic";
+
 export async function POST(req: Request) {
   const body = await req.json().catch(() => null);
   if (!body || typeof body !== "object") {

@@ -18,7 +18,9 @@ export const metadata: Metadata = {
   alternates: { canonical: "https://norvika.ca/contact" },
 };
 
-export const revalidate = 3600;
+// Meme raison que dans app/layout.tsx : la revalidation ne pouvait rien
+// ecrire, elle ne servait qu'a marquer la page perimee pour toujours.
+export const dynamic = "force-static";
 
 export default async function ContactPage() {
   const { siteInfo } = await getSiteData();
