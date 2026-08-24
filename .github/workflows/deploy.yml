@@ -61,7 +61,12 @@ jobs:
         run: npx wrangler deploy
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          # L'identifiant de compte n'est pas un secret : il apparait dans les
+          # URL du tableau de bord. En VARIABLE, il est lisible et verifiable.
+          # En secret, il etait masque, et un caractere colle en trop (espace ou
+          # retour de ligne) faisait echouer le deploiement avec « Invalid
+          # account ID » sans qu'on puisse voir la valeur pour comprendre.
+          CLOUDFLARE_ACCOUNT_ID: ${{ vars.CLOUDFLARE_ACCOUNT_ID }}
 
       - name: Verifier que le site repond
         if: github.ref == 'refs/heads/next16-migration'
