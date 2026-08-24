@@ -283,6 +283,10 @@
     {
       "date": "2026-08-24",
       "quoi": "Le jeton fine-grained du compte NORVIKA peut changer les REGLAGES du depot (branche par defaut, via PATCH /repos) mais PAS gerer les ACCES (ajout de collaborateur, 403 « Resource not accessible by personal access token »). Deux permissions distinctes : la seconde demande Administration."
+    },
+    {
+      "date": "2026-08-24",
+      "quoi": "Le site s'affichait sans ses couleurs tant qu'on ne rafraichissait pas. Cause : un 'next: { revalidate: 3600 }' cache dans lib/get-site-data.ts rendait toutes les pages ISR, alors que notre cache incrementiel est en LECTURE SEULE. Elles restaient donc perimees pour de bon (x-nextjs-cache: STALE), et Next annoncait 'stale-while-revalidate=2592000' : un navigateur pouvait afficher une page vieille de 30 jours, qui reclamait un fichier CSS supprime au deploiement suivant (404), donc plus aucune variable CSS. Corrige aux deux bouts : revalidate a false (pages vraiment statiques, HIT) et /_next/static/* en immutable dans public/_headers. Chercher 'revalidate' partout, pas seulement dans app/."
     }
   ],
   "backlog_post_lancement": [
@@ -343,6 +347,12 @@
     {
       "titre": "Que faire de la branche main, maintenant perimee",
       "detail": "La branche par defaut est passee a next16-migration le 2026-08-24 : on arrive dessus en ouvrant le depot, et c'est bien d'ou le site se deploie. `main` existe toujours mais est restee en Next 14 depuis le 2026-08-12 et ne sert plus a rien. A trancher : la supprimer, ou la faire pointer sur le meme etat pour qu'elle cesse de mentir. Aucune urgence, plus personne n'y atterrit par defaut.",
+      "qui": "will",
+      "prio": "basse"
+    },
+    {
+      "titre": "s-maxage=31536000 sur le HTML : inerte aujourd'hui, piege demain",
+      "detail": "Depuis le passage en statique, les pages annoncent 'cache-control: s-maxage=31536000'. Sans max-age ni Last-Modified, le navigateur revalide a chaque visite : aucun risque cote visiteur, et Cloudflare ne met pas le HTML en cache (aucun cf-cache-status sur la reponse). MAIS si quelqu'un active un jour une Cache Rule sur le HTML de la zone, l'edge figerait les pages un an et le meme bug reviendrait, cette fois pour tout le monde d'un coup. A verifier avant d'ajouter la moindre regle de cache sur norvika.ca.",
       "qui": "will",
       "prio": "basse"
     }
