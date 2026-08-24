@@ -151,7 +151,7 @@
       "gate_statut": null,
       "debut": "",
       "fin": "",
-      "rapport": "Deploiement Cloudflare Workers, norvika.ca et www",
+      "rapport": "Deploiement Cloudflare Workers, norvika.ca et www. Depuis le 2026-08-24, AUTOMATIQUE : l'action GitHub verifie les types et le style, construit avec OpenNext, deploie, puis verifie que quatre pages repondent 200. Verifiee de bout en bout.",
       "date": "2026-08-21"
     },
     {
@@ -275,6 +275,10 @@
     {
       "date": "2026-08-24",
       "quoi": "Test Loi 25 des trois cas COMPLET avec GA4 reellement actif : sans interaction et apres refus, aucun _ga et analytics_storage reste 'denied' ; apres acceptation, _ga et _ga_<id> apparaissent avec 'granted'. Le montage CookieYes + mode consentement par defaut refuse tient la route."
+    },
+    {
+      "date": "2026-08-24",
+      "quoi": "Un jeton Cloudflare « Account · Workers Scripts · Edit » NE SUFFIT PAS a deployer un Worker dont le wrangler.jsonc declare des domaines personnalises : wrangler interroge /zones/<zone>/workers/routes et echoue en « Authentication error [code: 10000] ». Il faut AUSSI « Zone · Workers Routes · Edit » sur la zone. Toujours pas de DNS pour autant : la distinction jeton de lancement / jeton d'entretien tient."
     }
   ],
   "backlog_post_lancement": [
@@ -295,12 +299,6 @@
       "detail": "La production vit sur next16-migration ; main est restee en Next 14 depuis le 2026-08-12. Aligner main pour que le depot ne mente plus sur ce qui est en ligne.",
       "qui": "will",
       "prio": "basse"
-    },
-    {
-      "titre": "Le jeton Cloudflare a besoin d'une permission de plus",
-      "detail": "Le jeton cree avec « Account · Workers Scripts · Edit » ne suffit pas : wrangler interroge /zones/<zone>/workers/routes parce que wrangler.jsonc declare les domaines personnalises. Erreur « Authentication error [code: 10000] ». Ajouter « Zone · Workers Routes · Edit » sur la zone norvika.ca. Toujours PAS de DNS : c'est bien le jeton d'entretien. Le reste de l'action est vert (types, style, construction, identifiant de compte).",
-      "qui": "will",
-      "prio": "haute"
     },
     {
       "titre": "Donner a Lau ses acces, et un poste qui marche",
