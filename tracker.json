@@ -291,6 +291,10 @@
     {
       "date": "2026-08-24",
       "quoi": "Bande de photos a hauteur constante : calculer la hauteur en FLUIDE, pas par paliers. La somme des largeurs vaut (somme des ratios) x hauteur ; avec un @media par palier, chaque largeur d'ecran juste sous le palier fait deborder la rangee, et un parent en overflow:hidden rogne les extremites SANS AUCUN signe visible. Formule utilisee : height: clamp(min, calc(17.2vw - 18px), max). Et deux fois le meme piege de specificite : une classe seule (0,1,0) ne bat pas '.conteneur img' (0,1,1) -- il faut repeter le selecteur pour masquer une image ou annuler un transform en media query."
+    },
+    {
+      "date": "2026-08-24",
+      "quoi": "Hero refait trois fois. Les deux premieres propositions changeaient le CONTENU (photos du portfolio, puis captures de sites clients) en gardant la meme forme sobre sur fond clair : refusees. Le vrai diagnostic etait chromatique, pas compositionnel. Le hero est passe au SOMBRE avec trois aurores (bleu electrique, turquoise, violet) parce qu'une couleur saturee sur du blanc devient criarde alors que la meme sur du navy devient de la lumiere. Piege evite : l'orange initial virait au brun sale partout ou il chevauchait le turquoise (couleurs opposees) ; le violet est du meme bord froid que le bleu. Contraste a verifier sur les teintes CLAIRES du degrade, pas sur le navy : le sous-titre a 78 % tombait a 4,57:1 au-dessus du turquoise."
     }
   ],
   "backlog_post_lancement": [
@@ -363,6 +367,12 @@
     {
       "titre": "Brancher la video du hero quand elle sera prete",
       "detail": "En attendant, le creneau est occupe par cinq photos du portfolio (bande sur ordinateur, mosaique 2x2 sur telephone). Tout est dans components/site/BandeTravail.tsx : remplacer le contenu de ce fichier par le lecteur video, rien d'autre a toucher. Garder les memes proportions (bande large, ~190px de haut sur ordinateur) pour eviter un saut de mise en page. Rappels : pas de lecture automatique avec son, prevoir une affiche (poster) sinon le LCP tombe, et le domaine de la video doit etre ajoute a la CSP dans next.config.mjs sinon elle sera bloquee.",
+      "qui": "will",
+      "prio": "moyenne"
+    },
+    {
+      "titre": "Le creneau de la video, maintenant que le hero est sombre",
+      "detail": "Le hero n'a plus de bloc sous les boutons : c'est le fond au complet qui porte l'aurore et les lames animees (components/site/CourantNorvika.tsx). Quand la video arrivera, elle se posera PAR-DESSUS ce fond, dans le bloc de texte, sans retirer le courant. Rappels pour ce jour-la : prevoir une image d'affiche sinon la vitesse tombe, et ajouter le domaine de la video a la CSP dans next.config.mjs sinon elle sera bloquee. Les composants des deux propositions refusees (BandeTravail.tsx, VitrineSites.tsx) restent dans le depot mais ne sont plus rendus : a supprimer si on ne revient pas dessus.",
       "qui": "will",
       "prio": "moyenne"
     }
