@@ -9,7 +9,6 @@ import { useReveal } from "@/lib/useReveal";
 import { Roadmap, type RoadStep } from "@/components/site/Roadmap";
 import { LIEN_RDV } from "@/lib/liens";
 import { AutresPages } from "@/components/site/AutresPages";
-import { BandeTravail } from "@/components/site/BandeTravail";
 const lauEtWill = { url: "/assets/lau-et-will-2.webp" };
 // Bande de logos clients. On prend les versions DETOUREES (fond transparent) :
 // les versions « brand » sont des visuels carres qu'il fallait rogner, ce qui
@@ -200,12 +199,12 @@ function Index() {
             }}
           />
         </div>
-        <div className="nv-shell nv-hero-haut"
+        <div className="nv-shell"
           style={{
             position: "relative",
             maxWidth: 900,
             margin: "0 auto",
-            padding: "76px 32px 0",
+            padding: "76px 32px 78px",
             display: "flex",
             flexDirection: "column",
             alignItems: "center",
@@ -277,19 +276,6 @@ function Index() {
           </div>
         </div>
 
-        {/* Creneau de la future video showreel. Volontairement hors du bloc de
-            texte : la rangee de photos a besoin de plus large que ses 900px. */}
-        <div
-          className="nv-shell nv-bande-shell"
-          style={{
-            position: "relative",
-            maxWidth: 1180,
-            margin: "0 auto",
-            padding: "0 32px 78px",
-          }}
-        >
-          <BandeTravail />
-        </div>
       </section>
 
       {/* Quiz band */}
