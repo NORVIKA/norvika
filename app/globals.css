@@ -377,7 +377,7 @@
    coupait avec `object-fit: cover`. */
 .nv-logos-bande {
   display: grid;
-  grid-template-columns: repeat(6, minmax(0, 1fr));
+  grid-template-columns: repeat(5, minmax(0, 1fr));
   align-items: center;
   gap: 4px;
   padding: 22px 26px;
@@ -405,6 +405,17 @@
   transition: opacity .25s ease;
 }
 .nv-logos-bande:hover img { opacity: 1; }
+/* Les logos qui n'existent qu'en blanc sur un bloc de couleur (Desjardins,
+   Anytime Fitness). Coins arrondis pour qu'ils se lisent comme une pastille de
+   marque et non comme un rectangle oublie ; un peu plus hauts que les logos
+   detoures, sinon le nom a l'interieur devient illisible.
+   ⚠️ Il faut repeter `.nv-logos-bande img` : la regle de base pose
+   `max-height: 34px` avec une specificite de (0,1,1), qu'une classe seule
+   (0,1,0) ne bat pas. */
+.nv-logos-bande img.nv-logo-pastille {
+  max-height: 42px;
+  border-radius: 8px;
+}
 
 @media (max-width: 1000px) {
   .nv-logos-bande { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
@@ -412,7 +423,8 @@
 @media (max-width: 640px) {
   .nv-logos-bande { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; padding: 18px; }
   .nv-logos-bande img { max-height: 30px; }
-  /* Six logos sur deux colonnes feraient trois rangees et pousseraient le
+  .nv-logos-bande img.nv-logo-pastille { max-height: 38px; }
+  /* Cinq logos sur deux colonnes feraient trois rangees et pousseraient le
      reste de la page trop bas : on n'en garde que quatre. */
   .nv-logo-cache-mobile { display: none !important; }
 }

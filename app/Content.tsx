@@ -12,18 +12,22 @@ import { AutresPages } from "@/components/site/AutresPages";
 import { CourantNorvika } from "@/components/site/CourantNorvika";
 import { Aimant } from "@/components/site/Aimant";
 const lauEtWill = { url: "/assets/lau-et-will-2.webp" };
-// Bande de logos clients. On prend les versions DETOUREES (fond transparent) :
-// les versions « brand » sont des visuels carres qu'il fallait rogner, ce qui
-// coupait les logos. Six sur ordinateur, quatre sur telephone (les deux
-// derniers sont masques par CSS plutot que retires du HTML, pour que le
-// maillage vers /realisations reste identique partout).
+// Bande de logos clients, choisie par William le 2026-08-24.
+//
+// ⚠️ DEUX TRAITEMENTS, ET C'EST VOULU. Enfin Libre, le Roi des Cartes et TDT
+// existent en version detouree (fond transparent) : ils se posent directement
+// sur la bande. Desjardins et Anytime Fitness, eux, n'ont pas de version
+// detouree ici : leur logo est BLANC sur un bloc de couleur de marque. Poser
+// un rectangle vert et un rectangle mauve bruts au milieu de logos qui
+// flottent aurait l'air d'une erreur ; en pastille arrondie, ca se lit comme
+// un logo assume. On ne recolore pas le logo d'une institution financiere
+// pour l'harmoniser : c'est leur marque, pas la notre.
 const LOGOS_CLIENTS = [
+  { src: "/assets/client-desjardins.webp", nom: "Desjardins", pastille: true },
+  { src: "/assets/client-anytimefitness.webp", nom: "Anytime Fitness", pastille: true },
   { src: "/assets/clean-enfin-libre.webp", nom: "Enfin Libre" },
   { src: "/assets/clean-le-roi-des-cartes.webp", nom: "Roi des Cartes" },
   { src: "/assets/clean-titan-diamond-tools.webp", nom: "Titan Diamond Tools" },
-  { src: "/assets/clean-agence-allies.webp", nom: "Agence Alliés" },
-  { src: "/assets/clean-garno.webp", nom: "Garno Photographe" },
-  { src: "/assets/clean-piment-szechuan.webp", nom: "Le Piment Szechuan" },
 ];
 const SERVICES = [
   {
@@ -436,6 +440,7 @@ function Index() {
                   src={l.src}
                   alt={l.nom}
                   title={l.nom}
+                  className={l.pastille ? "nv-logo-pastille" : undefined}
                 />
               </span>
             ))}

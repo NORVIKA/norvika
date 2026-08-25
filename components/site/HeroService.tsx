@@ -51,30 +51,86 @@ export function HeroService({
       style={{
         position: "relative",
         overflow: "hidden",
-        background: "#0C192F",
+        background: "#081120",
         color: "#F5F3EE",
       }}
     >
+      {/* La meme aurore que l'accueil : bleu electrique, turquoise, violet.
+          Avant, cette entete n'avait qu'un seul halo turquoise a 20 %, donc
+          pratiquement pas de couleur. Depuis que l'accueil en a, une entete
+          grise ici ferait lire les pages de service comme un autre site.
+
+          ⚠️ Volontairement PLUS SOBRE que l'accueil (opacites reduites d'un
+          tiers, bande deux fois moins haute) : l'accueil est le moment fort,
+          une page de service doit porter son contenu, pas rivaliser avec lui.
+
+          ⚠️ Pas d'orange dans le contrepoint. Orange et turquoise sont
+          opposes : partout ou ils se chevauchent, le melange vire au brun
+          sale. Le violet est du meme bord froid que le bleu. */}
       <div
         aria-hidden="true"
-        style={{
-          position: "absolute",
-          top: -260,
-          right: "-10%",
-          width: 900,
-          height: 700,
-          background:
-            "radial-gradient(ellipse, rgba(79,138,147,.20) 0%, rgba(79,138,147,0) 70%)",
-          pointerEvents: "none",
-        }}
-      />
+        style={{ position: "absolute", inset: 0, pointerEvents: "none" }}
+      >
+        <div
+          style={{
+            position: "absolute",
+            top: "-58%",
+            left: "-10%",
+            width: 640,
+            height: 640,
+            borderRadius: "50%",
+            background:
+              "radial-gradient(circle, rgba(53,87,212,.58) 0%, rgba(53,87,212,0) 68%)",
+            filter: "blur(46px)",
+            animation: "driftA 24s ease-in-out infinite",
+          }}
+        />
+        <div
+          style={{
+            position: "absolute",
+            top: "-46%",
+            left: "34%",
+            width: 620,
+            height: 620,
+            borderRadius: "50%",
+            background:
+              "radial-gradient(circle, rgba(45,212,191,.40) 0%, rgba(45,212,191,0) 68%)",
+            filter: "blur(52px)",
+            animation: "driftB 29s ease-in-out infinite",
+          }}
+        />
+        <div
+          style={{
+            position: "absolute",
+            top: "-34%",
+            right: "-12%",
+            width: 620,
+            height: 620,
+            borderRadius: "50%",
+            background:
+              "radial-gradient(circle, rgba(168,85,247,.42) 0%, rgba(168,85,247,0) 66%)",
+            filter: "blur(50px)",
+            animation: "driftA 33s ease-in-out infinite reverse",
+          }}
+        />
+        {/* Le bas se rassombrit : les onglets de service et le trait qui les
+            porte doivent rester lisibles, pas flotter dans la couleur. */}
+        <div
+          style={{
+            position: "absolute",
+            inset: 0,
+            background:
+              "linear-gradient(to bottom, rgba(8,17,32,0) 34%, rgba(8,17,32,.82) 88%, #081120 100%)",
+          }}
+        />
+      </div>
 
       <div
         className="nv-shell nv-hero-fil"
         style={{ position: "relative", maxWidth: 1240, margin: "0 auto", padding: "26px 32px 0" }}
       >
         <nav aria-label="Fil d'Ariane" style={{ fontSize: 13 }}>
-          <Link href="/" style={{ color: "rgba(245,243,238,.62)" }}>
+          <Link href="/" style={{ color: "rgba(245,243,238,.8)" }}>
             Accueil
           </Link>
           <span aria-hidden="true" style={{ color: "rgba(245,243,238,.34)", padding: "0 8px" }}>
@@ -104,7 +160,7 @@ export function HeroService({
               fontSize: 11.5,
               letterSpacing: ".2em",
               textTransform: "uppercase",
-              color: "rgba(245,243,238,.6)",
+              color: "rgba(245,243,238,.78)",
               fontWeight: 600,
             }}
           >
@@ -130,7 +186,7 @@ export function HeroService({
               margin: 0,
               fontSize: 17,
               lineHeight: 1.65,
-              color: "rgba(245,243,238,.72)",
+              color: "rgba(245,243,238,.88)",
             }}
           >
             {texte}
@@ -211,7 +267,7 @@ export function HeroService({
                   padding: "13px 16px",
                   fontSize: 14,
                   fontWeight: 600,
-                  color: actif ? "#F5F3EE" : "rgba(245,243,238,.58)",
+                  color: actif ? "#F5F3EE" : "rgba(245,243,238,.74)",
                   borderBottom: actif
                     ? "2px solid #F5F3EE"
                     : "2px solid transparent",
