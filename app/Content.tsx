@@ -966,61 +966,6 @@ function Index() {
         </div>
       </section>
 
-      {/* Diagnostic */}
-      <section style={{ borderBottom: "1px solid rgba(12,25,47,.1)" }}>
-        <div className="nv-shell nv-grid"
-          data-reveal
-          style={{
-            maxWidth: 1240,
-            margin: "0 auto",
-            padding: "88px 32px",
-            display: "grid",
-            gridTemplateColumns: "1.2fr 1fr",
-            gap: 56,
-            alignItems: "center",
-          }}
-        >
-          <div>
-            <h2
-              style={{
-                margin: 0,
-                fontSize: "clamp(26px,3vw,40px)",
-                lineHeight: 1.1,
-              }}
-            >
-              Est-ce que votre entreprise va bien, pour vrai?
-            </h2>
-            <p
-              style={{
-                margin: "20px 0 0",
-                maxWidth: "58ch",
-                fontSize: 17,
-                lineHeight: 1.62,
-                color: "rgba(12,25,47,.64)",
-              }}
-            >
-              Sept questions, deux minutes, et vous saurez ce qui freine le plus
-              votre entreprise en ce moment: votre site, votre temps ou votre
-              image. Aucun courriel demandé.
-            </p>
-          </div>
-          <Link
-            href="/diagnostic"
-            className="nv-btn-primary"
-            style={{
-              justifySelf: "end",
-              padding: "18px 34px",
-              borderRadius: 10,
-              fontSize: 15,
-              fontWeight: 600,
-              boxShadow: "0 12px 34px rgba(12,25,47,.22)",
-            }}
-          >
-            Faire le quiz
-          </Link>
-        </div>
-      </section>
-
       <AutresPages courante="/" />
       <SiteFooter />
     </div>
