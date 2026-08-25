@@ -9,6 +9,8 @@ import { useReveal } from "@/lib/useReveal";
 import { Roadmap, type RoadStep } from "@/components/site/Roadmap";
 import { LIEN_RDV } from "@/lib/liens";
 import { AutresPages } from "@/components/site/AutresPages";
+import { CourantNorvika } from "@/components/site/CourantNorvika";
+import { Aimant } from "@/components/site/Aimant";
 const lauEtWill = { url: "/assets/lau-et-will-2.webp" };
 // Bande de logos clients. On prend les versions DETOUREES (fond transparent) :
 // les versions « brand » sont des visuels carres qu'il fallait rogner, ce qui
@@ -145,60 +147,100 @@ function Index() {
     >
       <SiteHeader />
 
-      {/* Hero */}
+      {/* Hero
+          ⚠️ SOMBRE ET COLORE, VOLONTAIREMENT. Il etait clair, navy sur blanc,
+          et le verdict de William tenait en une phrase : « tout est sans
+          couleur ». Il avait raison, le site entier tourne autour d'un seul
+          navy. De la couleur posee sur du blanc devient vite criarde ; la meme
+          couleur posee sur du navy DEVIENT DE LA LUMIERE. C'est pour ca que le
+          fond passe au sombre : c'est ce qui permet au bleu et au turquoise
+          d'exister vraiment, au lieu de rester des teintes polies. */}
       <section
         style={{
           position: "relative",
           overflow: "hidden",
+          background: "#081120",
+          color: "#F5F3EE",
           borderBottom: "1px solid rgba(12,25,47,.1)",
         }}
       >
+        {/* Les aurores. Trois masses de couleur floues qui derivent lentement.
+            Elles sont vives (55 %, 42 %, 30 %) la ou les anciennes plafonnaient
+            a 16 % : c'est la difference entre « on devine une nuance » et « il
+            y a de la couleur ». */}
         <div
           aria-hidden="true"
-          style={{
-            position: "absolute",
-            inset: "-15% -10% auto",
-            height: 1000,
-            pointerEvents: "none",
-          }}
+          style={{ position: "absolute", inset: 0, pointerEvents: "none" }}
         >
           <div
             style={{
               position: "absolute",
-              top: "8%",
-              left: "4%",
-              width: 680,
-              height: 680,
+              top: "-32%",
+              left: "-8%",
+              width: 860,
+              height: 860,
               borderRadius: "50%",
               background:
-                "radial-gradient(circle, rgba(51,73,108,.16) 0%, rgba(51,73,108,0) 68%)",
-              filter: "blur(40px)",
+                "radial-gradient(circle, rgba(53,87,212,.85) 0%, rgba(53,87,212,0) 68%)",
+              filter: "blur(44px)",
               animation: "driftA 22s ease-in-out infinite",
             }}
           />
           <div
             style={{
               position: "absolute",
-              top: 0,
-              left: "44%",
-              width: 720,
-              height: 720,
+              top: "-20%",
+              left: "30%",
+              width: 820,
+              height: 820,
               borderRadius: "50%",
               background:
-                "radial-gradient(circle, rgba(79,138,147,.16) 0%, rgba(79,138,147,0) 68%)",
-              filter: "blur(44px)",
+                "radial-gradient(circle, rgba(45,212,191,.62) 0%, rgba(45,212,191,0) 68%)",
+              filter: "blur(50px)",
               animation: "driftB 27s ease-in-out infinite",
             }}
           />
+          {/* Le contrepoint. Il etait orange et il se melait au turquoise en
+              donnant un brun sale au centre droit : orange et turquoise sont
+              opposes, leur melange vire a la boue. Le magenta, lui, appartient
+              a la meme moitie froide que le bleu : il ajoute une hue de plus
+              sans salir ce qu'il touche. */}
+          <div
+            style={{
+              position: "absolute",
+              bottom: "-26%",
+              right: "-12%",
+              width: 760,
+              height: 760,
+              borderRadius: "50%",
+              background:
+                "radial-gradient(circle, rgba(168,85,247,.62) 0%, rgba(168,85,247,0) 66%)",
+              filter: "blur(48px)",
+              animation: "driftA 31s ease-in-out infinite reverse",
+            }}
+          />
+          {/* Le bas se rassombrit pour que la bordure vers la section suivante
+              soit nette, au lieu de finir dans une bouillie de couleurs. */}
           <div
             style={{
               position: "absolute",
               inset: 0,
               background:
-                "linear-gradient(to bottom, rgba(255,255,255,0) 45%, #ffffff 96%)",
+                "linear-gradient(to bottom, rgba(10,21,38,0) 68%, rgba(10,21,38,.72) 94%, #0A1526 100%)",
             }}
           />
         </div>
+
+        {/* Le courant : les lames de la marque derivent derriere le texte.
+            Elle ne prend aucun clic : tout le contenu est en
+            `position: relative`, donc au-dessus. */}
+        <div
+          aria-hidden="true"
+          style={{ position: "absolute", inset: 0, pointerEvents: "none" }}
+        >
+          <CourantNorvika />
+        </div>
+
         <div className="nv-shell"
           style={{
             position: "relative",
@@ -219,6 +261,7 @@ function Index() {
               lineHeight: 1.04,
               letterSpacing: "-.035em",
               textWrap: "balance",
+              color: "#FFFFFF",
             }}
           >
             Vos courtiers des outils numériques.
@@ -230,7 +273,7 @@ function Index() {
               maxWidth: "58ch",
               fontSize: 19,
               lineHeight: 1.62,
-              color: "rgba(12,25,47,.64)",
+              color: "rgba(245,243,238,.88)",
             }}
           >
             Chaque entreprise est différente, la vôtre aussi. On prend le temps
@@ -247,28 +290,32 @@ function Index() {
               justifyContent: "center",
             }}
           >
-            <a
-              href={LIEN_RDV}
-              className="nv-btn-primary"
-              style={{
-                padding: "16px 28px",
-                borderRadius: 10,
-                fontSize: 15,
-                fontWeight: 600,
-              }}
-             target="_blank" rel="noopener noreferrer">
-              Réserver mes 30 minutes
-            </a>
+            <Aimant>
+              <a
+                href={LIEN_RDV}
+                className="nv-btn-cream"
+                style={{
+                  padding: "16px 28px",
+                  borderRadius: 10,
+                  fontSize: 15,
+                  fontWeight: 600,
+                }}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                Réserver mes 30 minutes
+              </a>
+            </Aimant>
             <Link
               href="/realisations"
-              className="nv-btn-outline"
+              className="nv-cream-hover"
               style={{
                 padding: "16px 22px",
                 borderRadius: 10,
-                border: "1px solid rgba(12,25,47,.14)",
+                border: "1px solid rgba(245,243,238,.32)",
                 fontSize: 15,
                 fontWeight: 600,
-                color: "rgba(12,25,47,.76)",
+                color: "#F5F3EE",
               }}
             >
               Nos réalisations →
