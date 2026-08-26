@@ -76,7 +76,7 @@ export default async function ContactPage() {
                   </dt>
                   <dd className="mt-1">
                     <a href={rdvLink} target="_blank" rel="noopener noreferrer" className="text-base font-medium text-[var(--brand)] hover:underline">
-                      Réserver un appel de 30 min →
+                      Réserver un appel de 30 min
                     </a>
                   </dd>
                 </div>

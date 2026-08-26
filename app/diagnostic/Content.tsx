@@ -444,7 +444,7 @@ function Page() {
 
                 {i > 0 && (
                   <button onClick={back} className="nv-link-fade" style={backLinkStyle}>
-                    ← Revenir
+                    Revenir
                   </button>
                 )}
               </div>
@@ -620,7 +620,7 @@ function Page() {
                     {merciTexte}
                   </p>
                   <Link href={approcheHref} className="nv-btn-cream" style={{ display: "inline-block", marginTop: 26, padding: "15px 28px", borderRadius: 12, fontSize: 15, fontWeight: 600 }}>
-                    Voir notre approche →
+                    Voir notre approche
                   </Link>
                 </div>
               )}

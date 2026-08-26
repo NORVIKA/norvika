@@ -178,7 +178,7 @@ function Page() {
                 transition: "all .2s ease",
               }}
             >
-              Voir le portfolio →
+              Voir le portfolio
             </a>
           </div>
         </div>

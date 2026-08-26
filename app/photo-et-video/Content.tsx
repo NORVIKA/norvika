@@ -149,7 +149,7 @@ function Page() {
         courante="/photo-et-video"
         lienExtra={{
           href: "https://norvika.myportfolio.com/",
-          libelle: "Voir notre portfolio →",
+          libelle: "Voir notre portfolio",
         }}
       />
 

@@ -36,7 +36,7 @@ export default async function AdminDashboard() {
             <p className="text-sm text-[var(--muted-foreground)]">{c.label}</p>
             <p className="mt-2 text-4xl font-bold text-[var(--foreground)]">{c.value}</p>
             <Link href={c.href} className="mt-4 inline-block text-sm font-medium text-[var(--brand)] hover:underline">
-              {c.cta} →
+              {c.cta}
             </Link>
           </div>
         ))}
@@ -48,7 +48,7 @@ export default async function AdminDashboard() {
           {links.map((l) => (
             <li key={l.href}>
               <Link href={l.href} className="text-sm text-[var(--brand)] hover:underline">
-                {l.label} →
+                {l.label}
               </Link>
             </li>
           ))}

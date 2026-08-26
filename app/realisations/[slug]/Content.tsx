@@ -60,7 +60,7 @@ export default function Page({ slug }: { slug: string }) {
             className="nv-navlink"
             style={{ fontSize: 14, fontWeight: 600 }}
           >
-            ← Toutes les réalisations
+            Toutes les réalisations
           </Link>
 
           <div
@@ -169,7 +169,7 @@ export default function Page({ slug }: { slug: string }) {
                       fontWeight: 600,
                     }}
                   >
-                    Visiter le site →
+                    Visiter le site
                   </a>
                 </div>
               ) : null}
@@ -252,7 +252,7 @@ export default function Page({ slug }: { slug: string }) {
                     fontWeight: 600,
                   }}
                 >
-                  Voir le portfolio complet →
+                  Voir le portfolio complet
                 </a>
               </figcaption>
             </figure>

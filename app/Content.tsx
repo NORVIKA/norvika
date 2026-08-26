@@ -322,7 +322,7 @@ function Index() {
                 color: "#F5F3EE",
               }}
             >
-              Nos réalisations →
+              Nos réalisations
             </Link>
           </div>
         </div>
@@ -454,7 +454,7 @@ function Index() {
               color: "#33496C",
             }}
           >
-            Voir toutes nos réalisations →
+            Voir toutes nos réalisations
           </Link>
         </div>
       </section>
@@ -491,17 +491,6 @@ function Index() {
             >
               Ce qu'on fait, et pour régler quoi.
             </h2>
-            <p
-              style={{
-                margin: 0,
-                fontSize: 17,
-                lineHeight: 1.6,
-                color: "rgba(12,25,47,.6)",
-              }}
-            >
-              On part du problème, jamais du service. Cliquez sur une ligne pour
-              voir le détail, ou ouvrez la page complète.
-            </p>
           </div>
 
           <div
@@ -586,7 +575,7 @@ function Index() {
                           color: "#33496C",
                         }}
                       >
-                        Voir la page {s.title} →
+                        Voir la page {s.title}
                       </Link>
                     </>
                   )}
@@ -599,7 +588,7 @@ function Index() {
                     color: "#33496C",
                   }}
                 >
-                  {open[i] ? "Réduire ↑" : "Le détail ↓"}
+                  {open[i] ? "Réduire" : "Le détail"}
                 </span>
               </div>
             ))}
@@ -811,15 +800,6 @@ function Index() {
                 ★★★★★
               </span>{" "}
               5,0 sur 6 avis
-            </span>
-            <span
-              style={{
-                marginLeft: "auto",
-                fontSize: 12.5,
-                color: "rgba(12,25,47,.42)",
-              }}
-            >
-              Choisissez un nom pour lire l'avis complet
             </span>
           </div>
 

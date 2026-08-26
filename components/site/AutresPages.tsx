@@ -149,9 +149,6 @@ export function AutresPages({
                 >
                   {p.titre}
                 </span>
-                <span aria-hidden="true" style={{ fontSize: 15, color: "#33496C" }}>
-                  →
-                </span>
               </span>
               <span
                 style={{
