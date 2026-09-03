@@ -29,6 +29,7 @@ const brandSuperGolf = { url: "/assets/brand-super-golf.webp" };
 const brandHackcell = { url: "/assets/brand-hackcell.webp" };
 const vergerLegault = { url: "/assets/clean-verger-legault.webp" };
 const snackEnMasse = { url: "/assets/snack-en-masse.webp" };
+const boutiqueTpm = { url: "/assets/clean-boutique-tpm.webp" };
 export type CategoryId = "site-web" | "photo-video" | "automatisation" | "formation";
 
 export const CATEGORIES: { id: CategoryId; label: string }[] = [
@@ -354,6 +355,24 @@ export const CLIENTS: Client[] = [
       "On a tourné la vidéo pour le site web, et couvert le photoshoot en behind the scenes: les préparatifs, les échanges, les moments d'équipe. Le tout monté et livré prêt à intégrer au site et à publier sur les réseaux.",
     result:
       "Une agence qui montre qui elle est, pas juste ce qu'elle produit.",
+  },
+  {
+    slug: "boutique-tpm",
+    name: "TPM Hobby & Collection",
+    logo: boutiqueTpm.url,
+    logoStyle: "brand",
+    logoShape: "wide",
+    sector: "Boutique de jeux et d'articles de collection, Québec",
+    categories: ["site-web"],
+    website: "https://boutique-tpm.com/",
+    summary:
+      "Une boutique de collection ouverte depuis 1990 à Québec, avec un inventaire immense et un nouveau propriétaire à faire connaître.",
+    context:
+      "TPM Hobby & Collection tient boutique à Fleur de Lys, à Québec, depuis 1990. Plus de trente ans de réputation bâtie sur place, avec un inventaire qui va des cartes Pokémon et Magic aux figurines, aux monnaies, aux casse-têtes et aux comics. En janvier 2024, Martin Desbiens rachète le commerce et hérite de tout ça. Le problème n'était pas dans le magasin, il était en ligne. Un collectionneur qui cherche une carte précise ou une figurine la cherche sur Google avant de sortir de chez lui, et s'il ne trouve pas TPM, il achète ailleurs. Il fallait une boutique en ligne à la hauteur de celle qui existe déjà sur la rue, visible dans les recherches, et que l'équipe puisse gérer elle-même sans nous rappeler chaque fois qu'un produit entre.",
+    work:
+      "On a refait la boutique Shopify au complet: une structure claire par rayons, une navigation pensée pour quelqu'un qui cherche un item précis, des pages produits propres, un ensemble plus rapide. Le référencement a été travaillé en même temps que la refonte, pour que les pages remontent sur ce que les gens tapent vraiment. Puis on a formé l'équipe: ajouter un produit, monter une promotion, modifier une page, suivre les commandes. Dans une boutique où l'inventaire change chaque semaine, tout ce qui bouge, ils le font eux-mêmes.",
+    result:
+      "Une boutique en ligne qui ressemble enfin au magasin, et une équipe qui la fait vivre sans dépendre de personne.",
   },
   {
     slug: "garage-la-touche-finale",
