@@ -57,8 +57,16 @@ export default function Page({ slug }: { slug: string }) {
         >
           <Link
             href="/realisations"
-            className="nv-navlink"
-            style={{ fontSize: 14, fontWeight: 600 }}
+            className="nv-cta-outline"
+            style={{
+              display: "inline-block",
+              padding: "10px 17px",
+              borderRadius: 10,
+              border: "1px solid",
+              background: "rgba(255,255,255,.7)",
+              fontSize: 13.5,
+              fontWeight: 600,
+            }}
           >
             Toutes les réalisations
           </Link>
