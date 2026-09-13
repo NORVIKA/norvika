@@ -273,6 +273,25 @@ export const CLIENTS: Client[] = [
       "Un verger qui apparaît maintenant quand on le cherche, avec un site qui lui ressemble.",
   },
   {
+    slug: "zone-detente-urbaine",
+    name: "Zone Détente Urbaine",
+    logo: zoneDetente.url,
+    logoStyle: "transparent",
+    logoShape: "wide",
+    logoScale: 1.35,
+    sector: "Institut de soins et massothérapie, Beloeil",
+    categories: ["site-web"],
+    website: "https://www.zonedetenteurbaine.ca/",
+    summary:
+      "Un institut de soins à Beloeil, avec une boutique en ligne qui ne suivait plus.",
+    context:
+      "Zone Détente Urbaine, c'est l'institut de Marie-Ève Bérubé, rue Jeannotte à Beloeil. Massothérapie, soins du visage, technologies esthétiques, et une gamme de produits de soins qu'elle vend aussi en ligne. Son site WooCommerce avait vieilli, et la boutique accumulait les pépins. Pour une propriétaire qui passe ses journées avec ses clientes, pas question de gérer un chantier web à côté, ni de perdre la main sur son propre site.",
+    work:
+      "On a pris le projet de bout en bout: le design, la refonte du site sur WooCommerce, le débogage de la boutique, la mise en ligne, jusqu'au transfert du nom de domaine. Elle n'a eu aucun fournisseur de plus à coordonner. Et parce que le site reste le sien, on l'a monté pour qu'elle en garde le contrôle: ses produits, ses prix, ses pages, elle les modifie elle-même.",
+    result:
+      "Un site qui ressemble à l'institut, une boutique qui fonctionne, et une propriétaire qui garde la main sur tout.",
+  },
+  {
     slug: "loud",
     name: "LOUD Conférence",
     logo: brandLoud.url,
@@ -410,25 +429,6 @@ export const CLIENTS: Client[] = [
       "On a couvert le photoshoot en vidéo, en mode behind the scenes: discret, en mouvement, sans jamais interférer avec la séance. Le tout monté et livré prêt à publier.",
     result:
       "Un contenu qui montre le photographe au travail, et qui vend son approche mieux qu'une description.",
-  },
-  {
-    slug: "zone-detente-urbaine",
-    name: "Zone Détente Urbaine",
-    logo: zoneDetente.url,
-    logoStyle: "transparent",
-    logoShape: "wide",
-    logoScale: 1.35,
-    sector: "Institut de soins et massothérapie, Beloeil",
-    categories: ["site-web"],
-    website: "https://www.zonedetenteurbaine.ca/",
-    summary:
-      "Un institut de soins à Beloeil, avec une boutique en ligne qui ne suivait plus.",
-    context:
-      "Zone Détente Urbaine, c'est l'institut de Marie-Ève Bérubé, rue Jeannotte à Beloeil. Massothérapie, soins du visage, technologies esthétiques, et une gamme de produits de soins qu'elle vend aussi en ligne. Son site WooCommerce avait vieilli, et la boutique accumulait les pépins. Pour une propriétaire qui passe ses journées avec ses clientes, pas question de gérer un chantier web à côté, ni de perdre la main sur son propre site.",
-    work:
-      "On a pris le projet de bout en bout: le design, la refonte du site sur WooCommerce, le débogage de la boutique, la mise en ligne, jusqu'au transfert du nom de domaine. Elle n'a eu aucun fournisseur de plus à coordonner. Et parce que le site reste le sien, on l'a monté pour qu'elle en garde le contrôle: ses produits, ses prix, ses pages, elle les modifie elle-même.",
-    result:
-      "Un site qui ressemble à l'institut, une boutique qui fonctionne, et une propriétaire qui garde la main sur tout.",
   },
   {
     slug: "cracheur-de-feu",
