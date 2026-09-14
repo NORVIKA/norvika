@@ -25,7 +25,7 @@ export const metadata: Metadata = {
     template: "%s | Norvika",
   },
   description:
-    "Sites web, automatisation, photo et vidéo pour les entreprises du Québec. On comprend votre réalité, puis on bâtit une offre qui vous ressemble.",
+    "Agence web à Beloeil, sur la Rive-Sud de Montréal : sites web, automatisation, photo et vidéo pour les PME du Québec. On comprend votre réalité, puis on bâtit une offre qui vous ressemble.",
   metadataBase: new URL("https://norvika.ca"),
   openGraph: {
     type: "website",
@@ -154,7 +154,20 @@ gtag('config', '${GA_ID}', { anonymize_ip: true });`,
               telephone: siteInfo.telephone || "438 522 4275",
               description:
                 "Présence numérique pour les entreprises et les travailleurs autonomes.",
-              areaServed: { "@type": "Place", name: "Québec, Canada" },
+              // Zone desservie PRECISE : une seule entree « Québec, Canada » ne dit
+              // rien a Google pour une recherche locale (veille SEO du 2026-09-14).
+              address: {
+                "@type": "PostalAddress",
+                addressLocality: "Beloeil",
+                addressRegion: "QC",
+                addressCountry: "CA",
+              },
+              areaServed: [
+                { "@type": "City", name: "Beloeil" },
+                { "@type": "Place", name: "Rive-Sud de Montréal" },
+                { "@type": "AdministrativeArea", name: "Montérégie" },
+                { "@type": "AdministrativeArea", name: "Québec" },
+              ],
               serviceType: [
                 "Création de sites web",
                 "Automatisation",

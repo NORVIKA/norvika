@@ -117,7 +117,7 @@ export function SiteFooter() {
               justifyContent: "space-between",
             }}
           >
-            <span>© 2026 Norvika</span>
+            <span>© 2026 Norvika · Beloeil et Rive-Sud de Montréal</span>
             <Link
               href="/politique-de-confidentialite"
               style={{ color: "rgba(12,25,47,.62)" }}

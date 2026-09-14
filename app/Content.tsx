@@ -280,9 +280,9 @@ function Index() {
               color: "rgba(245,243,238,.88)",
             }}
           >
-            Chaque entreprise est différente, la vôtre aussi. On prend le temps
-            de comprendre votre réalité, pis on bâtit une offre qui vous
-            ressemble.
+            Agence web à Beloeil, sur la Rive-Sud de Montréal. Chaque entreprise
+            est différente, la vôtre aussi : on prend le temps de comprendre
+            votre réalité, pis on bâtit une offre qui vous ressemble.
           </p>
           <div
             data-reveal="hero"
