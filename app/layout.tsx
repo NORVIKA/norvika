@@ -25,7 +25,7 @@ export const metadata: Metadata = {
     template: "%s | Norvika",
   },
   description:
-    "Agence web à Beloeil, sur la Rive-Sud de Montréal : sites web, automatisation, photo et vidéo pour les PME du Québec. On comprend votre réalité, puis on bâtit une offre qui vous ressemble.",
+    "Sites web, automatisation, photo et vidéo pour les PME de la ville de Québec, de la Rive-Sud de Montréal et de partout en province. On comprend votre réalité, puis on bâtit une offre qui vous ressemble.",
   metadataBase: new URL("https://norvika.ca"),
   openGraph: {
     type: "website",
@@ -154,16 +154,13 @@ gtag('config', '${GA_ID}', { anonymize_ip: true });`,
               telephone: siteInfo.telephone || "438 522 4275",
               description:
                 "Présence numérique pour les entreprises et les travailleurs autonomes.",
-              // Zone desservie PRECISE : une seule entree « Québec, Canada » ne dit
-              // rien a Google pour une recherche locale (veille SEO du 2026-09-14).
-              address: {
-                "@type": "PostalAddress",
-                addressLocality: "Beloeil",
-                addressRegion: "QC",
-                addressCountry: "CA",
-              },
+              // Zone desservie PRECISE, invisible a l'ecran mais lue par Google : une
+              // seule entree « Québec, Canada » ne dit rien pour une recherche locale
+              // (veille SEO du 2026-09-14). Ville de Québec en premier : c'est la cible
+              // de developpement (William, 2026-09-14). Pas d'adresse postale tant que
+              // le siege n'est pas confirme.
               areaServed: [
-                { "@type": "City", name: "Beloeil" },
+                { "@type": "City", name: "Québec" },
                 { "@type": "Place", name: "Rive-Sud de Montréal" },
                 { "@type": "AdministrativeArea", name: "Montérégie" },
                 { "@type": "AdministrativeArea", name: "Québec" },

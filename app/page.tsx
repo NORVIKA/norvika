@@ -4,7 +4,7 @@ import Content from "./Content";
 export const metadata: Metadata = {
   title: { absolute: "Norvika · Vos courtiers des outils numériques" },
   description:
-    "Agence web à Beloeil, sur la Rive-Sud de Montréal : sites web, automatisation, photo et vidéo pour les PME du Québec. On comprend votre réalité, puis on bâtit une offre qui vous ressemble.",
+    "Sites web, automatisation, photo et vidéo pour les PME de la ville de Québec, de la Rive-Sud de Montréal et de partout en province. On comprend votre réalité, puis on bâtit une offre qui vous ressemble.",
   alternates: { canonical: "/" },
   openGraph: {
     title: "Norvika · Vos courtiers des outils numériques",
