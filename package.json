@@ -9,7 +9,7 @@
     "lint": "eslint app lib",
     "cf:build": "opennextjs-cloudflare build",
     "preview": "opennextjs-cloudflare build && opennextjs-cloudflare preview",
-    "deploy": "opennextjs-cloudflare build && opennextjs-cloudflare deploy",
+    "deploy": "bash scripts/deploy.sh",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {

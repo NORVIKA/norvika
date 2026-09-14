@@ -24,3 +24,4 @@ out/
 
 # Artefact du cerveau Norvika (contrat de frontière) — ne fait pas partie du site
 PROJET.json
+.env.secrets
