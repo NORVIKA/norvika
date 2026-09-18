@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Content from "./Content";
+import SchemaService from "@/components/site/SchemaService";
 
 export const metadata: Metadata = {
   title: { absolute: "Automatisation pour PME à Québec | Norvika" },
@@ -9,5 +10,10 @@ export const metadata: Metadata = {
 };
 
 export default function Page() {
-  return <Content />;
+  return (
+    <>
+      <SchemaService nom="Automatisation pour PME" type="Automatisation" description="Automatisation pour les PME de la ville de Québec, de la Rive-Sud de Montréal et de partout en province : on vous aide à comprendre vos outils, choisir ce qui manque, et retrouver du temps pour ce qui compte." chemin="/automatisation" />
+      <Content />
+    </>
+  );
 }
