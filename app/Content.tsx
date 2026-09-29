@@ -152,13 +152,11 @@ function Index() {
       <SiteHeader />
 
       {/* Hero
-          ⚠️ SOMBRE ET COLORE, VOLONTAIREMENT. Il etait clair, navy sur blanc,
-          et le verdict de William tenait en une phrase : « tout est sans
-          couleur ». Il avait raison, le site entier tourne autour d'un seul
-          navy. De la couleur posee sur du blanc devient vite criarde ; la meme
-          couleur posee sur du navy DEVIENT DE LA LUMIERE. C'est pour ca que le
-          fond passe au sombre : c'est ce qui permet au bleu et au turquoise
-          d'exister vraiment, au lieu de rester des teintes polies. */}
+          Fond sombre uni. Il a porte un temps trois aurores colorees en
+          degrade (bleu, turquoise, magenta) pour repondre au verdict de
+          William, « tout est sans couleur ». Elles ont ete retirees a la
+          demande de Lau, qui voulait un fond simple. Le sombre reste : le
+          texte creme et les boutons sont regles pour ce contraste-la. */}
       <section
         style={{
           position: "relative",
@@ -168,73 +166,6 @@ function Index() {
           borderBottom: "1px solid rgba(12,25,47,.1)",
         }}
       >
-        {/* Les aurores. Trois masses de couleur floues qui derivent lentement.
-            Elles sont vives (55 %, 42 %, 30 %) la ou les anciennes plafonnaient
-            a 16 % : c'est la difference entre « on devine une nuance » et « il
-            y a de la couleur ». */}
-        <div
-          aria-hidden="true"
-          style={{ position: "absolute", inset: 0, pointerEvents: "none" }}
-        >
-          <div
-            style={{
-              position: "absolute",
-              top: "-32%",
-              left: "-8%",
-              width: 860,
-              height: 860,
-              borderRadius: "50%",
-              background:
-                "radial-gradient(circle, rgba(53,87,212,.85) 0%, rgba(53,87,212,0) 68%)",
-              filter: "blur(44px)",
-              animation: "driftA 22s ease-in-out infinite",
-            }}
-          />
-          <div
-            style={{
-              position: "absolute",
-              top: "-20%",
-              left: "30%",
-              width: 820,
-              height: 820,
-              borderRadius: "50%",
-              background:
-                "radial-gradient(circle, rgba(45,212,191,.62) 0%, rgba(45,212,191,0) 68%)",
-              filter: "blur(50px)",
-              animation: "driftB 27s ease-in-out infinite",
-            }}
-          />
-          {/* Le contrepoint. Il etait orange et il se melait au turquoise en
-              donnant un brun sale au centre droit : orange et turquoise sont
-              opposes, leur melange vire a la boue. Le magenta, lui, appartient
-              a la meme moitie froide que le bleu : il ajoute une hue de plus
-              sans salir ce qu'il touche. */}
-          <div
-            style={{
-              position: "absolute",
-              bottom: "-26%",
-              right: "-12%",
-              width: 760,
-              height: 760,
-              borderRadius: "50%",
-              background:
-                "radial-gradient(circle, rgba(168,85,247,.62) 0%, rgba(168,85,247,0) 66%)",
-              filter: "blur(48px)",
-              animation: "driftA 31s ease-in-out infinite reverse",
-            }}
-          />
-          {/* Le bas se rassombrit pour que la bordure vers la section suivante
-              soit nette, au lieu de finir dans une bouillie de couleurs. */}
-          <div
-            style={{
-              position: "absolute",
-              inset: 0,
-              background:
-                "linear-gradient(to bottom, rgba(10,21,38,0) 68%, rgba(10,21,38,.72) 94%, #0A1526 100%)",
-            }}
-          />
-        </div>
-
         {/* Le courant : les lames de la marque derivent derriere le texte.
             Elle ne prend aucun clic : tout le contenu est en
             `position: relative`, donc au-dessus. */}
