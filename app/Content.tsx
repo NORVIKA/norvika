@@ -9,7 +9,6 @@ import { useReveal } from "@/lib/useReveal";
 import { Roadmap, type RoadStep } from "@/components/site/Roadmap";
 import { LIEN_RDV } from "@/lib/liens";
 import { AutresPages } from "@/components/site/AutresPages";
-import { CourantNorvika } from "@/components/site/CourantNorvika";
 import { Aimant } from "@/components/site/Aimant";
 const lauEtWill = { url: "/assets/lau-et-will-2.webp" };
 // Bande de logos clients, choisie par William le 2026-08-24.
@@ -152,10 +151,10 @@ function Index() {
       <SiteHeader />
 
       {/* Hero
-          Fond sombre uni. Il a porte un temps trois aurores colorees en
-          degrade (bleu, turquoise, magenta) pour repondre au verdict de
-          William, « tout est sans couleur ». Elles ont ete retirees a la
-          demande de Lau, qui voulait un fond simple. Le sombre reste : le
+          Fond sombre uni, sans decor. Il a porte un temps trois aurores
+          colorees en degrade (bleu, turquoise, magenta) et les lames de la
+          marque qui derivaient derriere le texte. Les deux ont ete retirees a
+          la demande de Lau, qui voulait un fond simple. Le sombre reste : le
           texte creme et les boutons sont regles pour ce contraste-la. */}
       <section
         style={{
@@ -166,16 +165,6 @@ function Index() {
           borderBottom: "1px solid rgba(12,25,47,.1)",
         }}
       >
-        {/* Le courant : les lames de la marque derivent derriere le texte.
-            Elle ne prend aucun clic : tout le contenu est en
-            `position: relative`, donc au-dessus. */}
-        <div
-          aria-hidden="true"
-          style={{ position: "absolute", inset: 0, pointerEvents: "none" }}
-        >
-          <CourantNorvika />
-        </div>
-
         <div className="nv-shell"
           style={{
             position: "relative",
