@@ -31,6 +31,7 @@ const vergerLegault = { url: "/assets/clean-verger-legault.webp" };
 const snackEnMasse = { url: "/assets/snack-en-masse.webp" };
 const boutiqueTpm = { url: "/assets/clean-boutique-tpm.webp" };
 const zoneDetente = { url: "/assets/clean-zone-detente-urbaine.webp" };
+const boulangerieChambly = { url: "/assets/clean-boulangerie-vieux-chambly.webp" };
 export type CategoryId = "site-web" | "photo-video" | "automatisation" | "formation";
 
 export const CATEGORIES: { id: CategoryId; label: string }[] = [
@@ -290,6 +291,24 @@ export const CLIENTS: Client[] = [
       "On a pris le projet de bout en bout: le design, la refonte du site sur WooCommerce, le débogage de la boutique, la mise en ligne, jusqu'au transfert du nom de domaine. Elle n'a eu aucun fournisseur de plus à coordonner. Et parce que le site reste le sien, on l'a monté pour qu'elle en garde le contrôle: ses produits, ses prix, ses pages, elle les modifie elle-même.",
     result:
       "Un site qui ressemble à l'institut, une boutique qui fonctionne, et une propriétaire qui garde la main sur tout.",
+  },
+  {
+    slug: "boulangerie-du-vieux-chambly",
+    name: "Boulangerie du Vieux-Chambly",
+    logo: boulangerieChambly.url,
+    logoStyle: "transparent",
+    logoShape: "square",
+    sector: "Boulangerie artisanale, Chambly",
+    categories: ["site-web"],
+    website: "https://boulangerievieuxchambly.com/",
+    summary:
+      "Un site que juste une personne sait gérer, c'est un site à retardement.",
+    context:
+      "La refonte de la Boulangerie du Vieux-Chambly était due: les produits avaient évolué, l'équipe aussi. Et quand il y a du roulement, un site devient vite un problème. La personne qui savait comment le modifier n'est plus là, et plus personne ose y toucher.",
+    work:
+      "On l'a donc refait pour que ça se gère sans formation. Changer un produit, une heure, une photo: n'importe qui dans l'équipe est capable, pas juste celui qui était là le jour de la livraison.",
+    result:
+      "Un site que l'équipe fait vivre au complet, peu importe qui est en poste.",
   },
   {
     slug: "loud",
