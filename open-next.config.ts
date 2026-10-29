@@ -20,4 +20,8 @@ import staticAssetsIncrementalCache from "@opennextjs/cloudflare/overrides/incre
 // ressource correspondante. Garder ce cache-ci ferait servir du HTML figé.
 export default defineCloudflareConfig({
   incrementalCache: staticAssetsIncrementalCache,
+  // Une page trouvée dans le cache est servie SANS charger le serveur Next. Mesuré sur Immuart
+  // le 2026-10-29 : 12,6 ms de calcul par page sans ce réglage, pour une limite de 10 ms au forfait
+  // gratuit (erreurs 1102 sous charge) ; 6,1 ms et 0 erreur avec. À retirer si le PPR arrive.
+  enableCacheInterception: true,
 });
