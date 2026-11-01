@@ -32,6 +32,8 @@ const snackEnMasse = { url: "/assets/snack-en-masse.webp" };
 const boutiqueTpm = { url: "/assets/clean-boutique-tpm.webp" };
 const zoneDetente = { url: "/assets/clean-zone-detente-urbaine.webp" };
 const boulangerieChambly = { url: "/assets/clean-boulangerie-vieux-chambly.webp" };
+const nellyDufour = { url: "/assets/clean-nelly-dufour.webp" };
+const barLeVox = { url: "/assets/clean-bar-le-vox.webp" };
 export type CategoryId = "site-web" | "photo-video" | "automatisation" | "formation";
 
 export const CATEGORIES: { id: CategoryId; label: string }[] = [
@@ -291,6 +293,40 @@ export const CLIENTS: Client[] = [
       "On a pris le projet de bout en bout: le design, la refonte du site sur WooCommerce, le débogage de la boutique, la mise en ligne, jusqu'au transfert du nom de domaine. Elle n'a eu aucun fournisseur de plus à coordonner. Et parce que le site reste le sien, on l'a monté pour qu'elle en garde le contrôle: ses produits, ses prix, ses pages, elle les modifie elle-même.",
     result:
       "Un site qui ressemble à l'institut, une boutique qui fonctionne, et une propriétaire qui garde la main sur tout.",
+  },
+  {
+    slug: "nelly-dufour",
+    name: "Nelly Dufour",
+    logo: nellyDufour.url,
+    logoStyle: "transparent",
+    logoShape: "square",
+    sector: "Photographe",
+    categories: ["site-web"],
+    summary:
+      "Une photographe qui avait besoin d'un site, et d'une plateforme de livraison qui suit.",
+    context:
+      "Nelly Dufour est photographe. Son métier se vend par l'image, et il lui fallait un site capable de la montrer, pas un gabarit de plus. Dans son domaine, le site n'est que la moitié du travail: il faut aussi une plateforme pour livrer les photos aux clients, gérer les commandes et les visites. Deux chantiers d'un coup, quand on travaille seule, c'est le genre de projet qu'on repousse d'une saison à l'autre.",
+    work:
+      "On a bâti le site de A à Z, de la structure au design jusqu'à la mise en ligne. En parallèle, on a configuré la plateforme Aryeo clé en main, pour que la livraison aux clients soit prête à fonctionner dès le premier mandat. Elle n'a eu ni gabarit à décortiquer, ni plateforme à apprivoiser toute seule.",
+    result:
+      "Un site qui montre son travail, et une plateforme de livraison prête à l'emploi.",
+  },
+  {
+    slug: "bar-le-vox",
+    name: "Bar Le Vox",
+    logo: barLeVox.url,
+    logoStyle: "transparent",
+    logoShape: "wide",
+    sector: "Bar à cidres et rétrogaming, Québec",
+    categories: ["photo-video"],
+    summary:
+      "Un bar qui a une ambiance forte, et qui avait besoin de la montrer en ligne.",
+    context:
+      "Le Bar Le Vox, rue Saint-Joseph à Québec, c'est du cidre, des machines d'arcade et du rétrogaming dans la même salle. Une place qui se comprend en trente secondes quand on y entre, et beaucoup moins sur une photo. Pour attirer du monde, il fallait des images qui rendent l'ambiance: le bruit, les lumières, le fait qu'on y joue autant qu'on y boit.",
+    work:
+      "On a tourné et monté quatre clips pour les réseaux sociaux, pensés pour le format vertical et la lecture sans son, plus une vidéo promotionnelle d'une minute pour présenter l'endroit au complet. Le tout livré prêt à publier.",
+    result:
+      "Une ambiance qui se voit en ligne, au lieu de se raconter.",
   },
   {
     slug: "boulangerie-du-vieux-chambly",
