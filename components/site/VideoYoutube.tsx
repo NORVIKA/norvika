@@ -22,10 +22,13 @@ export function VideoYoutube({
   youtubeId,
   titre,
   format = "horizontal",
+  largeurMax = 340,
 }: {
   youtubeId: string;
   titre: string;
   format?: "vertical" | "horizontal";
+  /** Largeur maximale d'une vidéo verticale, en pixels. Sans effet à l'horizontale. */
+  largeurMax?: number;
 }) {
   const [joue, setJoue] = useState(false);
   const vertical = format === "vertical";
@@ -36,7 +39,7 @@ export function VideoYoutube({
         position: "relative",
         margin: "0 auto",
         width: "100%",
-        maxWidth: vertical ? 340 : "100%",
+        maxWidth: vertical ? largeurMax : "100%",
         aspectRatio: vertical ? "9 / 16" : "16 / 9",
         borderRadius: 18,
         overflow: "hidden",

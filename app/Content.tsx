@@ -250,6 +250,93 @@ function Index() {
 
       </section>
 
+      {/* Vidéos
+          Juste sous le hero, et non en bas de page : decision de Lau, « c'est
+          une des premieres choses que les clients doivent voir ». Un client
+          qui parle et un avant/apres convainquent plus vite qu'un paragraphe.
+          La section ne ralentit pas l'accueil malgre sa position : les deux
+          lecteurs ne chargent rien de YouTube tant que personne ne clique. */}
+      <section
+        style={{
+          borderBottom: "1px solid rgba(12,25,47,.1)",
+          background: "#fff",
+        }}
+      >
+        <div
+          className="nv-shell"
+          style={{ maxWidth: 900, margin: "0 auto", padding: "76px 32px 82px" }}
+        >
+          <div data-reveal style={{ textAlign: "center" }}>
+            <h2
+              style={{
+                margin: 0,
+                fontSize: 11.5,
+                letterSpacing: ".2em",
+                textTransform: "uppercase",
+                color: "#33496C",
+                fontWeight: 600,
+              }}
+            >
+              En vidéo
+            </h2>
+            <p
+              style={{
+                margin: "18px 0 40px",
+                fontFamily: "var(--font-display)",
+                fontWeight: 600,
+                fontSize: "clamp(24px,2.8vw,34px)",
+                lineHeight: 1.25,
+                letterSpacing: "-.03em",
+                color: "#0C192F",
+              }}
+            >
+              Nos clients en parlent mieux que nous.
+            </p>
+          </div>
+          <div
+            data-reveal
+            className="nv-grid"
+            style={{
+              display: "grid",
+              gridTemplateColumns: "repeat(auto-fit, minmax(240px, 280px))",
+              justifyContent: "center",
+              gap: 28,
+            }}
+          >
+            {[
+              {
+                youtubeId: "RSq7pu-hRjs",
+                titre: "Témoignage d'André et Jen",
+                legende: "André et Jen, en leurs mots.",
+              },
+              {
+                youtubeId: "zAKFvYKTxfQ",
+                titre: "Nelly Dufour, avant et après",
+                legende: "Le site de Nelly Dufour, avant et après.",
+              },
+            ].map((v) => (
+              <figure key={v.youtubeId} style={{ margin: 0 }}>
+                <VideoYoutube
+                  youtubeId={v.youtubeId}
+                  titre={v.titre}
+                  format="vertical"
+                />
+                <figcaption
+                  style={{
+                    marginTop: 14,
+                    textAlign: "center",
+                    fontSize: 13.5,
+                    color: "rgba(12,25,47,.6)",
+                  }}
+                >
+                  {v.legende}
+                </figcaption>
+              </figure>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* Quiz band */}
       <section
         style={{
@@ -863,56 +950,6 @@ function Index() {
                 {selected.footer}
               </p>
             </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Témoignage vidéo. Il suit les avis Google : le texte d'abord, puis
-          des vraies personnes qui le disent. Le lecteur ne charge rien tant
-          qu'on ne clique pas, donc cette section ne coûte rien à l'accueil. */}
-      <section
-        style={{
-          borderBottom: "1px solid rgba(12,25,47,.1)",
-          background: "#fff",
-        }}
-      >
-        <div
-          className="nv-shell"
-          style={{ maxWidth: 780, margin: "0 auto", padding: "88px 32px" }}
-        >
-          <div data-reveal style={{ textAlign: "center" }}>
-            <h2
-              style={{
-                margin: 0,
-                fontSize: 11.5,
-                letterSpacing: ".2em",
-                textTransform: "uppercase",
-                color: "#33496C",
-                fontWeight: 600,
-              }}
-            >
-              En vidéo
-            </h2>
-            <p
-              style={{
-                margin: "18px 0 36px",
-                fontFamily: "var(--font-display)",
-                fontWeight: 600,
-                fontSize: "clamp(24px,2.8vw,34px)",
-                lineHeight: 1.25,
-                letterSpacing: "-.03em",
-                color: "#0C192F",
-              }}
-            >
-              André et Jen en parlent mieux que nous.
-            </p>
-          </div>
-          <div data-reveal>
-            <VideoYoutube
-              youtubeId="RSq7pu-hRjs"
-              titre="Témoignage d'André et Jen"
-              format="vertical"
-            />
           </div>
         </div>
       </section>
