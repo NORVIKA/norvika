@@ -61,6 +61,13 @@ export type Client = {
   work: string;
   /** Le résultat */
   result?: string;
+  /** Vidéo YouTube montrée sur la fiche, chargée seulement au clic */
+  video?: {
+    youtubeId: string;
+    titre: string;
+    legende: string;
+    format?: "vertical" | "horizontal";
+  };
 };
 
 export const CLIENTS: Client[] = [
@@ -310,6 +317,12 @@ export const CLIENTS: Client[] = [
       "On a bâti le site de A à Z, de la structure au design jusqu'à la mise en ligne. En parallèle, on a configuré la plateforme Aryeo clé en main, pour que la livraison aux clients soit prête à fonctionner dès le premier mandat. Elle n'a eu ni gabarit à décortiquer, ni plateforme à apprivoiser toute seule.",
     result:
       "Un site qui montre son travail, et une plateforme de livraison prête à l'emploi.",
+    video: {
+      youtubeId: "zAKFvYKTxfQ",
+      titre: "Nelly Dufour, avant et après",
+      legende: "Le site avant, et après.",
+      format: "vertical",
+    },
   },
   {
     slug: "bar-le-vox",

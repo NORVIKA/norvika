@@ -84,6 +84,12 @@ const nextConfig = {
               "img-src 'self' data: https://*.supabase.co https://cdn.sanity.io https://placehold.co https://image.thum.io https://cdn-cookieyes.com https://*.google-analytics.com https://*.googletagmanager.com",
               "font-src 'self' data: https://cdn-cookieyes.com",
               "connect-src 'self' https://*.supabase.co https://cdn-cookieyes.com https://log.cookieyes.com https://directives.cookieyes.com https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com",
+              // Les lecteurs YouTube des fiches de realisation. Le domaine
+              // youtube-nocookie.com ne depose rien avant que le visiteur
+              // clique sur lecture, et le lecteur n'est insere qu'a ce
+              // moment-la. Sans cette ligne, `default-src 'self'` bloquerait
+              // l'iframe et la video resterait un cadre vide.
+              "frame-src https://www.youtube-nocookie.com",
               "form-action 'self'",
               "frame-ancestors 'none'",
               "base-uri 'self'",
