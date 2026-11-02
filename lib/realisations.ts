@@ -191,6 +191,12 @@ export const CLIENTS: Client[] = [
       "Deux jours de formation privée sur mesure, dans leurs locaux. On a fourni tout l'équipement nécessaire pour la formation, pour qu'ils puissent apprendre sur du vrai matériel avant de décider quoi acheter. On a couvert ce dont ils avaient vraiment besoin: cadrage, lumière, prise de vue, montage simple, publication sur les réseaux. On a pratiqué sur du vrai contenu, pas sur des exemples.",
     result:
       "Ils produisent maintenant leur propre contenu, sans dépendre de personne.",
+    video: {
+      youtubeId: "9g_IWhFRhIo",
+      titre: "Témoignage d'Ékip Jeunesse",
+      legende: "Ékip Jeunesse, en leurs mots.",
+      format: "vertical",
+    },
   },
   {
     slug: "taverne-du-collectionneur",

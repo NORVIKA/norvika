@@ -264,7 +264,7 @@ function Index() {
       >
         <div
           className="nv-shell"
-          style={{ maxWidth: 900, margin: "0 auto", padding: "76px 32px 82px" }}
+          style={{ maxWidth: 1040, margin: "0 auto", padding: "76px 32px 82px" }}
         >
           <div data-reveal style={{ textAlign: "center" }}>
             <h2
@@ -310,6 +310,11 @@ function Index() {
                 // Andre et Jen tiennent le Bar Le Vox : la video est tournee
                 // dans leur bar, chandail, micro et affiche VOX a l'appui.
                 fiche: "/realisations/bar-le-vox",
+              },
+              {
+                youtubeId: "9g_IWhFRhIo",
+                titre: "Témoignage d'Ékip Jeunesse",
+                fiche: "/realisations/ekip-jeunesse",
               },
               {
                 youtubeId: "zAKFvYKTxfQ",
