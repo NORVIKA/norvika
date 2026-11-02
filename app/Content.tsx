@@ -307,12 +307,15 @@ function Index() {
               {
                 youtubeId: "RSq7pu-hRjs",
                 titre: "Témoignage d'André et Jen",
-                legende: "André et Jen, en leurs mots.",
+                // ⚠️ Pas de fiche : on ne sait pas encore de quel client
+                // Andre et Jen sont les proprietaires. Des que Lau le dira,
+                // il suffit d'ajouter le slug ici.
+                fiche: null,
               },
               {
                 youtubeId: "zAKFvYKTxfQ",
                 titre: "Nelly Dufour, avant et après",
-                legende: "Le site de Nelly Dufour, avant et après.",
+                fiche: "/realisations/nelly-dufour",
               },
             ].map((v) => (
               <figure key={v.youtubeId} style={{ margin: 0 }}>
@@ -321,16 +324,24 @@ function Index() {
                   titre={v.titre}
                   format="vertical"
                 />
-                <figcaption
-                  style={{
-                    marginTop: 14,
-                    textAlign: "center",
-                    fontSize: 13.5,
-                    color: "rgba(12,25,47,.6)",
-                  }}
-                >
-                  {v.legende}
-                </figcaption>
+                {v.fiche ? (
+                  <figcaption style={{ marginTop: 16, textAlign: "center" }}>
+                    <Link
+                      href={v.fiche}
+                      className="nv-cta-outline"
+                      style={{
+                        display: "inline-block",
+                        padding: "10px 16px",
+                        borderRadius: 999,
+                        border: "1px solid",
+                        fontSize: 13.5,
+                        fontWeight: 600,
+                      }}
+                    >
+                      Voir la réalisation
+                    </Link>
+                  </figcaption>
+                ) : null}
               </figure>
             ))}
           </div>
