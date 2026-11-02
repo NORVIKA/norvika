@@ -10,6 +10,7 @@ import { Roadmap, type RoadStep } from "@/components/site/Roadmap";
 import { LIEN_RDV } from "@/lib/liens";
 import { AutresPages } from "@/components/site/AutresPages";
 import { Aimant } from "@/components/site/Aimant";
+import { VideoYoutube } from "@/components/site/VideoYoutube";
 const lauEtWill = { url: "/assets/lau-et-will-2.webp" };
 // Bande de logos clients, choisie par William le 2026-08-24.
 //
@@ -862,6 +863,56 @@ function Index() {
                 {selected.footer}
               </p>
             </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Témoignage vidéo. Il suit les avis Google : le texte d'abord, puis
+          des vraies personnes qui le disent. Le lecteur ne charge rien tant
+          qu'on ne clique pas, donc cette section ne coûte rien à l'accueil. */}
+      <section
+        style={{
+          borderBottom: "1px solid rgba(12,25,47,.1)",
+          background: "#fff",
+        }}
+      >
+        <div
+          className="nv-shell"
+          style={{ maxWidth: 780, margin: "0 auto", padding: "88px 32px" }}
+        >
+          <div data-reveal style={{ textAlign: "center" }}>
+            <h2
+              style={{
+                margin: 0,
+                fontSize: 11.5,
+                letterSpacing: ".2em",
+                textTransform: "uppercase",
+                color: "#33496C",
+                fontWeight: 600,
+              }}
+            >
+              En vidéo
+            </h2>
+            <p
+              style={{
+                margin: "18px 0 36px",
+                fontFamily: "var(--font-display)",
+                fontWeight: 600,
+                fontSize: "clamp(24px,2.8vw,34px)",
+                lineHeight: 1.25,
+                letterSpacing: "-.03em",
+                color: "#0C192F",
+              }}
+            >
+              André et Jen en parlent mieux que nous.
+            </p>
+          </div>
+          <div data-reveal>
+            <VideoYoutube
+              youtubeId="RSq7pu-hRjs"
+              titre="Témoignage d'André et Jen"
+              format="vertical"
+            />
           </div>
         </div>
       </section>
