@@ -293,9 +293,14 @@ function Index() {
               Nos clients en parlent mieux que nous.
             </p>
           </div>
+          {/* ⚠️ PAS `nv-grid` ICI. Cette classe force une seule colonne sous
+              1024 px : les trois videos verticales s'empilaient et mettaient
+              1500 px de defilement entre le hero et la suite de la page. La
+              classe ci-dessous garde la rangee sur grand ecran et la
+              transforme en carrousel sur telephone (voir globals.css). */}
           <div
             data-reveal
-            className="nv-grid"
+            className="nv-videos-rangee"
             style={{
               display: "grid",
               gridTemplateColumns: "repeat(auto-fit, minmax(240px, 280px))",
