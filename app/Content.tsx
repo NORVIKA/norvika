@@ -307,10 +307,9 @@ function Index() {
               {
                 youtubeId: "RSq7pu-hRjs",
                 titre: "Témoignage d'André et Jen",
-                // ⚠️ Pas de fiche : on ne sait pas encore de quel client
-                // Andre et Jen sont les proprietaires. Des que Lau le dira,
-                // il suffit d'ajouter le slug ici.
-                fiche: null,
+                // Andre et Jen tiennent le Bar Le Vox : la video est tournee
+                // dans leur bar, chandail, micro et affiche VOX a l'appui.
+                fiche: "/realisations/bar-le-vox",
               },
               {
                 youtubeId: "zAKFvYKTxfQ",

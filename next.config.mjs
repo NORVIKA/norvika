@@ -81,7 +81,9 @@ const nextConfig = {
               // googletagmanager.com : GA4, qui ne mesure qu'apres acceptation.
               `script-src 'self' 'unsafe-inline'${process.env.NODE_ENV === "development" ? " 'unsafe-eval'" : ""} https://cdn-cookieyes.com https://www.googletagmanager.com`,
               "style-src 'self' 'unsafe-inline' https://cdn-cookieyes.com",
-              "img-src 'self' data: https://*.supabase.co https://cdn.sanity.io https://placehold.co https://image.thum.io https://cdn-cookieyes.com https://*.google-analytics.com https://*.googletagmanager.com",
+              // i.ytimg.com : les vignettes des videos, affichees avant que le
+              // visiteur clique. Une image seule, sans cookie ni script.
+              "img-src 'self' data: https://*.supabase.co https://cdn.sanity.io https://placehold.co https://image.thum.io https://cdn-cookieyes.com https://*.google-analytics.com https://*.googletagmanager.com https://i.ytimg.com",
               "font-src 'self' data: https://cdn-cookieyes.com",
               "connect-src 'self' https://*.supabase.co https://cdn-cookieyes.com https://log.cookieyes.com https://directives.cookieyes.com https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com",
               // Les lecteurs YouTube des fiches de realisation. Le domaine

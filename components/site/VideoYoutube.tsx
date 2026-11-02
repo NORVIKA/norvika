@@ -13,10 +13,12 @@ import { useState } from "react";
  * youtube-nocookie.com : aucun cookie de suivi n'est depose avant la lecture,
  * donc rien a negocier avec la banniere de consentement.
  *
- * ⚠️ PAS DE VIGNETTE YOUTUBE. On pourrait afficher i.ytimg.com en fond du
- * bouton, mais il faudrait ouvrir `img-src` a un domaine de plus dans la CSP,
- * et la vignette d'un Short est une image 16/9 qu'il faut recadrer pour un
- * cadre vertical. Un panneau sombre coute moins cher et ne casse pas.
+ * ⚠️ LA VIGNETTE VIENT DE YOUTUBE, ET LE NOM DE FICHIER COMPTE.
+ * `hqdefault.jpg` et `maxresdefault.jpg` sont toujours en 16/9 : dans un cadre
+ * vertical, ils donnent une image recadree ou cernee de bandes noires.
+ * `oardefault.jpg` (original aspect ratio) rend la vraie image verticale du
+ * Short, en 1080x1920. D'ou le choix selon le format. Ces vignettes obligent
+ * `img-src https://i.ytimg.com` dans la CSP ; elles ne deposent pas de cookie.
  */
 export function VideoYoutube({
   youtubeId,
@@ -74,6 +76,30 @@ export function VideoYoutube({
             justifyContent: "center",
           }}
         >
+          <img
+            src={`https://i.ytimg.com/vi/${youtubeId}/${
+              vertical ? "oardefault" : "maxresdefault"
+            }.jpg`}
+            alt=""
+            loading="lazy"
+            style={{
+              position: "absolute",
+              inset: 0,
+              width: "100%",
+              height: "100%",
+              objectFit: "cover",
+              display: "block",
+            }}
+          />
+          <span
+            aria-hidden="true"
+            style={{
+              position: "absolute",
+              inset: 0,
+              background:
+                "linear-gradient(to bottom, rgba(12,25,47,.08), rgba(12,25,47,.4))",
+            }}
+          />
           <span
             aria-hidden="true"
             style={{
