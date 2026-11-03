@@ -130,6 +130,27 @@ const AVIS = [
     lead: "Excellant support, très bon travail et super bon rapport qualité/prix. réponses et solutions rapides!",
     body: ["Je recommande."],
   },
+  {
+    name: "François Timmons",
+    meta: "Bistro de la Gare · cette semaine",
+    footer: "François Timmons · Bistro de la Gare · 5,0 sur Google",
+    lead: "Super travail!! Très professionnel. Je suis vraiment très heureux de mon nouveau site web!!",
+    body: [],
+  },
+  {
+    name: "Théo Chastenay",
+    meta: "il y a 4 semaines",
+    footer: "Théo Chastenay · 5,0 sur Google",
+    lead: "Laurianne et Will! Deux machines de guerre digne du film Terminator! Service exceptionnel et ils savent rendre des comptes! Je vous recommande à 100%!",
+    body: [],
+  },
+  {
+    name: "Martin Desbiens",
+    meta: "TPM Hobby & Collection · il y a 10 semaines",
+    footer: "Martin Desbiens · TPM Hobby & Collection · 5,0 sur Google",
+    lead: "Excellent service. À l'écoute de nos besoins. Vous ne vous tromper pas avec Norvika.",
+    body: [],
+  },
 ];
 
 const ROAD_STEPS: RoadStep[] = ETAPES.map((e) => ({
@@ -827,7 +848,11 @@ function Index() {
               <span style={{ color: "#33496C", letterSpacing: ".1em" }}>
                 ★★★★★
               </span>{" "}
-              5,0 sur 6 avis
+              {/* Pas de nombre d'avis ici. Il etait fige a « 6 » et la page en
+                  montrait deja plus : un compteur ecrit en dur ment des le
+                  prochain avis recu. « 5,0 sur Google » reste vrai tant que la
+                  note l'est. */}
+              5,0 sur Google
             </span>
           </div>
 
