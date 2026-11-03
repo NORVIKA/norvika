@@ -34,6 +34,7 @@ const zoneDetente = { url: "/assets/clean-zone-detente-urbaine.webp" };
 const boulangerieChambly = { url: "/assets/clean-boulangerie-vieux-chambly.webp" };
 const nellyDufour = { url: "/assets/clean-nelly-dufour.webp" };
 const barLeVox = { url: "/assets/clean-bar-le-vox.webp" };
+const bistroDeLaGare = { url: "/assets/clean-bistro-de-la-gare.webp" };
 export type CategoryId = "site-web" | "photo-video" | "automatisation" | "formation";
 
 export const CATEGORIES: { id: CategoryId; label: string }[] = [
@@ -306,6 +307,25 @@ export const CLIENTS: Client[] = [
       "On a pris le projet de bout en bout: le design, la refonte du site sur WooCommerce, le débogage de la boutique, la mise en ligne, jusqu'au transfert du nom de domaine. Elle n'a eu aucun fournisseur de plus à coordonner. Et parce que le site reste le sien, on l'a monté pour qu'elle en garde le contrôle: ses produits, ses prix, ses pages, elle les modifie elle-même.",
     result:
       "Un site qui ressemble à l'institut, une boutique qui fonctionne, et une propriétaire qui garde la main sur tout.",
+  },
+  {
+    slug: "bistro-de-la-gare",
+    name: "Bistro de la Gare",
+    logo: bistroDeLaGare.url,
+    logoStyle: "transparent",
+    logoShape: "square",
+    logoScale: 1.3,
+    sector: "Resto-bar, Drummondville",
+    categories: ["site-web"],
+    website: "https://www.bistrodelagare.ca/",
+    summary:
+      "Un resto-bar du centre-ville de Drummondville ouvert depuis 1969, avec un site qui ne suivait plus.",
+    context:
+      "Le Bistro de la Gare tient la rue Lindsay, au centre-ville de Drummondville, depuis 1969. Fondé par Guy Timmons, repris par son fils François en 2003. Un menu qui va des tapas aux tartares, une carte de cocktails, de bières en fût et de gins québécois, et une terrasse sur le toit. Tout ça existe sur place, mais un client qui cherche où souper regarde d'abord en ligne. Si le site ne donne pas le menu, les heures et la façon de réserver en quelques secondes, il passe au suivant.",
+    work:
+      "On a refait le site au complet: une structure claire entre le menu, les boissons, la terrasse et les réservations, des pages qui se lisent vite sur un téléphone, et le contenu monté pour que l'équipe puisse le changer elle-même. Un menu de resto-bar bouge, les heures aussi, et personne ne devrait avoir à nous appeler pour corriger un prix.",
+    result:
+      "Un site qui donne en dix secondes ce qu'un client cherche avant de réserver.",
   },
   {
     slug: "nelly-dufour",
