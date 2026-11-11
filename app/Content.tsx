@@ -349,12 +349,8 @@ function Index() {
               },
               {
                 youtubeId: "iUQmSeDHcAk",
-                titre: "Témoignage d'un client",
-                // ⚠️ Pas de fiche : la video est tournee dans une boutique de
-                // cartes a collectionner, et trois clients correspondent (Le
-                // Roi des cartes, TPM Hobby & Collection, Taverne du
-                // Collectionneur). Des que Lau tranche, le slug va ici.
-                fiche: null,
+                titre: "Témoignage de la Taverne du Collectionneur",
+                fiche: "/realisations/taverne-du-collectionneur",
               },
             ].map((v) => (
               <figure key={v.youtubeId} style={{ margin: 0 }}>

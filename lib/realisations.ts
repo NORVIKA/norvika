@@ -216,6 +216,12 @@ export const CLIENTS: Client[] = [
       "On a refait la boutique Shopify au complet: structure plus claire, navigation pensée pour un client qui cherche une carte précise, pages produits plus propres, ensemble plus rapide. On a travaillé avec BinderPOS pour que la refonte s'intègre à ce que l'équipe utilise déjà, sans changer leurs façons de faire.",
     result:
       "Une boutique qui inspire confiance dès la première visite, plus simple à parcourir, faite pour vendre.",
+    video: {
+      youtubeId: "iUQmSeDHcAk",
+      titre: "Témoignage de la Taverne du Collectionneur",
+      legende: "La Taverne du Collectionneur, en leurs mots.",
+      format: "vertical",
+    },
   },
   {
     slug: "hackcell",
