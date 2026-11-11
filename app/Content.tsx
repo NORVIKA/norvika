@@ -347,6 +347,15 @@ function Index() {
                 titre: "Nelly Dufour, avant et après",
                 fiche: "/realisations/nelly-dufour",
               },
+              {
+                youtubeId: "iUQmSeDHcAk",
+                titre: "Témoignage d'un client",
+                // ⚠️ Pas de fiche : la video est tournee dans une boutique de
+                // cartes a collectionner, et trois clients correspondent (Le
+                // Roi des cartes, TPM Hobby & Collection, Taverne du
+                // Collectionneur). Des que Lau tranche, le slug va ici.
+                fiche: null,
+              },
             ].map((v) => (
               <figure key={v.youtubeId} style={{ margin: 0 }}>
                 <VideoYoutube

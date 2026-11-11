@@ -265,38 +265,39 @@
 .nv-logo-round img { width: 100%; height: 100%; object-fit: cover; transform: scale(1.02); }
 
 /* ===== Rangee de videos de l'accueil =====
-   Sur grand ecran, les trois videos tiennent cote a cote (la grille vient des
-   styles en ligne du composant). Sur telephone, empilees, elles mettaient
-   environ 1500 px de defilement entre le hero et la suite : ce sont des Shorts
-   verticaux, chacun fait presque un ecran de haut. On les met donc sur un rail
+   Ce sont des Shorts verticaux : chacun fait presque un ecran de haut. Empilees
+   sur telephone, trois d'entre elles mettaient environ 1500 px de defilement
+   entre le hero et la suite de la page. Elles vivent donc sur un rail
    horizontal qui s'arrete net sur chaque video.
 
-   Le rail commence a 1024 px et non a 680 : entre les deux, la troisieme video
-   retombait seule sur une deuxieme rangee et la section montait a 1374 px.
-   Au-dessus de 1024 px, les trois tiennent cote a cote et la grille reste.
+   Le rail s'applique a TOUTES les largeurs, et non seulement sous 1024 px :
+   a quatre videos, la rangee ne tient plus sur un ecran large non plus et la
+   derniere retombait seule sur une deuxieme ligne. Le rail encaisse n'importe
+   quel nombre de videos sans qu'on ait a retoucher la mise en page.
+
+   `safe center` centre tant que le contenu tient, puis cale a gauche des qu'il
+   deborde : `center` seul rendrait le debut du rail inatteignable.
 
    Les cartes font 78 % de la largeur, plafonnees a 280 px pour ne pas enfler
    sur tablette. Le 78 % sert a ce que la suivante depasse un peu : sans ce bout
    qui depasse, rien n'indique qu'il y a autre chose a droite. */
-@media (max-width: 1024px) {
-  .nv-videos-rangee {
-    display: flex !important;
-    grid-template-columns: none !important;
-    justify-content: flex-start !important;
-    gap: 14px !important;
-    overflow-x: auto;
-    scroll-snap-type: x mandatory;
-    -webkit-overflow-scrolling: touch;
-    padding-bottom: 6px;
-    /* La barre de defilement masquee : le bout de carte qui depasse suffit a
-       dire que ca glisse, et la barre coupait le bas des vignettes. */
-    scrollbar-width: none;
-  }
-  .nv-videos-rangee::-webkit-scrollbar { display: none; }
-  .nv-videos-rangee > figure {
-    flex: 0 0 min(78%, 280px);
-    scroll-snap-align: center;
-  }
+.nv-videos-rangee {
+  display: flex !important;
+  grid-template-columns: none !important;
+  justify-content: safe center !important;
+  gap: 20px !important;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+  padding-bottom: 6px;
+  /* La barre de defilement masquee : le bout de carte qui depasse suffit a
+     dire que ca glisse, et la barre coupait le bas des vignettes. */
+  scrollbar-width: none;
+}
+.nv-videos-rangee::-webkit-scrollbar { display: none; }
+.nv-videos-rangee > figure {
+  flex: 0 0 min(78%, 280px);
+  scroll-snap-align: center;
 }
 
 /* Les halos du haut de page sont des cercles de 700 px avec un blur de 44 px,
