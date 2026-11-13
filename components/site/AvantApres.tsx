@@ -19,7 +19,7 @@ export function AvantApres({
   avant,
   apres,
   alt,
-  ratio = "1252 / 646",
+  ratio = "1006 / 592",
 }: {
   avant: string;
   apres: string;
