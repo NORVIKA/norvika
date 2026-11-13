@@ -63,14 +63,6 @@ export type Client = {
   work: string;
   /** Le résultat */
   result?: string;
-  /** Comparaison avant / après du site. Les deux captures doivent avoir
-   *  exactement le même cadrage, sinon le balayage ment. */
-  avantApres?: {
-    avant: string;
-    apres: string;
-    alt: string;
-    legende: string;
-  };
   /** Vidéo YouTube montrée sur la fiche, chargée seulement au clic */
   video?: {
     youtubeId: string;
@@ -341,12 +333,6 @@ export const CLIENTS: Client[] = [
       "On a refait le site au complet. Le haut de page laisse voir le gym et le monde dedans, au lieu d'un fond blanc. Les tarifs sont affichés dans une grille où le visiteur choisit la durée de son entente et le nombre de séances par semaine, et voit le prix mensuel et le total. On a ajouté une section pour ceux qui n'ont jamais fait de CrossFit, et le déroulement d'une heure de cours, parce que c'est ça qui freine un débutant. L'essai gratuit et la réservation passent toujours par Fliip, le système que l'équipe utilise déjà.",
     result:
       "Un site qui montre le gym, affiche ses prix, et donne une porte d'entrée claire: un premier cours gratuit.",
-    avantApres: {
-      avant: "/assets/crossfit-sainte-foy-avant.webp",
-      apres: "/assets/crossfit-sainte-foy-apres.webp",
-      alt: "Le haut de la page d'accueil de CrossFit Sainte-Foy",
-      legende: "Le haut de la page d'accueil, avant et après. Glissez.",
-    },
   },
   {
     slug: "bistro-de-la-gare",
