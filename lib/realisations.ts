@@ -62,6 +62,14 @@ export type Client = {
   work: string;
   /** Le résultat */
   result?: string;
+  /** Comparaison avant / après du site. Les deux captures doivent avoir
+   *  exactement le même cadrage, sinon le balayage ment. */
+  avantApres?: {
+    avant: string;
+    apres: string;
+    alt: string;
+    legende: string;
+  };
   /** Vidéo YouTube montrée sur la fiche, chargée seulement au clic */
   video?: {
     youtubeId: string;

@@ -9,6 +9,7 @@ import { CATEGORIES, CLIENT_COVERS, getClient } from "@/lib/realisations";
 import { LIEN_RDV } from "@/lib/liens";
 import { AutresPages } from "@/components/site/AutresPages";
 import { VideoYoutube } from "@/components/site/VideoYoutube";
+import { AvantApres } from "@/components/site/AvantApres";
 
 const labelFor = (id: string) =>
   CATEGORIES.find((c) => c.id === id)?.label ?? id;
@@ -280,6 +281,26 @@ export default function Page({ slug }: { slug: string }) {
             <h2 style={blockTitle}>Ce qu'on a fait</h2>
             <p style={blockText}>{client.work}</p>
           </article>
+
+          {client.avantApres ? (
+            <figure data-reveal style={{ margin: "44px 0 0" }}>
+              <AvantApres
+                avant={client.avantApres.avant}
+                apres={client.avantApres.apres}
+                alt={client.avantApres.alt}
+              />
+              <figcaption
+                style={{
+                  marginTop: 14,
+                  textAlign: "center",
+                  fontSize: 13.5,
+                  color: "rgba(12,25,47,.6)",
+                }}
+              >
+                {client.avantApres.legende}
+              </figcaption>
+            </figure>
+          ) : null}
 
           {client.video ? (
             <figure data-reveal style={{ margin: "44px 0 0" }}>

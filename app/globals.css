@@ -474,3 +474,56 @@
   /* Le guillemet passe derriere le texte au lieu de lui voler une colonne. */
   .nv-avis-corps > span:first-child { font-size: 64px !important; opacity: .6; }
 }
+
+/* ===== Glissiere avant / apres =====
+   La poignee est un `input[type=range]` etale sur tout le cadre et rendu
+   invisible. Pourquoi : on recupere gratuitement le glisser a la souris, au
+   doigt, les fleches du clavier, le focus et l'annonce par lecteur d'ecran.
+   Ce qu'on voit (le trait et la pastille) est dessine a part, en
+   `pointer-events: none`, et suit la valeur. */
+.nv-avant-apres-poignee {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  appearance: none;
+  -webkit-appearance: none;
+  background: transparent;
+  cursor: ew-resize;
+}
+.nv-avant-apres-poignee:focus-visible {
+  outline: 3px solid #F5F3EE;
+  outline-offset: -3px;
+}
+/* Le curseur natif prend toute la hauteur du cadre : c'est lui qu'on attrape,
+   donc il doit etre haut, et invisible puisque la pastille le remplace. */
+.nv-avant-apres-poignee::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 48px;
+  height: 100vh;
+  background: transparent;
+  cursor: ew-resize;
+}
+.nv-avant-apres-poignee::-moz-range-thumb {
+  width: 48px;
+  height: 100vh;
+  border: 0;
+  background: transparent;
+  cursor: ew-resize;
+}
+.nv-avant-apres-poignee::-moz-range-track { background: transparent; }
+
+.nv-visuellement-cache {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
