@@ -35,6 +35,7 @@ const boulangerieChambly = { url: "/assets/clean-boulangerie-vieux-chambly.webp"
 const nellyDufour = { url: "/assets/clean-nelly-dufour.webp" };
 const barLeVox = { url: "/assets/clean-bar-le-vox.webp" };
 const bistroDeLaGare = { url: "/assets/clean-bistro-de-la-gare.webp" };
+const crossfitSainteFoy = { url: "/assets/clean-crossfit-sainte-foy.webp" };
 export type CategoryId = "site-web" | "photo-video" | "automatisation" | "formation";
 
 export const CATEGORIES: { id: CategoryId; label: string }[] = [
@@ -321,6 +322,31 @@ export const CLIENTS: Client[] = [
       "On a pris le projet de bout en bout: le design, la refonte du site sur WooCommerce, le débogage de la boutique, la mise en ligne, jusqu'au transfert du nom de domaine. Elle n'a eu aucun fournisseur de plus à coordonner. Et parce que le site reste le sien, on l'a monté pour qu'elle en garde le contrôle: ses produits, ses prix, ses pages, elle les modifie elle-même.",
     result:
       "Un site qui ressemble à l'institut, une boutique qui fonctionne, et une propriétaire qui garde la main sur tout.",
+  },
+  {
+    slug: "crossfit-sainte-foy",
+    name: "CrossFit Sainte-Foy",
+    logo: crossfitSainteFoy.url,
+    logoStyle: "transparent",
+    logoShape: "square",
+    logoScale: 1.15,
+    sector: "Gym de CrossFit, Québec",
+    categories: ["site-web"],
+    website: "https://www.crossfitsaintefoy.com/",
+    summary:
+      "Un gym ouvert depuis 2012, avec un site qui ne donnait ni les prix ni l'envie d'essayer.",
+    context:
+      "CrossFit Sainte-Foy entraîne du monde chemin Sainte-Foy depuis 2012: onze entraîneurs certifiés, plus de deux cents membres, quarante-cinq classes par semaine. Le site, lui, ne montrait rien de tout ça. Un gabarit clair et sage, un titre passe-partout, aucune photo du gym, et surtout pas un prix nulle part. Or quelqu'un qui pense s'inscrire à un gym veut savoir trois choses avant d'appeler: à quoi ça ressemble, combien ça coûte, et si c'est pour quelqu'un comme lui. Il fallait répondre aux trois sur la page d'accueil.",
+    work:
+      "On a refait le site au complet. Le haut de page laisse voir le gym et le monde dedans, au lieu d'un fond blanc. Les tarifs sont affichés dans une grille où le visiteur choisit la durée de son entente et le nombre de séances par semaine, et voit le prix mensuel et le total. On a ajouté une section pour ceux qui n'ont jamais fait de CrossFit, et le déroulement d'une heure de cours, parce que c'est ça qui freine un débutant. L'essai gratuit et la réservation passent toujours par Fliip, le système que l'équipe utilise déjà.",
+    result:
+      "Un site qui montre le gym, affiche ses prix, et donne une porte d'entrée claire: un premier cours gratuit.",
+    avantApres: {
+      avant: "/assets/crossfit-sainte-foy-avant.webp",
+      apres: "/assets/crossfit-sainte-foy-apres.webp",
+      alt: "Le haut de la page d'accueil de CrossFit Sainte-Foy",
+      legende: "Le haut de la page d'accueil, avant et après. Glissez.",
+    },
   },
   {
     slug: "bistro-de-la-gare",
