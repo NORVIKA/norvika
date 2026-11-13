@@ -491,7 +491,12 @@
   appearance: none;
   -webkit-appearance: none;
   background: transparent;
-  cursor: ew-resize;
+  /* ⚠️ Curseur normal sur le cadre, `ew-resize` SEULEMENT sur la poignee.
+     Le champ couvre toute l'image pour qu'un clic n'importe ou deplace le
+     balayage ; mais si le cadre entier affichait la fleche de glissement, le
+     pointeur changerait de forme partout sur la photo, ce qui attire l'oeil au
+     milieu de l'image et distrait de ce qu'on regarde. */
+  cursor: default;
 }
 .nv-avant-apres-poignee:focus-visible {
   outline: 3px solid #F5F3EE;

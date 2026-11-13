@@ -152,7 +152,9 @@ function Etiquette({
       aria-hidden="true"
       style={{
         position: "absolute",
-        top: 14,
+        // En bas plutot qu'en haut : les deux captures ont leur entete en
+        // haut, et l'etiquette venait se poser sur le logo du client.
+        bottom: 14,
         [cote === "gauche" ? "left" : "right"]: 14,
         padding: "5px 11px",
         borderRadius: 999,
