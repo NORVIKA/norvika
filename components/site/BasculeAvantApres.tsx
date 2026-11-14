@@ -47,67 +47,79 @@ export function BasculeAvantApres({
 
   return (
     <div>
+      {/* La barre du navigateur, qui porte aussi la bascule.
+          Les deux boutons flottaient au-dessus du cadre et faisaient
+          « boutons de formulaire » poses la. Ici l'ensemble se lit comme un
+          seul objet : une fenetre de navigateur dont on change l'onglet. */}
       <div
-        role="tablist"
-        aria-label={`Comparer avant et après: ${alt}`}
-        style={{
-          display: "flex",
-          justifyContent: "center",
-          gap: 8,
-          marginBottom: 18,
-        }}
-      >
-        {(["avant", "apres"] as const).map((v) => (
-          <button
-            key={v}
-            type="button"
-            role="tab"
-            aria-selected={vue === v}
-            onClick={() => changer(v)}
-            className={vue === v ? "nv-btn-primary" : "nv-cta-outline"}
-            style={{
-              padding: "10px 20px",
-              borderRadius: 999,
-              border: "1px solid",
-              borderColor: vue === v ? "#0C192F" : undefined,
-              fontSize: 13.5,
-              fontWeight: 600,
-              cursor: "pointer",
-            }}
-          >
-            {v === "avant" ? "Avant" : "Après"}
-          </button>
-        ))}
-      </div>
-
-      {/* La barre du navigateur. Elle n'est pas decorative : sans elle, une
-          capture de site pleine page ressemble a une longue affiche. */}
-      <div
-        aria-hidden="true"
         style={{
           display: "flex",
           alignItems: "center",
           gap: 6,
-          padding: "9px 13px",
+          padding: "8px 10px 8px 13px",
           borderRadius: "14px 14px 0 0",
           background: "#DFE3EC",
+          border: "1px solid rgba(12,25,47,.14)",
+          borderBottom: 0,
         }}
       >
         <Pastille />
         <Pastille />
         <Pastille />
         <span
+          className="nv-bascule-url"
+          aria-hidden="true"
           style={{
             marginLeft: 10,
             padding: "5px 13px",
             borderRadius: 999,
-            background: "#fff",
+            background: "rgba(255,255,255,.75)",
             fontSize: 11.5,
-            color: "rgba(12,25,47,.55)",
+            color: "rgba(12,25,47,.5)",
+            whiteSpace: "nowrap",
           }}
         >
           crossfitsaintefoy.com
         </span>
+
+        <div
+          role="tablist"
+          aria-label={`Comparer avant et après: ${alt}`}
+          style={{
+            marginLeft: "auto",
+            display: "flex",
+            gap: 2,
+            padding: 3,
+            borderRadius: 999,
+            background: "rgba(12,25,47,.08)",
+          }}
+        >
+          {(["avant", "apres"] as const).map((v) => (
+            <button
+              key={v}
+              type="button"
+              role="tab"
+              aria-selected={vue === v}
+              onClick={() => changer(v)}
+              className="nv-bascule-onglet"
+              style={{
+                padding: "6px 15px",
+                borderRadius: 999,
+                border: 0,
+                cursor: "pointer",
+                fontSize: 11.5,
+                fontWeight: 700,
+                letterSpacing: ".1em",
+                textTransform: "uppercase",
+                background: vue === v ? "#0C192F" : "transparent",
+                color: vue === v ? "#F5F3EE" : "rgba(12,25,47,.62)",
+                transition: "background .18s ease, color .18s ease",
+              }}
+            >
+              {v === "avant" ? "Avant" : "Après"}
+            </button>
+          ))}
+        </div>
       </div>
 
       <div

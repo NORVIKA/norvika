@@ -475,3 +475,14 @@
   .nv-avis-corps > span:first-child { font-size: 64px !important; opacity: .6; }
 }
 
+
+/* La bascule avant / apres vit dans la barre du navigateur. Sur un ecran
+   etroit, l'adresse et les deux onglets ne tiennent pas cote a cote : c'est
+   l'adresse qui part, elle est decorative, les onglets ne le sont pas. */
+.nv-bascule-onglet:focus-visible {
+  outline: 2px solid #0C192F;
+  outline-offset: 2px;
+}
+@media (max-width: 620px) {
+  .nv-bascule-url { display: none !important; }
+}
