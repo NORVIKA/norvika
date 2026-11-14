@@ -25,3 +25,6 @@ out/
 # Artefact du cerveau Norvika (contrat de frontière) — ne fait pas partie du site
 PROJET.json
 .env.secrets
+
+# Sorties d'outils deposees a la racine ; ne font pas partie du site.
+Claude outputs/
