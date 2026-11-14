@@ -11,6 +11,7 @@ import { LIEN_RDV } from "@/lib/liens";
 import { AutresPages } from "@/components/site/AutresPages";
 import { Aimant } from "@/components/site/Aimant";
 import { VideoYoutube } from "@/components/site/VideoYoutube";
+import { BasculeAvantApres } from "@/components/site/BasculeAvantApres";
 const lauEtWill = { url: "/assets/lau-et-will-2.webp" };
 // Bande de logos clients, choisie par William le 2026-08-24.
 //
@@ -379,6 +380,84 @@ function Index() {
                 ) : null}
               </figure>
             ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Avant / apres
+          Les videos montrent des clients qui DISENT que c'etait bon ; la
+          bascule MONTRE le resultat. Deux natures de preuve, d'ou leur
+          voisinage. Un seul exemple, assume au singulier : au deuxieme
+          client, le titre passera au pluriel. */}
+      <section
+        style={{
+          borderBottom: "1px solid rgba(12,25,47,.1)",
+          background: "#EEF2FA",
+        }}
+      >
+        <div
+          className="nv-shell"
+          style={{ maxWidth: 940, margin: "0 auto", padding: "76px 32px 82px" }}
+        >
+          <div data-reveal style={{ textAlign: "center" }}>
+            <h2
+              style={{
+                margin: 0,
+                fontSize: 11.5,
+                letterSpacing: ".2em",
+                textTransform: "uppercase",
+                color: "#33496C",
+                fontWeight: 600,
+              }}
+            >
+              Avant / après
+            </h2>
+            <p
+              style={{
+                margin: "18px 0 10px",
+                fontFamily: "var(--font-display)",
+                fontWeight: 600,
+                fontSize: "clamp(24px,2.8vw,34px)",
+                lineHeight: 1.25,
+                letterSpacing: "-.03em",
+                color: "#0C192F",
+              }}
+            >
+              Ce qu'une refonte change.
+            </p>
+            <p
+              style={{
+                margin: "0 0 30px",
+                fontSize: 16,
+                lineHeight: 1.6,
+                color: "rgba(12,25,47,.6)",
+              }}
+            >
+              Le gym CrossFit Sainte-Foy, avant et après son nouveau site.
+            </p>
+          </div>
+          <div data-reveal>
+            <BasculeAvantApres
+              avant="/assets/crossfit-avant-page.webp"
+              apres="/assets/crossfit-apres-page.webp"
+              alt="La page d'accueil de CrossFit Sainte-Foy"
+            />
+            <p style={{ margin: "22px 0 0", textAlign: "center" }}>
+              <Link
+                href="/realisations/crossfit-sainte-foy"
+                className="nv-cta-outline"
+                style={{
+                  display: "inline-block",
+                  padding: "10px 16px",
+                  borderRadius: 999,
+                  border: "1px solid",
+                  fontSize: 13.5,
+                  fontWeight: 600,
+                }}
+              >
+                Voir la réalisation
+              </Link>
+            </p>
           </div>
         </div>
       </section>
