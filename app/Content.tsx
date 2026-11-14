@@ -397,7 +397,7 @@ function Index() {
       >
         <div
           className="nv-shell"
-          style={{ maxWidth: 940, margin: "0 auto", padding: "76px 32px 82px" }}
+          style={{ maxWidth: 1240, margin: "0 auto", padding: "76px 32px 82px" }}
         >
           <div data-reveal style={{ textAlign: "center" }}>
             <h2

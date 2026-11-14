@@ -108,7 +108,10 @@ export function BasculeAvantApres({
       <div
         ref={ecran}
         style={{
-          height: "clamp(380px, 56vh, 560px)",
+          // Grand volontairement : c'est la piece de demonstration de la page.
+          // Le plafond a 760 px evite qu'elle depasse un portable de 900 px de
+          // haut, ou on ne verrait plus ni les boutons ni le reste de la page.
+          height: "clamp(420px, 72vh, 760px)",
           overflowY: "auto",
           borderRadius: "0 0 14px 14px",
           border: "1px solid rgba(12,25,47,.14)",
