@@ -1,7 +1,7 @@
 "use client";
 
-import Link from "next/link";
 import { useState, type FormEvent } from "react";
+import { MentionCollecte } from "@/components/site/MentionCollecte";
 import { LIEN_RDV } from "@/lib/liens";
 
 /**
@@ -246,9 +246,10 @@ export function ContactCTA() {
             >
               {envoi ? "Envoi en cours…" : "Envoyer"}
             </button>
-            <p style={{ margin: "12px 0 0", fontSize: 12.5, color: "rgba(245,243,238,.55)" }}>
-              Vos données servent uniquement à répondre à votre message.
-            </p>
+            <MentionCollecte
+              id="mention-collecte-cta"
+              style={{ marginTop: 14, color: "rgba(245,243,238,.72)" }}
+            />
           </form>
         )}
       </div>

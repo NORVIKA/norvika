@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, type FormEvent } from "react";
+import { MentionCollecte } from "@/components/site/MentionCollecte";
 
 export function ContactForm({ email }: { email: string }) {
   const [nom, setNom] = useState("");
@@ -114,9 +115,9 @@ export function ContactForm({ email }: { email: string }) {
         >
           {envoi ? "Envoi en cours…" : "Envoyer le message"}
         </button>
-        <p className="text-sm text-[var(--muted-foreground)]">
-          Vos données sont utilisées uniquement pour répondre à votre message.
-        </p>
+      </div>
+      <div className="mt-5 text-[var(--muted-foreground)]">
+        <MentionCollecte id="mention-collecte-contact" />
       </div>
     </form>
   );

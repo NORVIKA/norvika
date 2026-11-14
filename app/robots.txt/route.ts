@@ -2,28 +2,57 @@
 // l'API de Next ne sait pas emettre la directive `Content-Signal`, qui n'est pas
 // dans la norme robots.txt.
 //
-// ⚠️ CE FICHIER N'EST PAS SEUL A DECIDER. Tant que le reglage Cloudflare
-// « robots.txt setting » (Security Settings > Bot traffic) est actif, Cloudflare
-// FUSIONNE son propre bloc par-dessus, avec un `Disallow: /` pour GPTBot,
-// ClaudeBot, Google-Extended, CCBot et compagnie. Autrement dit : ce qui suit ne
-// s'applique vraiment qu'une fois ce reglage desactive dans le tableau de bord.
+// ROBOTS DES IA AUTORISES, entrainement compris (decision William du 2026-10-21,
+// CLAUDE.md § SEO) : une PME veut etre citee par ChatGPT, Perplexity, Claude et
+// Gemini, et bloquer l'entrainement bloque aussi les robots mixtes (recherche +
+// entrainement). Avant le 2026-11-14, ce fichier disait encore `ai-train=no`.
 //
-// L'intention exprimee ici : on accepte d'etre indexe et cite, y compris par les
-// assistants IA (`search=yes`, `ai-input=yes`), on refuse de servir de matiere
-// d'entrainement (`ai-train=no`), et on accepte l'extrait avec lien de retour
-// (`use=reference`).
+// ⚠️ CE FICHIER N'EST PAS SEUL A DECIDER. Tant que le reglage Cloudflare
+// « Manage your robots.txt » (Security > Settings) est actif, Cloudflare
+// FUSIONNE son propre bloc par-dessus, avec un `Disallow: /` pour GPTBot,
+// ClaudeBot, Google-Extended, CCBot et compagnie. Ce qui suit ne s'applique
+// vraiment qu'une fois ce reglage desactive dans le tableau de bord, et
+// AI Crawl Control regle sur « Allow ».
 export const dynamic = "force-static";
+
+const ROBOTS_IA = [
+  "GPTBot",
+  "OAI-SearchBot",
+  "ChatGPT-User",
+  "ClaudeBot",
+  "Claude-SearchBot",
+  "Claude-User",
+  "anthropic-ai",
+  "PerplexityBot",
+  "Perplexity-User",
+  "Google-Extended",
+  "GoogleOther",
+  "Applebot-Extended",
+  "Bingbot",
+  "CCBot",
+  "meta-externalagent",
+  "Amazonbot",
+  "DuckAssistBot",
+  "MistralAI-User",
+];
+
+const REGLES = `Allow: /
+Disallow: /admin
+Disallow: /admin/
+Disallow: /api/`;
 
 const BODY = `# Norvika
 # Nos preferences d'usage du contenu, au format Content Signals
-# (https://contentsignals.org). En clair : indexez-nous et citez-nous,
-# n'entrainez pas de modele sur notre contenu.
+# (https://contentsignals.org). En clair : indexez-nous, citez-nous, et les
+# assistants IA peuvent apprendre de notre contenu.
 
 User-agent: *
-Content-Signal: search=yes, ai-input=yes, ai-train=no, use=reference
-Allow: /
-Disallow: /admin
-Disallow: /admin/
+Content-Signal: search=yes, ai-input=yes, ai-train=yes
+${REGLES}
+
+# Robots des assistants IA, autorises explicitement.
+${ROBOTS_IA.map((r) => `User-agent: ${r}`).join("\n")}
+${REGLES}
 
 Sitemap: https://norvika.ca/sitemap.xml
 `;

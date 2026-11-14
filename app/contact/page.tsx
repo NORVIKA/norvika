@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import { SiteShell } from "@/components/site/SiteShell";
 import { getSiteData } from "@/lib/get-site-data";
 import { Reveal } from "@/components/ui/Reveal";
-import { Eyebrow } from "@/components/ui/Eyebrow";
 import { ContactForm } from "./ContactForm";
 
 export const metadata: Metadata = {
@@ -40,7 +39,6 @@ export default async function ContactPage() {
           <div className="grid gap-12 lg:grid-cols-[1fr_1.3fr] lg:gap-20">
             {/* Colonne info */}
             <Reveal>
-              <Eyebrow>Contact</Eyebrow>
               <h1 className="text-4xl font-semibold leading-[1.05] tracking-tight text-[var(--foreground)] sm:text-5xl">
                 Parlons de votre projet.
               </h1>

@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import { SiteShell } from "@/components/site/SiteShell";
-import { Eyebrow } from "@/components/ui/Eyebrow";
 import { Reveal } from "@/components/ui/Reveal";
 import { LeadForm } from "./LeadForm";
 
@@ -46,7 +45,6 @@ export default function BienvenuePage() {
         {/* INTRO */}
         <section className="border-b border-[var(--hairline)] bg-[var(--background)]">
           <div className="mx-auto max-w-4xl px-6 py-20 md:py-28">
-            <Eyebrow>Espace client</Eyebrow>
             <h1 className="text-4xl font-semibold leading-tight tracking-tight text-[var(--foreground)] md:text-6xl">
               Bienvenue. Voici comment on va s&apos;y prendre.
             </h1>
@@ -61,7 +59,6 @@ export default function BienvenuePage() {
         {/* FORMULAIRE */}
         <section className="border-b border-[var(--hairline)] bg-[var(--cream)]">
           <div className="mx-auto max-w-4xl px-6 py-20 md:py-24">
-            <Eyebrow>Étape 1</Eyebrow>
             <h2 className="text-3xl font-semibold leading-tight tracking-tight text-[var(--foreground)] md:text-4xl">
               Pour commencer, laissez-nous vos coordonnées.
             </h2>
@@ -74,7 +71,6 @@ export default function BienvenuePage() {
         {/* OUTILS */}
         <section className="border-b border-[var(--hairline)] bg-[var(--background)]">
           <div className="mx-auto max-w-5xl px-6 py-20 md:py-24">
-            <Eyebrow>Les outils</Eyebrow>
             <h2 className="text-3xl font-semibold leading-tight tracking-tight text-[var(--foreground)] md:text-4xl">
               Les outils qu&apos;on va utiliser, expliqués simplement.
             </h2>
@@ -106,7 +102,6 @@ export default function BienvenuePage() {
         {/* ÉTAPES */}
         <section className="border-b border-[var(--hairline)] bg-[var(--cream)]">
           <div className="mx-auto max-w-5xl px-6 py-20 md:py-24">
-            <Eyebrow>Les prochaines étapes</Eyebrow>
             <h2 className="text-3xl font-semibold leading-tight tracking-tight text-[var(--foreground)] md:text-4xl">
               Ce qui s&apos;en vient, étape par étape.
             </h2>
@@ -127,7 +122,6 @@ export default function BienvenuePage() {
         {/* PAIEMENT */}
         <section className="border-b border-[var(--hairline)] bg-[var(--background)]">
           <div className="mx-auto max-w-4xl px-6 py-20 md:py-24">
-            <Eyebrow>Le paiement</Eyebrow>
             <h2 className="text-3xl font-semibold leading-tight tracking-tight text-[var(--foreground)] md:text-4xl">
               Le paiement, simple et sans surprise.
             </h2>

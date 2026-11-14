@@ -41,7 +41,8 @@ export const metadata: Metadata = {
   },
   twitter: { card: "summary_large_image" },
   robots: { index: true, follow: true },
-  icons: { icon: [{ url: "/favicon.png", type: "image/png" }, { url: "/icon.svg", type: "image/svg+xml" }] },
+  // Icônes : app/favicon.ico, app/icon.png et app/apple-icon.png, lus par Next.
+  // Générées sur fond navy plein par scripts/generer-icones.mjs.
 };
 
 // Identifiant GA4. Absent = aucun script de mesure n'est emis du tout, ce qui

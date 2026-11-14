@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { supabaseService, verifierDebit } from "@/lib/rate-limit";
+import { champTexte, ligneSimpleValide, lireCorpsJson } from "@/lib/garde-formulaire";
 
 /**
  * Formulaire « Espace client » de /bienvenue.
@@ -19,29 +20,26 @@ const MAX = { prenom: 100, courriel: 255, telephone: 50 } as const;
 export const dynamic = "force-dynamic";
 
 export async function POST(req: Request) {
-  const body = await req.json().catch(() => null);
-  if (!body || typeof body !== "object") {
-    return NextResponse.json({ error: "Corps invalide." }, { status: 400 });
+  const corps = await lireCorpsJson(req);
+  if (!corps.ok) {
+    return NextResponse.json({ error: corps.erreur }, { status: corps.statut });
   }
 
-  const { prenom, courriel, telephone } = body as {
-    prenom?: string;
-    courriel?: string;
-    telephone?: string;
-  };
+  const prenom = champTexte(corps.donnees, "prenom");
+  const courriel = champTexte(corps.donnees, "courriel");
+  const telephone = champTexte(corps.donnees, "telephone");
 
-  if (!prenom?.trim() || !courriel?.trim() || !telephone?.trim()) {
+  if (!prenom || !courriel || !telephone) {
     return NextResponse.json({ error: "Tous les champs sont requis." }, { status: 400 });
   }
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(courriel)) {
     return NextResponse.json({ error: "Courriel invalide." }, { status: 400 });
   }
-  if (
-    prenom.trim().length > MAX.prenom ||
-    courriel.trim().length > MAX.courriel ||
-    telephone.trim().length > MAX.telephone
-  ) {
+  if (prenom.length > MAX.prenom || courriel.length > MAX.courriel || telephone.length > MAX.telephone) {
     return NextResponse.json({ error: "Un des champs est trop long." }, { status: 400 });
+  }
+  if (![prenom, courriel, telephone].every(ligneSimpleValide)) {
+    return NextResponse.json({ error: "Un des champs contient des caractères non permis." }, { status: 400 });
   }
 
   const debit = await verifierDebit(req, "lead");
@@ -50,9 +48,9 @@ export async function POST(req: Request) {
   }
 
   const { error } = await supabaseService().from("client_leads").insert({
-    prenom: prenom.trim(),
-    courriel: courriel.trim(),
-    telephone: telephone.trim(),
+    prenom,
+    courriel,
+    telephone,
   });
 
   if (error) {

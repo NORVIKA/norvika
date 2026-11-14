@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, type FormEvent } from "react";
+import { MentionCollecte } from "@/components/site/MentionCollecte";
 
 export function LeadForm() {
   const [prenom, setPrenom] = useState("");
@@ -117,9 +118,9 @@ export function LeadForm() {
         >
           {envoi ? "Envoi en cours…" : "Envoyer"}
         </button>
-        <p className="text-sm text-[var(--muted-foreground)]">
-          Vos données sont utilisées uniquement pour vous contacter.
-        </p>
+      </div>
+      <div className="mt-5 text-[var(--muted-foreground)]">
+        <MentionCollecte id="mention-collecte-bienvenue" />
       </div>
     </form>
   );
