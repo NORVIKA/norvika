@@ -66,7 +66,9 @@ export type Client = {
   /** Bascule avant / après du site. Deux captures de PAGE COMPLÈTE. */
   avantApres?: {
     avant: string;
+    avant2x?: string;
     apres: string;
+    apres2x?: string;
     alt: string;
     legende: string;
   };
@@ -342,7 +344,9 @@ export const CLIENTS: Client[] = [
       "Un site qui montre le gym, affiche ses prix, et donne une porte d'entrée claire: un premier cours gratuit.",
     avantApres: {
       avant: "/assets/crossfit-avant-page.webp",
+      avant2x: "/assets/crossfit-avant-page-2x.webp",
       apres: "/assets/crossfit-apres-page.webp",
+      apres2x: "/assets/crossfit-apres-page-2x.webp",
       alt: "La page d'accueil de CrossFit Sainte-Foy",
       legende: "La page d'accueil au complet, avant et après. Le cadre défile.",
     },

@@ -286,7 +286,9 @@ export default function Page({ slug }: { slug: string }) {
             <figure data-reveal style={{ margin: "44px 0 0" }}>
               <BasculeAvantApres
                 avant={client.avantApres.avant}
+                avant2x={client.avantApres.avant2x}
                 apres={client.avantApres.apres}
+                apres2x={client.avantApres.apres2x}
                 alt={client.avantApres.alt}
               />
               <figcaption

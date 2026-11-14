@@ -22,11 +22,16 @@ import { useRef, useState } from "react";
  */
 export function BasculeAvantApres({
   avant,
+  avant2x,
   apres,
+  apres2x,
   alt,
 }: {
   avant: string;
+  /** Version haute densité, servie aux écrans Retina. */
+  avant2x?: string;
   apres: string;
+  apres2x?: string;
   /** Le site montre, pour les lecteurs d'ecran. */
   alt: string;
 }) {
@@ -119,8 +124,25 @@ export function BasculeAvantApres({
           background: "#fff",
         }}
       >
+        {/* ⚠️ DEUX TAILLES, PAS UNE. Le cadre fait environ 1 180 px de large :
+            sur un ecran Retina, cela demande 2 360 px reels. Servir seulement
+            la version 1x donnait une capture floue. Servir seulement la 2x
+            imposerait 420 Ko a tout le monde, y compris aux telephones. Le
+            navigateur choisit selon l'ecran, et l'image n'est chargee que
+            quand la section arrive a l'ecran. */}
         <img
+          key={vue}
           src={vue === "avant" ? avant : apres}
+          srcSet={
+            vue === "avant"
+              ? avant2x
+                ? `${avant} 1240w, ${avant2x} 1440w`
+                : undefined
+              : apres2x
+                ? `${apres} 1240w, ${apres2x} 2360w`
+                : undefined
+          }
+          sizes="(min-width: 1304px) 1176px, (min-width: 820px) calc(100vw - 128px), calc(100vw - 64px)"
           alt={`${alt} — ${vue === "avant" ? "avant" : "après"} la refonte`}
           loading="lazy"
           style={{ width: "100%", display: "block" }}

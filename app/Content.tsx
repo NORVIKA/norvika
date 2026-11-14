@@ -439,7 +439,9 @@ function Index() {
           <div data-reveal>
             <BasculeAvantApres
               avant="/assets/crossfit-avant-page.webp"
+              avant2x="/assets/crossfit-avant-page-2x.webp"
               apres="/assets/crossfit-apres-page.webp"
+              apres2x="/assets/crossfit-apres-page-2x.webp"
               alt="La page d'accueil de CrossFit Sainte-Foy"
             />
             <p style={{ margin: "22px 0 0", textAlign: "center" }}>
