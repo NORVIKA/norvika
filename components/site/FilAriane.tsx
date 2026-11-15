@@ -13,7 +13,8 @@ import { adresseAbsolue } from "@/lib/adresse";
  * se trouve (non cliquable, `aria-current`). Les données structurées BreadcrumbList sont produites
  * à partir des MÊMES étapes : ce que Google lit est toujours ce qu'on voit.
  *
- * Le séparateur « › » est décoratif (aria-hidden) : les lecteurs d'écran annoncent une liste.
+ * Le séparateur « / » est décoratif (aria-hidden) : les lecteurs d'écran annoncent une liste.
+ * Pas de « › » : il se lit comme une flèche, et la règle 9 de William (2026-09-29) les interdit.
  */
 export type EtapeFil = { libelle: string; lien: string };
 
@@ -36,7 +37,7 @@ export function FilAriane({ etapes, ton }: { etapes: EtapeFil[]; ton: "sombre" |
             <li key={e.lien}>
               {i > 0 ? (
                 <span aria-hidden="true" className="nv-fil-sep">
-                  ›
+                  /
                 </span>
               ) : null}
               {i < derniere ? <Link href={e.lien}>{e.libelle}</Link> : <span aria-current="page">{e.libelle}</span>}
