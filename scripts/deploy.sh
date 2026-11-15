@@ -15,6 +15,34 @@
 set -euo pipefail
 cd "$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 
+# --- 0. Alerte d'échec (Workers Builds, 2026-11-15, modèle bistro-de-la-gare) -----------
+# Sous Workers Builds, si ce script s'arrête en erreur, un message part dans #alerte de
+# Norvika (secret de build SLACK_ALERTES_WEBHOOK ; sans lui, rien ne part et le build échoue
+# quand même). Angle mort : un échec AVANT ce script (clonage, installation, délai de
+# 20 minutes) ne déclenche rien ; il se voit dans l'historique des builds du Worker.
+alerte_echec() {
+  local code=$?
+  if [ "$code" -eq 0 ] || [ "${WORKERS_CI:-}" != "1" ]; then return 0; fi
+  if [ -z "${SLACK_ALERTES_WEBHOOK:-}" ]; then echo "Pas de webhook d'alerte : aucune alerte envoyée."; return 0; fi
+  local prefixe="" sha="${WORKERS_CI_COMMIT_SHA:-inconnu}"
+  if [ "${SIMULATION_ECHEC:-}" = "1" ]; then prefixe="[SIMULATION, rien à faire] "; fi
+  local msg="${prefixe}norvika.ca : la reconstruction a ÉCHOUÉ (commit ${sha:0:7}, build ${WORKERS_CI_BUILD_UUID:-inconnu}). Le site en ligne n'a pas changé. Journal : Cloudflare de Norvika, Workers & Pages, norvika, Deployments."
+  node -e 'process.stdout.write(JSON.stringify({ text: process.argv[1] }))' "$msg" \
+    | curl -sS -X POST -H "Content-Type: application/json" --data @- "$SLACK_ALERTES_WEBHOOK" >/dev/null \
+    && echo "Alerte envoyée." || echo "L'alerte n'a pas pu partir."
+}
+trap alerte_echec EXIT
+
+# Test de l'alerte : un commit dont le message contient [simuler-echec] fait échouer le build
+# AVANT toute construction. Rien n'est déployé, et l'alerte part avec « SIMULATION ».
+# ⚠️ Pousser AUSSITÔT un commit normal après : le Deploy Hook reconstruit le dernier commit, et
+# chaque « Publier » échouerait exprès tant que c'est le commit de test.
+if [ "${WORKERS_CI:-}" = "1" ] && git log -1 --format=%s 2>/dev/null | grep -qF "[simuler-echec]"; then
+  SIMULATION_ECHEC=1
+  echo "SIMULATION : échec volontaire demandé par le message du commit, pour tester l'alerte."
+  exit 1
+fi
+
 # Deux façons de lancer ce script :
 # - Workers Builds (WORKERS_CI=1, depuis le 2026-11-15) : c'est LA voie normale. Cloudflare
 #   construit à chaque push sur next16-migration et à chaque appel du Deploy Hook (webhook
