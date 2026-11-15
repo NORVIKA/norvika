@@ -2,6 +2,8 @@
 
 import { useRef, useState } from "react";
 
+import { useContenuGlobal } from "@/components/site/ContenuGlobal";
+
 /**
  * Bascule Avant / Apres pour montrer une refonte.
  *
@@ -45,6 +47,8 @@ export function BasculeAvantApres({
 }) {
   const [vue, setVue] = useState<"avant" | "apres">("avant");
   const ecran = useRef<HTMLDivElement>(null);
+  // Libellés lus par les lecteurs d'écran : « Menu et pied de page » du Studio (zéro texte en dur).
+  const { navigation } = useContenuGlobal();
 
   const changer = (v: "avant" | "apres") => {
     setVue(v);
@@ -92,7 +96,7 @@ export function BasculeAvantApres({
 
         <div
           role="tablist"
-          aria-label={`Comparer avant et après: ${alt}`}
+          aria-label={`${navigation.basculeComparer} ${alt}`}
           style={{
             marginLeft: "auto",
             display: "flex",
@@ -119,9 +123,6 @@ export function BasculeAvantApres({
                 fontWeight: 700,
                 letterSpacing: ".1em",
                 textTransform: "uppercase",
-                background: vue === v ? "#0C192F" : "transparent",
-                color: vue === v ? "#F5F3EE" : "rgba(12,25,47,.62)",
-                transition: "background .18s ease, color .18s ease",
               }}
             >
               {v === "avant" ? libelleAvant : libelleApres}
@@ -163,7 +164,7 @@ export function BasculeAvantApres({
                 : undefined
           }
           sizes="(min-width: 1304px) 1176px, (min-width: 820px) calc(100vw - 128px), calc(100vw - 64px)"
-          alt={`${alt} — ${vue === "avant" ? "avant" : "après"} la refonte`}
+          alt={`${alt}, ${vue === "avant" ? navigation.basculeImageAvant : navigation.basculeImageApres}`}
           loading="lazy"
           style={{ width: "100%", display: "block" }}
         />

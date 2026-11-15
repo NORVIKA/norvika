@@ -64,8 +64,11 @@
     transition: color .2s cubic-bezier(.2, 0, 0, 1);
   }
 
-  a:hover {
-    color: var(--navy-500);
+  /* Survol : seulement avec un pointeur qui survole (regle 10), jamais selon la largeur. */
+  @media (hover: hover) {
+    a:hover {
+      color: var(--navy-500);
+    }
   }
 
   h1, h2, h3, h4 {
@@ -135,23 +138,78 @@
   [data-reveal] { opacity: 1; transform: none; }
 }
 
-/* ===== Boutons, liens, cartes ===== */
+/* ===== Boutons, liens, cartes =====
+   REGLE 10 (2026-09-29), dans les deux sens : une animation au survol veut dire « c'est
+   cliquable ». Chaque regle de survol ci-dessous vise un lien ou un bouton, et TOUTES sont sous
+   `@media (hover: hover)` : la capacite du peripherique, jamais la largeur de l'ecran.
+   Inventaire du 2026-11-15 : retires le survol des cartes non cliquables (.nv-card-hover sur des
+   div), de la bande de logos de l'accueil et du div des lignes de services ; ajoutes ceux qui
+   manquaient (logo, bouton du menu, liens du pied de page, onglets des services, filtres,
+   boutons contour, video, points du parcours, onglets avant/apres). */
 .nv-navlink { color: rgba(12,25,47,.6); }
-.nv-navlink:hover { color: var(--navy); }
 .nv-btn-primary { background: var(--navy); color: #fff; }
-.nv-btn-primary:hover { background: #16294a; color: #fff; }
 .nv-btn-cream { background: var(--cream); color: var(--navy); }
-.nv-btn-cream:hover { background: #fff; color: var(--navy); }
-.nv-row:hover { background: rgba(51,73,108,.04); }
 .nv-card-hover { transition: transform .3s cubic-bezier(.2,0,0,1), box-shadow .3s cubic-bezier(.2,0,0,1); }
-.nv-card-hover:hover { transform: translateY(-3px); box-shadow: 0 30px 70px -40px rgba(12,25,47,.6); }
 .nv-cta-outline { color: rgba(12,25,47,.76); border-color: rgba(12,25,47,.14); }
-.nv-cta-outline:hover { border-color: var(--navy); color: var(--navy); }
-.nv-cream-hover:hover { background: #fff; color: var(--navy); }
-.nv-step-dot { cursor: pointer; }
-.nv-link-fade:hover { color: #0C192F; }
-.nv-btn-outline:hover { border-color: var(--navy-500) !important; color: var(--navy-500) !important; }
-.nv-avis:hover { padding-left: 10px; }
+/* Bouton contour sur fond fonce, accueil : la couleur vit ICI, pas en style en ligne, sinon le
+   survol (fond blanc) gardait un texte creme : blanc sur blanc. */
+.nv-cream-hover { color: #F5F3EE; border: 1px solid rgba(245,243,238,.32); transition: background .2s, color .2s, border-color .2s; }
+/* Lien discret (« Voir toutes nos realisations », « Revenir ») : sa couleur est souvent en style
+   en ligne, que le survol ne peut pas changer ; le soulignement, lui, apparait toujours. */
+.nv-link-fade {
+  text-decoration-line: underline;
+  text-decoration-color: transparent;
+  text-underline-offset: 3px;
+  transition: color .2s, text-decoration-color .2s;
+}
+/* Nom dans la liste des avis (accueil) : un bouton, remis a plat. */
+.nv-avis {
+  width: 100%;
+  margin: 0;
+  border: 0;
+  background: none;
+  font: inherit;
+  text-align: left;
+  color: inherit;
+  cursor: pointer;
+}
+.nv-avis > span:last-child { transition: transform .25s cubic-bezier(.2,0,0,1); }
+/* Ligne d'un service (accueil) : le bouton « Le detail » couvre toute la ligne par son ::after ;
+   les liens de la ligne passent au-dessus. */
+.nv-row { position: relative; }
+.nv-row a { position: relative; z-index: 1; }
+.nv-row-bouton {
+  justify-self: end;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: none;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  color: #33496C;
+  cursor: pointer;
+  text-decoration-line: underline;
+  text-decoration-color: transparent;
+  text-underline-offset: 3px;
+  transition: text-decoration-color .2s;
+}
+.nv-row-bouton::after { content: ""; position: absolute; inset: 0; transition: background .3s ease; }
+.nv-row-bouton:focus-visible { outline: none; }
+.nv-row-bouton:focus-visible::after { outline: 2px solid var(--navy); outline-offset: -2px; border-radius: 4px; }
+@media (hover: hover) {
+  .nv-navlink:hover { color: var(--navy); }
+  .nv-btn-primary:hover { background: #16294a; color: #fff; }
+  .nv-btn-cream:hover { background: #fff; color: var(--navy); }
+  .nv-card-hover:hover { transform: translateY(-3px); box-shadow: 0 30px 70px -40px rgba(12,25,47,.6); }
+  .nv-cta-outline:hover { border-color: var(--navy); color: var(--navy); }
+  .nv-cream-hover:hover { background: #fff; color: var(--navy); border-color: #fff; }
+  .nv-link-fade:hover { color: #0C192F; text-decoration-color: currentColor; }
+  /* Avant : padding-left, que le style en ligne du bouton annulait ; le survol ne faisait rien. */
+  .nv-avis:hover > span:last-child { transform: translateX(8px); }
+  .nv-row-bouton:hover { text-decoration-color: currentColor; }
+  .nv-row-bouton:hover::after { background: rgba(51,73,108,.04); }
+}
 .nv-btn-primary-round {
   border: 0;
   border-radius: 12px;
@@ -163,7 +221,9 @@
   box-shadow: 0 22px 44px -24px rgba(12,25,47,.9);
   transition: transform .2s cubic-bezier(.2,0,0,1), background .2s;
 }
-.nv-btn-primary-round:hover { background: #16294a; transform: translateY(-2px); }
+@media (hover: hover) {
+  .nv-btn-primary-round:hover { background: #16294a; transform: translateY(-2px); }
+}
 
 /* ===== Crochets animes ===== */
 .nv-check-box { animation: popBoxAuto .5s cubic-bezier(.2,0,0,1) both; }
@@ -220,10 +280,13 @@
   overflow: hidden;
   transition: transform .25s cubic-bezier(.2,0,0,1), box-shadow .25s, border-color .25s;
 }
-.nv-logo-card:hover {
-  transform: translateY(-4px);
-  border-color: rgba(12,25,47,.35);
-  box-shadow: 0 28px 60px -32px rgba(12,25,47,.55);
+@media (hover: hover) {
+  .nv-logo-card:hover {
+    transform: translateY(-4px);
+    border-color: rgba(12,25,47,.35);
+    box-shadow: 0 28px 60px -32px rgba(12,25,47,.55);
+  }
+  .nv-logo-card:hover .nv-logo-name { color: var(--navy); }
 }
 .nv-logo-zone {
   display: flex;
@@ -245,7 +308,6 @@
   color: rgba(12,25,47,.6);
   transition: color .2s ease;
 }
-.nv-logo-card:hover .nv-logo-name { color: var(--navy); }
 .nv-logo-img { width: auto; height: auto; object-fit: contain; opacity: 1; }
 .nv-logo-tile {
   display: block;
@@ -331,10 +393,12 @@
   font-family: var(--font-body) !important;
   font-weight: 600 !important;
 }
-.cky-btn-accept:hover,
-.cky-btn-reject:hover {
-  background: #16294a !important;
-  border-color: #16294a !important;
+@media (hover: hover) {
+  .cky-btn-accept:hover,
+  .cky-btn-reject:hover {
+    background: #16294a !important;
+    border-color: #16294a !important;
+  }
 }
 .cky-btn-customize {
   color: var(--navy) !important;
@@ -342,9 +406,11 @@
   font-family: var(--font-body) !important;
   font-weight: 600 !important;
 }
-.cky-btn-customize:hover {
-  border-color: var(--navy) !important;
-  background: rgba(12, 25, 47, .04) !important;
+@media (hover: hover) {
+  .cky-btn-customize:hover {
+    border-color: var(--navy) !important;
+    background: rgba(12, 25, 47, .04) !important;
+  }
 }
 .cky-consent-container .cky-consent-bar,
 .cky-modal {
@@ -440,7 +506,8 @@
   opacity: .78;
   transition: opacity .25s ease;
 }
-.nv-logos-bande:hover img { opacity: 1; }
+/* Pas de survol sur la bande : les logos ne sont pas des liens (regle 10). Le lien
+   « Voir toutes nos realisations » est juste dessous. */
 /* Les logos qui n'existent qu'en blanc sur un bloc de couleur (Desjardins,
    Anytime Fitness). Coins arrondis pour qu'ils se lisent comme une pastille de
    marque et non comme un rectangle oublie ; un peu plus hauts que les logos
@@ -479,6 +546,15 @@
 /* La bascule avant / apres vit dans la barre du navigateur. Sur un ecran
    etroit, l'adresse et les deux onglets ne tiennent pas cote a cote : c'est
    l'adresse qui part, elle est decorative, les onglets ne le sont pas. */
+.nv-bascule-onglet {
+  background: transparent;
+  color: rgba(12,25,47,.62);
+  transition: background .18s ease, color .18s ease;
+}
+.nv-bascule-onglet[aria-selected="true"] { background: #0C192F; color: #F5F3EE; }
+@media (hover: hover) {
+  .nv-bascule-onglet[aria-selected="false"]:hover { color: #0C192F; background: rgba(255,255,255,.7); }
+}
 .nv-bascule-onglet:focus-visible {
   outline: 2px solid #0C192F;
   outline-offset: 2px;
@@ -623,4 +699,64 @@
   .nv-plan-pages, .nv-plan-fiches { grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: 16px; row-gap: 0; }
   .nv-plan-pages p { display: none; }
   .nv-plan-lien, .nv-plan-fiches .nv-plan-lien { padding: 11px 0; font-size: 15.5px; line-height: 22px; }
+}
+
+/* ===== Signaux de survol ajoutes le 2026-11-15 (regle 10, inventaire complet) ===== */
+/* Lien de texte (pied de page) : le soulignement apparait au survol. */
+.nv-lien {
+  text-decoration-line: underline;
+  text-decoration-color: transparent;
+  text-underline-offset: 3px;
+  transition: color .2s, text-decoration-color .2s;
+}
+/* Lien deja souligne dans un paragraphe (calendrier, politique) : le trait s'epaissit. */
+.nv-lien-texte {
+  text-decoration-line: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 3px;
+  transition: text-decoration-thickness .15s;
+}
+.nv-logo-lien { transition: opacity .2s; }
+.nv-burger {
+  border: 1px solid rgba(12,25,47,.14);
+  background: rgba(255,255,255,.6);
+  transition: background .2s, border-color .2s;
+}
+/* Bouton contour sur fond fonce (pages de services, portfolio). --contour regle le trait. */
+.nv-btn-contour-clair {
+  color: #F5F3EE;
+  border: 1px solid var(--contour, rgba(245,243,238,.28));
+  transition: background .2s, border-color .2s;
+}
+/* Onglets des services, sous le haut des pages de service. */
+.nv-onglet {
+  color: rgba(245,243,238,.74);
+  border-bottom: 2px solid transparent;
+  transition: color .2s, border-color .2s;
+}
+.nv-onglet[aria-current="page"] { color: #F5F3EE; border-bottom-color: #F5F3EE; }
+/* Filtres des realisations : l'etat choisi est annonce par aria-pressed. */
+.nv-filtre {
+  padding: 10px 18px;
+  border: 1px solid transparent;
+  border-radius: 999px;
+  background: rgba(12,25,47,.06);
+  color: rgba(12,25,47,.72);
+  font-size: 13.5px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background .18s, color .18s, border-color .18s;
+}
+.nv-filtre[aria-pressed="true"] { background: #0C192F; color: #fff; }
+.nv-video-rond { transition: transform .25s cubic-bezier(.2,0,0,1); }
+@media (hover: hover) {
+  .nv-lien:hover { text-decoration-color: currentColor; }
+  .nv-lien-texte:hover { text-decoration-thickness: 2px; }
+  .nv-logo-lien:hover { opacity: .72; }
+  .nv-burger:hover { background: #fff; border-color: rgba(12,25,47,.3); }
+  .nv-btn-contour-clair:hover { color: #F5F3EE; border-color: #F5F3EE; background: rgba(245,243,238,.08); }
+  .nv-onglet:not([aria-current]):hover { color: #F5F3EE; border-bottom-color: rgba(245,243,238,.34); }
+  .nv-filtre[aria-pressed="false"]:hover { border-color: rgba(12,25,47,.3); color: #0C192F; }
+  .nv-video-jouer:hover .nv-video-rond { transform: scale(1.08); }
+  .nv-etape-point:hover [data-point] { transform: scale(1.3); }
 }

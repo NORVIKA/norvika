@@ -391,9 +391,8 @@ function Page({ page }: { page: PageDiagnostic }) {
                   boxShadow: "0 40px 80px -50px rgba(12,25,47,1)",
                 }}
               >
-                <p style={{ margin: "0 0 20px", fontSize: 11.5, letterSpacing: ".2em", textTransform: "uppercase", color: "rgba(245,243,238,.5)" }}>
-                  {page.resultatSurtitre}
-                </p>
+                {/* Plus de sur-titre « Votre résultat » (règle d'agence 1) : arrivé au bout des sept
+                    questions, le titre du profil se lit comme le résultat. */}
                 <h2
                   style={{
                     margin: 0,
@@ -565,7 +564,8 @@ function Page({ page }: { page: PageDiagnostic }) {
       <footer className="nv-shell" style={{ padding: "56px 32px 40px", borderTop: "1px solid rgba(12,25,47,.08)" }}>
         <div className="nv-shell" style={{ maxWidth: 1240, margin: "0 auto", display: "flex", alignItems: "flex-end", justifyContent: "space-between", gap: 32 }}>
           <img loading="lazy" decoding="async" src={logoStack.url} alt={logoStack.alt ?? ""} style={{ height: 78, width: "auto", display: "block" }} />
-          <div style={{ fontSize: 12.5, color: "rgba(12,25,47,.45)" }}>
+          {/* .62 et non plus .45 : 4,97:1 de contraste sur blanc au lieu de 2,92:1 (WCAG AA). */}
+          <div style={{ fontSize: 12.5, color: "rgba(12,25,47,.62)" }}>
             <MentionDroits court />
           </div>
         </div>
@@ -605,7 +605,8 @@ const backLinkStyle: React.CSSProperties = {
   background: "none",
   fontFamily: "var(--font-body)",
   fontSize: 14,
-  color: "rgba(12,25,47,.45)",
+  // .62 et non plus .45 : 4,97:1 de contraste sur blanc au lieu de 2,92:1 (WCAG AA).
+  color: "rgba(12,25,47,.62)",
   cursor: "pointer",
 };
 

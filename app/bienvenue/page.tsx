@@ -123,16 +123,19 @@ export default async function BienvenuePage() {
             <p className="mt-6 max-w-2xl text-base leading-relaxed text-white/80">
               {t.contact.texte}
             </p>
+            {/* Les liens étaient navy sur fond navy (1:1, invisibles : la règle de base `a` gagnait sur
+                le blanc hérité). Couleur en ligne, pour que le survol de base ne la change pas ; le
+                survol épaissit le trait (.nv-lien-texte). */}
             <ul className="mt-8 space-y-2 text-base">
               <li>
                 {t.contact.libelleCourriel}{" "}
-                <a href={`mailto:${parametres.courriel}`} className="underline underline-offset-4">
+                <a href={`mailto:${parametres.courriel}`} className="nv-lien-texte" style={{ color: "#fff" }}>
                   {parametres.courriel}
                 </a>
               </li>
               <li>
                 {t.contact.libelleTelephone}{" "}
-                <a href={lienTelephone(parametres.telephone)} className="underline underline-offset-4">
+                <a href={lienTelephone(parametres.telephone)} className="nv-lien-texte" style={{ color: "#fff" }}>
                   {parametres.telephone}
                 </a>
               </li>

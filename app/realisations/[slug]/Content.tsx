@@ -11,17 +11,11 @@ import { VideoYoutube } from "@/components/site/VideoYoutube";
 import { BasculeAvantApres } from "@/components/site/BasculeAvantApres";
 
 
-const blockLabel: React.CSSProperties = {
-  margin: 0,
-  fontSize: 11.5,
-  letterSpacing: ".2em",
-  textTransform: "uppercase",
-  color: "#33496C",
-  fontWeight: 600,
-};
-
+// Plus de petits titres numérotés « 01 · Le point de départ » et « 02 · Notre mandat » au-dessus
+// des titres (règles d'agence 1 et 3) : ils redisaient « Le besoin » et « Ce qu'on a fait », et deux
+// numéros ne font pas une suite (le résultat n'en avait pas).
 const blockTitle: React.CSSProperties = {
-  margin: "10px 0 0",
+  margin: 0,
   fontFamily: "var(--font-display)",
   fontWeight: 600,
   fontSize: "clamp(24px,2.6vw,34px)",
@@ -190,7 +184,6 @@ export default function Page({ client, page }: { client: Realisation; page: Page
           style={{ maxWidth: 780, margin: "0 auto", padding: "78px 32px 88px" }}
         >
           <article data-reveal style={{ minWidth: 0 }}>
-            <p style={blockLabel}>{page.ficheBesoinSurtitre}</p>
             <h2 style={blockTitle}>{page.ficheBesoinTitre}</h2>
             <p style={blockText}>{client.besoin}</p>
           </article>
@@ -273,7 +266,6 @@ export default function Page({ client, page }: { client: Realisation; page: Page
           />
 
           <article data-reveal style={{ minWidth: 0 }}>
-            <p style={blockLabel}>{page.ficheMandatSurtitre}</p>
             <h2 style={blockTitle}>{page.ficheMandatTitre}</h2>
             <p style={blockText}>{client.mandat}</p>
           </article>
@@ -335,10 +327,14 @@ export default function Page({ client, page }: { client: Realisation; page: Page
                 borderLeft: "4px solid #0C192F",
               }}
             >
-              <p style={blockLabel}>{page.ficheResultat}</p>
+              {/* « Le résultat » était un petit libellé en capitales, SEUL repère de l'encadré : il est
+                  promu en vrai titre (nuance de la règle d'agence 1), même niveau que « Le besoin ». */}
+              <h2 style={{ margin: 0, fontFamily: "var(--font-display)", fontWeight: 600, fontSize: 17, letterSpacing: "-.01em", color: "#33496C" }}>
+                {page.ficheResultat}
+              </h2>
               <p
                 style={{
-                  margin: "14px 0 0",
+                  margin: "12px 0 0",
                   fontFamily: "var(--font-display)",
                   fontWeight: 600,
                   fontSize: "clamp(19px,2.1vw,25px)",

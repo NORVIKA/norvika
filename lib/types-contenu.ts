@@ -63,6 +63,14 @@ export type Navigation = {
   filArianeLibelle: string;
   /** Lu avant le numéro de la barre du haut par les lecteurs d'écran (« Appeler Norvika au »). */
   enteteTelephone: string;
+  /** Libellés lus par les lecteurs d'écran (invisibles à l'écran). */
+  menuOuvrir: string;
+  ongletsServices: string;
+  basculeComparer: string;
+  basculeImageAvant: string;
+  basculeImageApres: string;
+  videoLire: string;
+  etapeLibelle: string;
   basculeAvant: string;
   basculeApres: string;
   piedTitreServices: string;
@@ -91,7 +99,6 @@ export type BlocContact = {
 };
 
 export type Page404 = {
-  surtitre: string;
   titre: string;
   texte: string;
   boutonAccueil: string;
@@ -193,7 +200,7 @@ export type PageAccueil = DocumentPage & {
   quiz: { afficher?: boolean | null; titre: string; texte: string };
   logos: { afficher?: boolean | null; titre: string; lien: string; liste: { nom: string; logoStyle: string; logo: Image }[] };
   services: { afficher?: boolean | null; titre: string; ouvrir: string; fermer: string; lienPage: string };
-  parcours: { afficher?: boolean | null; surtitre: string; titre: string; etapes: Etape[] };
+  parcours: { afficher?: boolean | null; titre: string; etapes: Etape[] };
   fondateurs: { afficher?: boolean | null; titre: string; texte: string; legende: string; photo: Image; citation: string };
   avis: { afficher?: boolean | null; titre: string; etoiles: string; note: string };
 };
@@ -209,7 +216,6 @@ export type PageDiagnostic = DocumentPage & {
   encouragement: string;
   boutonRetour: string;
   questions: { question: string; precision?: string | null; reponses: Reponse[] }[];
-  resultatSurtitre: string;
   barreSite: string;
   barreTemps: string;
   barreImage: string;
@@ -250,7 +256,6 @@ export type PageEquipe = DocumentPage & {
 
 export type PageRealisations = DocumentPage & {
   nom: string;
-  surtitre: string;
   h1: string;
   h1Accent: string;
   intro: string;
@@ -259,11 +264,9 @@ export type PageRealisations = DocumentPage & {
   aucun: string;
   portfolio: { afficher?: boolean | null; titre: string; bouton: string };
   ficheSite: string;
-  ficheBesoinSurtitre: string;
   ficheBesoinTitre: string;
   ficheApercu: string;
   ficheApercuBouton: string;
-  ficheMandatSurtitre: string;
   ficheMandatTitre: string;
   ficheResultat: string;
   ficheAppel: string;

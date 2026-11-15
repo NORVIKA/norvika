@@ -16,20 +16,11 @@ export default async function NotFound() {
           textAlign: "center",
         }}
       >
-        <p
-          style={{
-            margin: 0,
-            fontSize: 11.5,
-            letterSpacing: ".2em",
-            textTransform: "uppercase",
-            color: "rgba(12,25,47,.45)",
-          }}
-        >
-          {t.surtitre}
-        </p>
+        {/* Plus de « Erreur 404 » au-dessus du titre (règle d'agence 1) : « Cette page n'existe
+            pas. » le dit déjà, et ce gris à 45 % n'atteignait que 2,9:1 de contraste. */}
         <h1
           style={{
-            margin: "18px 0 0",
+            margin: 0,
             fontSize: "clamp(28px,3.4vw,42px)",
             lineHeight: 1.1,
           }}

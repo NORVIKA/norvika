@@ -1,6 +1,9 @@
 import type { Config } from "tailwindcss";
 
 const config: Config = {
+  // Les classes hover: ne s'appliquent qu'avec un pointeur qui survole (@media (hover: hover) and
+  // (pointer: fine)) : règle d'agence 10, le survol se retire par la capacité, jamais la largeur.
+  future: { hoverOnlyWhenSupported: true },
   content: [
     "./pages/**/*.{js,ts,jsx,tsx,mdx}",
     "./components/**/*.{js,ts,jsx,tsx,mdx}",

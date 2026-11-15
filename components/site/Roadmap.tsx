@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { Etape } from "@/lib/types-contenu";
+import { useContenuGlobal } from "@/components/site/ContenuGlobal";
 
 /**
  * « Comment ça marche » : le parcours en N étapes, partagé par l'accueil et les
@@ -39,6 +40,8 @@ export const versRoadSteps = (etapes: Etape[]): RoadStep[] =>
 const easeOutCubic = (t: number) => 1 - Math.pow(1 - t, 3);
 
 export function Roadmap({ steps }: { steps: RoadStep[] }) {
+  // « Étape », lu avant le numéro de chaque point : « Menu et pied de page » du Studio.
+  const { navigation } = useContenuGlobal();
   const n = steps.length;
   const fracs = useMemo(
     () => Array.from({ length: n }, (_, i) => (n === 1 ? 0 : i / (n - 1))),
@@ -337,7 +340,8 @@ export function Roadmap({ steps }: { steps: RoadStep[] }) {
                 userTouched.current = true;
                 setStep(i);
               }}
-              aria-label={`Étape ${e.num ?? String(i + 1).padStart(2, "0")} : ${e.label}`}
+              aria-label={`${navigation.etapeLibelle} ${e.num ?? String(i + 1).padStart(2, "0")} : ${e.label}`}
+              className="nv-etape-point"
               aria-current={step === i ? "step" : undefined}
               style={{
                 position: "absolute",
@@ -355,6 +359,7 @@ export function Roadmap({ steps }: { steps: RoadStep[] }) {
             >
               <span
                 aria-hidden="true"
+                data-point
                 style={{
                   display: "block",
                   width: 14,
@@ -363,7 +368,7 @@ export function Roadmap({ steps }: { steps: RoadStep[] }) {
                   background: color,
                   boxShadow:
                     "0 0 0 6px rgba(255,255,255,.85), 0 6px 16px -8px rgba(12,25,47,.9)",
-                  transition: "background .3s cubic-bezier(.2,0,0,1)",
+                  transition: "background .3s cubic-bezier(.2,0,0,1), transform .2s cubic-bezier(.2,0,0,1)",
                 }}
               />
               <span

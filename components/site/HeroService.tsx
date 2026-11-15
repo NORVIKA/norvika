@@ -187,13 +187,12 @@ export function HeroService({
             </a>
             <Link
               href="/diagnostic"
+              className="nv-btn-contour-clair"
               style={{
                 padding: "14px 22px",
                 borderRadius: 10,
-                border: "1px solid rgba(245,243,238,.28)",
                 fontSize: 14.5,
                 fontWeight: 600,
-                color: "#F5F3EE",
               }}
             >
               {navigation.boutonQuiz}
@@ -203,13 +202,12 @@ export function HeroService({
                 href={lienExtra.href}
                 target="_blank"
                 rel="noopener noreferrer"
+                className="nv-btn-contour-clair"
                 style={{
                   padding: "14px 22px",
                   borderRadius: 10,
-                  border: "1px solid rgba(245,243,238,.28)",
                   fontSize: 14.5,
                   fontWeight: 600,
-                  color: "#F5F3EE",
                 }}
               >
                 {lienExtra.libelle}
@@ -230,7 +228,7 @@ export function HeroService({
         }}
       >
         <nav
-          aria-label="Nos services"
+          aria-label={navigation.ongletsServices}
           className="nv-service-switch"
           style={{
             display: "flex",
@@ -247,15 +245,8 @@ export function HeroService({
                 key={s.href}
                 href={s.href}
                 aria-current={actif ? "page" : undefined}
-                style={{
-                  padding: "13px 16px",
-                  fontSize: 14,
-                  fontWeight: 600,
-                  color: actif ? "#F5F3EE" : "rgba(245,243,238,.74)",
-                  borderBottom: actif
-                    ? "2px solid #F5F3EE"
-                    : "2px solid transparent",
-                }}
+                className="nv-onglet"
+                style={{ padding: "13px 16px", fontSize: 14, fontWeight: 600 }}
               >
                 {s.titre}
               </Link>

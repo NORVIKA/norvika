@@ -45,7 +45,7 @@ export function SiteHeader() {
           gap: 20,
         }}
       >
-        <Link href="/" style={{ display: "flex", alignItems: "center", gap: 11 }}>
+        <Link href="/" className="nv-logo-lien" style={{ display: "flex", alignItems: "center", gap: 11 }}>
           <img
             src={wordmark.url}
             alt={wordmark.alt ?? ""}
@@ -84,7 +84,7 @@ export function SiteHeader() {
         <button
           type="button"
           className="nv-burger"
-          aria-label="Ouvrir le menu"
+          aria-label={navigation.menuOuvrir}
           aria-expanded={open}
           onClick={() => setOpen((o) => !o)}
           style={{
@@ -94,8 +94,6 @@ export function SiteHeader() {
             height: 42,
             padding: 0,
             borderRadius: 10,
-            border: "1px solid rgba(12,25,47,.14)",
-            background: "rgba(255,255,255,.6)",
             cursor: "pointer",
           }}
         >

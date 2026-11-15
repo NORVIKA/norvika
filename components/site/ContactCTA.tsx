@@ -158,8 +158,11 @@ export function ContactCTA() {
             {t.texte}{" "}
             <a
               href={LIEN_RDV}
-              style={{ color: "#F5F3EE", textDecoration: "underline", textUnderlineOffset: 3 }}
-             target="_blank" rel="noopener noreferrer">
+              className="nv-lien-texte"
+              style={{ color: "#F5F3EE" }}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
               {t.lienTexte}
             </a>
             {t.apresLien}

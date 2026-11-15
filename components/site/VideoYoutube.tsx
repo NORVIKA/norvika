@@ -2,6 +2,8 @@
 
 import { useState } from "react";
 
+import { useContenuGlobal } from "@/components/site/ContenuGlobal";
+
 /**
  * Lecteur YouTube a chargement differe.
  *
@@ -34,6 +36,8 @@ export function VideoYoutube({
 }) {
   const [joue, setJoue] = useState(false);
   const vertical = format === "vertical";
+  // « Lire la vidéo : » vient de « Menu et pied de page » du Studio (zéro texte en dur).
+  const { navigation } = useContenuGlobal();
 
   return (
     <div
@@ -61,7 +65,8 @@ export function VideoYoutube({
         <button
           type="button"
           onClick={() => setJoue(true)}
-          aria-label={`Lire la vidéo: ${titre}`}
+          aria-label={`${navigation.videoLire} ${titre}`}
+          className="nv-video-jouer"
           style={{
             position: "absolute",
             inset: 0,
@@ -102,6 +107,7 @@ export function VideoYoutube({
           />
           <span
             aria-hidden="true"
+            className="nv-video-rond"
             style={{
               position: "relative",
               display: "flex",

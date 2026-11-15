@@ -106,7 +106,7 @@ function Page({ page }: { page: PageFormation }) {
               <div
                 key={i}
                 data-reveal
-                className="nv-card-hover"
+               
                 style={{
                   padding: "34px 30px",
                   borderRadius: 20,
@@ -139,7 +139,7 @@ function Page({ page }: { page: PageFormation }) {
               <div
                 key={n}
                 data-reveal
-                className="nv-card-hover"
+               
                 style={{
                   padding: "34px 30px",
                   borderRadius: 20,
@@ -193,7 +193,7 @@ function Page({ page }: { page: PageFormation }) {
               <div
                 key={i}
                 data-reveal
-                className="nv-card-hover"
+               
                 style={{
                   padding: "34px 30px",
                   borderRadius: 20,

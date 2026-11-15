@@ -59,7 +59,7 @@ function Page({ page, membres }: { page: PageEquipe; membres: Membre[] }) {
               <div
                 key={p.nom}
                 data-reveal
-                className="nv-card-hover nv-text-card"
+                className="nv-text-card"
                 style={{
                   overflow: "hidden",
                   borderRadius: 22,
@@ -168,7 +168,7 @@ function Page({ page, membres }: { page: PageEquipe; membres: Membre[] }) {
               <div
                 key={i}
                 data-reveal
-                className="nv-card-hover"
+               
                 style={{
                   padding: "34px 30px",
                   borderRadius: 20,

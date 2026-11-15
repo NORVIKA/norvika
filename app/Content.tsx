@@ -130,10 +130,8 @@ function Index({ page, avisListe }: { page: PageAccueil; avisListe: Avis[] }) {
               style={{
                 padding: "16px 22px",
                 borderRadius: 10,
-                border: "1px solid rgba(245,243,238,.32)",
                 fontSize: 15,
                 fontWeight: 600,
-                color: "#F5F3EE",
               }}
             >
               {page.heroBoutonSecondaire}
@@ -502,14 +500,16 @@ function Index({ page, avisListe }: { page: PageAccueil; avisListe: Avis[] }) {
                 "0 1px 0 rgba(255,255,255,.95) inset, 0 30px 70px -40px rgba(12,25,47,.6)",
             }}
           >
+            {/* Toute la ligne ouvre le détail, comme avant, mais par un VRAI bouton (« Le détail »)
+                dont la zone cliquable couvre la ligne (.nv-row-bouton::after) : joignable au clavier,
+                annoncé ouvert ou fermé, et le survol vise ce bouton, pas un div (règle 10). Les liens
+                de la ligne passent au-dessus de cette zone. */}
             {SERVICES.map((s, i) => (
               <div
                 key={s.num}
                 data-reveal
                 className="nv-row nv-grid"
-                onClick={() => setOpen((o) => ({ ...o, [i]: !o[i] }))}
                 style={{
-                  cursor: "pointer",
                   padding: "32px 24px",
                   display: "grid",
                   gridTemplateColumns: "80px 1fr 1.1fr 120px",
@@ -517,7 +517,6 @@ function Index({ page, avisListe }: { page: PageAccueil; avisListe: Avis[] }) {
                   alignItems: "start",
                   borderTop:
                     i === 0 ? undefined : "1px solid rgba(12,25,47,.08)",
-                  transition: "background .3s ease",
                 }}
               >
                 <span
@@ -530,7 +529,9 @@ function Index({ page, avisListe }: { page: PageAccueil; avisListe: Avis[] }) {
                   {s.num}
                 </span>
                 <h3 style={{ margin: 0, fontSize: 26, letterSpacing: "-.02em" }}>
-                  <Link href={s.to}>{s.title}</Link>
+                  <Link href={s.to} className="nv-lien">
+                    {s.title}
+                  </Link>
                 </h3>
                 <div>
                   <p
@@ -559,7 +560,6 @@ function Index({ page, avisListe }: { page: PageAccueil; avisListe: Avis[] }) {
                           lien, rien ne menait a la page du service depuis ici. */}
                       <Link
                         href={s.to}
-                        onClick={(e) => e.stopPropagation()}
                         className="nv-link-fade"
                         style={{
                           display: "inline-block",
@@ -574,16 +574,14 @@ function Index({ page, avisListe }: { page: PageAccueil; avisListe: Avis[] }) {
                     </>
                   )}
                 </div>
-                <span
-                  style={{
-                    justifySelf: "end",
-                    fontSize: 14,
-                    fontWeight: 600,
-                    color: "#33496C",
-                  }}
+                <button
+                  type="button"
+                  className="nv-row-bouton"
+                  aria-expanded={!!open[i]}
+                  onClick={() => setOpen((o) => ({ ...o, [i]: !o[i] }))}
                 >
                   {open[i] ? page.services.fermer : page.services.ouvrir}
-                </span>
+                </button>
               </div>
             ))}
           </div>
@@ -625,19 +623,8 @@ function Index({ page, avisListe }: { page: PageAccueil; avisListe: Avis[] }) {
             padding: "96px 32px",
           }}
         >
-          <p
-            data-reveal
-            style={{
-              margin: "0 0 18px",
-              fontSize: 11.5,
-              letterSpacing: ".2em",
-              textTransform: "uppercase",
-              color: "#33496C",
-              fontWeight: 600,
-            }}
-          >
-            {page.parcours.surtitre}
-          </p>
+          {/* Plus de sur-titre « Comment ça marche » (règle d'agence 1) : le titre et le parcours
+              disent déjà ce que c'est. */}
           <h2
             data-reveal
             style={{
@@ -827,22 +814,28 @@ function Index({ page, avisListe }: { page: PageAccueil; avisListe: Avis[] }) {
                 borderRight: "1px solid rgba(12,25,47,.1)",
               }}
             >
+              {/* Chaque nom est un bouton (il choisit l'avis affiché à droite) : avant, un div
+                  cliquable, injoignable au clavier, dont le survol ne visait pas un bouton (règle 10). */}
               {AVIS.map((a, i) => (
-                <div
+                <button
                   key={a.name}
+                  type="button"
                   className="nv-avis"
+                  aria-pressed={avis === i}
                   onClick={() => setAvis(i)}
                   style={{
-                    cursor: "pointer",
                     padding: "22px 26px 22px 0",
                     borderBottom: "1px solid rgba(12,25,47,.08)",
                     display: "flex",
                     alignItems: "baseline",
                     gap: 12,
-                    transition: "padding-left .25s cubic-bezier(.2,0,0,1)",
                   }}
                 >
+                  {/* Le point marque l'avis affiché (état réel, annoncé par aria-pressed). Dans un
+                      bouton, seuls des éléments en ligne sont permis : des span en bloc remplacent
+                      les div et p d'avant, même rendu. */}
                   <span
+                    aria-hidden="true"
                     style={{
                       fontFamily: "var(--font-display)",
                       fontSize: 12,
@@ -851,9 +844,10 @@ function Index({ page, avisListe }: { page: PageAccueil; avisListe: Avis[] }) {
                   >
                     ●
                   </span>
-                  <div style={{ flex: 1 }}>
-                    <p
+                  <span style={{ display: "block", flex: 1 }}>
+                    <span
                       style={{
+                        display: "block",
                         margin: 0,
                         fontSize: 16,
                         fontWeight: 600,
@@ -861,18 +855,19 @@ function Index({ page, avisListe }: { page: PageAccueil; avisListe: Avis[] }) {
                       }}
                     >
                       {a.name}
-                    </p>
-                    <p
+                    </span>
+                    <span
                       style={{
+                        display: "block",
                         margin: "4px 0 0",
                         fontSize: 12.5,
                         color: "rgba(12,25,47,.45)",
                       }}
                     >
                       {a.meta}
-                    </p>
-                  </div>
-                </div>
+                    </span>
+                  </span>
+                </button>
               ))}
             </div>
 

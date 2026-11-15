@@ -64,7 +64,7 @@ export function SiteFooter() {
               }}
             >
               {navigation.liensMenu.map((l) => (
-                <Link key={l.lien} href={l.lien}>
+                <Link key={l.lien} href={l.lien} className="nv-lien">
                   {l.libelle}
                 </Link>
               ))}
@@ -91,9 +91,11 @@ export function SiteFooter() {
                 fontSize: 14.5,
               }}
             >
-              <a href={`mailto:${parametres.courriel}`}>{parametres.courriel}</a>
+              <a href={`mailto:${parametres.courriel}`} className="nv-lien">
+                {parametres.courriel}
+              </a>
               {navigation.piedLiensContact.map((l) => (
-                <Link key={l.lien} href={l.lien} style={{ color: "rgba(12,25,47,.62)" }}>
+                <Link key={l.lien} href={l.lien} className="nv-pied-lien">
                   {l.libelle}
                 </Link>
               ))}

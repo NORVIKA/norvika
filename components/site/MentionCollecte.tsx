@@ -19,7 +19,7 @@ export function MentionCollecte({ id, style }: { id?: string; style?: CSSPropert
       Resend (envoi du courriel) et Google (notre messagerie), qui peuvent les traiter hors du Québec.
       Vous pouvez en tout temps les consulter, les faire corriger ou supprimer, ou retirer votre
       consentement, en écrivant à info@norvika.ca. Détails dans notre{" "}
-      <Link href="/politique-de-confidentialite" style={{ color: "inherit", textDecoration: "underline", textUnderlineOffset: 3 }}>
+      <Link href="/politique-de-confidentialite" className="nv-lien-texte" style={{ color: "inherit" }}>
         politique de confidentialité
       </Link>
       .

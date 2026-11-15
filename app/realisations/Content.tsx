@@ -47,18 +47,8 @@ function Page({ page, realisations }: { page: PageRealisations; realisations: Re
             textAlign: "center",
           }}
         >
-          <p
-            style={{
-              margin: "0 0 22px",
-              fontSize: 11.5,
-              letterSpacing: ".2em",
-              textTransform: "uppercase",
-              color: "#0C192F",
-              fontWeight: 700,
-            }}
-          >
-            {page.surtitre}
-          </p>
+          {/* Plus de sur-titre « Réalisations » au-dessus du grand titre (règle d'agence 1) :
+              le titre suffit, la page se nomme dans le menu, l'onglet et le fil d'Ariane des fiches. */}
           <h1
             style={{
               margin: 0,
@@ -112,18 +102,9 @@ function Page({ page, realisations }: { page: PageRealisations; realisations: Re
                 <button
                   key={c.id}
                   type="button"
+                  aria-pressed={active}
                   onClick={() => setFilter(c.id as CategoryId | "all")}
-                  style={{
-                    padding: "10px 18px",
-                    borderRadius: 999,
-                    fontSize: 13.5,
-                    fontWeight: 600,
-                    cursor: "pointer",
-                    border: "1px solid transparent",
-                    background: active ? "#0C192F" : "rgba(12,25,47,.06)",
-                    color: active ? "#fff" : "rgba(12,25,47,.72)",
-                    transition: "all .18s ease",
-                  }}
+                  className="nv-filtre"
                 >
                   {c.label}
                 </button>
@@ -175,15 +156,14 @@ function Page({ page, realisations }: { page: PageRealisations; realisations: Re
               href={parametres.lienPortfolio}
               target="_blank"
               rel="noopener"
+              className="nv-btn-contour-clair"
               style={{
                 display: "inline-block",
                 padding: "16px 22px",
                 borderRadius: 10,
-                border: "1px solid rgba(255,255,255,.55)",
                 fontSize: 15,
                 fontWeight: 600,
-                color: "#fff",
-                transition: "all .2s ease",
+                ["--contour" as string]: "rgba(255,255,255,.55)",
               }}
             >
               {page.portfolio.bouton}

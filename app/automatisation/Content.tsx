@@ -135,7 +135,7 @@ function Page({ page }: { page: PageAutomatisation }) {
               <div
                 key={i}
                 data-reveal
-                className="nv-card-hover"
+               
                 style={{
                   padding: "34px 30px",
                   borderRadius: 20,
