@@ -22,7 +22,7 @@ function Page({ page }: { page: PageFormation }) {
       <SiteHeader />
 
       <HeroService
-        eyebrow={page.nom}
+        nom={page.nom}
         titre={page.h1}
         texte={page.heroTexte}
         courante="/formation"

@@ -1,12 +1,11 @@
 "use client";
 
-import Link from "next/link";
-
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
 import { useReveal } from "@/lib/useReveal";
 import { AutresPages } from "@/components/site/AutresPages";
 import { useContenuGlobal } from "@/components/site/ContenuGlobal";
+import { FilAriane } from "@/components/site/FilAriane";
 import { categories, type PageRealisations, type Realisation } from "@/lib/types-contenu";
 import { VideoYoutube } from "@/components/site/VideoYoutube";
 import { BasculeAvantApres } from "@/components/site/BasculeAvantApres";
@@ -59,21 +58,16 @@ export default function Page({ client, page }: { client: Realisation; page: Page
           className="nv-shell"
           style={{ maxWidth: 1000, margin: "0 auto", padding: "44px 32px 72px" }}
         >
-          <Link
-            href="/realisations"
-            className="nv-cta-outline"
-            style={{
-              display: "inline-block",
-              padding: "10px 17px",
-              borderRadius: 10,
-              border: "1px solid",
-              background: "rgba(255,255,255,.7)",
-              fontSize: 13.5,
-              fontWeight: 600,
-            }}
-          >
-            {page.ficheRetour}
-          </Link>
+          {/* Fil d'Ariane (Accueil, Réalisations, client) a la place de l'ancien bouton « Toutes les
+              réalisations » : deux liens vers la meme liste, l'un au-dessus de l'autre, se repetaient.
+              Il porte aussi les donnees structurees BreadcrumbList de la fiche. */}
+          <FilAriane
+            etapes={[
+              { libelle: page.nom, lien: "/realisations" },
+              { libelle: client.nom, lien: `/realisations/${client.slug}` },
+            ]}
+            ton="clair"
+          />
 
           <div
             className="nv-grid"

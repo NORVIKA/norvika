@@ -41,39 +41,11 @@ export default async function Page({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const { realisations, realisationsPage, navigation } = await obtenirContenu();
+  const { realisations, realisationsPage } = await obtenirContenu();
   const client = realisations.find((c) => c.slug === slug);
   if (!client) notFound();
 
-  // Fil d'Ariane structuré : aide Google et les moteurs IA à situer la page
-  // dans le site (Accueil > Réalisations > Client).
-  const breadcrumb = {
-    "@context": "https://schema.org",
-    "@type": "BreadcrumbList",
-    itemListElement: [
-      { "@type": "ListItem", position: 1, name: navigation.filArianeAccueil, item: "https://norvika.ca" },
-      {
-        "@type": "ListItem",
-        position: 2,
-        name: realisationsPage.surtitre,
-        item: "https://norvika.ca/realisations",
-      },
-      {
-        "@type": "ListItem",
-        position: 3,
-        name: client.nom,
-        item: `https://norvika.ca/realisations/${client.slug}`,
-      },
-    ],
-  };
-
-  return (
-    <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumb) }}
-      />
-      <Content client={client} page={realisationsPage} />
-    </>
-  );
+  // Le fil d'Ariane visible et ses données structurées (BreadcrumbList) sont produits ensemble par
+  // components/site/FilAriane.tsx, dans la fiche : ce que Google lit est ce qu'on voit.
+  return <Content client={client} page={realisationsPage} />;
 }

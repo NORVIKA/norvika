@@ -3,9 +3,10 @@
 import Link from "next/link";
 import { ContactCTA } from "@/components/site/ContactCTA";
 import { useContenuGlobal } from "@/components/site/ContenuGlobal";
+import { MentionDroits } from "@/components/site/MentionDroits";
 
-// Tout le texte vient du Studio : « Infos de l'entreprise » (logo, phrase, courriel)
-// et « Menu et pied de page » (colonnes, liens, ligne du bas).
+// Tout le texte vient du Studio : « Infos de l'entreprise » (logo, phrase, courriel, nom légal)
+// et « Menu et pied de page » (colonnes, liens, ligne du bas). L'annee du © est calculee au build.
 export function SiteFooter() {
   const { parametres, navigation } = useContenuGlobal();
   const logoStack = parametres.logoPied;
@@ -118,13 +119,17 @@ export function SiteFooter() {
               justifyContent: "space-between",
             }}
           >
-            <span>{navigation.piedDroits}</span>
-            <Link
-              href="/politique-de-confidentialite"
-              style={{ color: "rgba(12,25,47,.62)" }}
-            >
-              {navigation.piedPolitique}
-            </Link>
+            <span>
+              <MentionDroits />
+            </span>
+            <div style={{ display: "flex", flexWrap: "wrap", gap: 18 }}>
+              <Link href="/politique-de-confidentialite" className="nv-pied-lien">
+                {navigation.piedPolitique}
+              </Link>
+              <Link href="/plan-du-site" className="nv-pied-lien">
+                {navigation.piedPlanDuSite}
+              </Link>
+            </div>
           </div>
         </div>
       </footer>

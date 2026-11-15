@@ -5,6 +5,7 @@ import { useState } from "react";
 
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { useContenuGlobal } from "@/components/site/ContenuGlobal";
+import { MentionDroits } from "@/components/site/MentionDroits";
 import type { PageDiagnostic, Profil } from "@/lib/types-contenu";
 /** Remplace {cle} dans un gabarit du Studio (ex. : « Merci, {prenom}. »). */
 function remplir(gabarit: string, valeurs: Record<string, string>): string {
@@ -17,7 +18,7 @@ type Phase = "intro" | "quiz" | "result";
 // Le calcul est celui d'avant : les points de chaque réponse sont maintenant écrits dans le
 // Studio (0 à 3) au lieu d'un barème [3, 2, 1, 0] implicite dans le code.
 function Page({ page }: { page: PageDiagnostic }) {
-  const { parametres, navigation } = useContenuGlobal();
+  const { parametres } = useContenuGlobal();
   const logoStack = parametres.logoPied;
   const QS = page.questions.map((q) => ({
     t: q.question,
@@ -564,7 +565,9 @@ function Page({ page }: { page: PageDiagnostic }) {
       <footer className="nv-shell" style={{ padding: "56px 32px 40px", borderTop: "1px solid rgba(12,25,47,.08)" }}>
         <div className="nv-shell" style={{ maxWidth: 1240, margin: "0 auto", display: "flex", alignItems: "flex-end", justifyContent: "space-between", gap: 32 }}>
           <img loading="lazy" decoding="async" src={logoStack.url} alt={logoStack.alt ?? ""} style={{ height: 78, width: "auto", display: "block" }} />
-          <div style={{ fontSize: 12.5, color: "rgba(12,25,47,.45)" }}>{navigation.piedDroitsCourt}</div>
+          <div style={{ fontSize: 12.5, color: "rgba(12,25,47,.45)" }}>
+            <MentionDroits court />
+          </div>
         </div>
       </footer>
     </div>

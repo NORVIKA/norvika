@@ -18,6 +18,7 @@ import type {
   PageEquipe,
   PageFormation,
   PagePhotoVideo,
+  PagePlanDuSite,
   PageRealisations,
   PageSitesWeb,
   Parametres,
@@ -39,8 +40,9 @@ import type {
 const IMAGE = `{ "url": asset->url, "largeur": asset->metadata.dimensions.width, "hauteur": asset->metadata.dimensions.height, alt, "hotspot": hotspot{ x, y } }`;
 const URL = `asset->url`;
 const AVANT_APRES = `{ "avant": avant.${URL}, "avant2x": avant2x.${URL}, "apres": apres.${URL}, "apres2x": apres2x.${URL}, alt, adresse, legende }`;
+// `_updatedAt` : la vraie date de modification, lue par le sitemap (même requête, aucun aller-retour de plus).
 const REALISATION = `{
-  "slug": slug.current, nom, secteur, categories, siteWeb, resume, besoin, mandat, resultat,
+  _updatedAt, "slug": slug.current, nom, secteur, categories, siteWeb, resume, besoin, mandat, resultat,
   "logo": logo${IMAGE}, logoStyle, logoForme, logoEchelle, "couverture": couverture${IMAGE},
   "avantApres": avantApres${AVANT_APRES}, video
 }`;
@@ -67,18 +69,19 @@ const REQUETE = `{
     logos{ ..., "liste": realisations[]->{ nom, logoStyle, "logo": logo${IMAGE} } },
     fondateurs{ ..., "photo": photo${IMAGE} }
   },
-  "avis": *[_type == "avis" && afficher != false && !(_id in path("drafts.**"))] | order(ordre asc){ nom, contexte, signature, accroche, suite, extraitGoogle },
+  "avis": *[_type == "avis" && afficher != false && !(_id in path("drafts.**"))] | order(ordre asc){ _updatedAt, nom, contexte, signature, accroche, suite, extraitGoogle },
   "sitesWeb": *[_id == "pageSitesWeb"][0]{ ..., ${SEO} },
   "automatisation": *[_id == "pageAutomatisation"][0]{ ..., ${SEO} },
   "photoVideo": *[_id == "pagePhotoVideo"][0]{ ..., ${SEO}, tournage{ ..., "photo": photo${IMAGE} } },
   "formation": *[_id == "pageFormation"][0]{ ..., ${SEO} },
   "diagnostic": *[_id == "pageDiagnostic"][0]{ ..., ${SEO} },
   "equipe": *[_id == "pageEquipe"][0]{ ..., ${SEO}, ensemble{ ..., "photo": photo${IMAGE} } },
-  "membres": *[_type == "membre" && afficher != false && !(_id in path("drafts.**"))] | order(ordre asc){ nom, role, texte, "photo": photo${IMAGE} },
+  "membres": *[_type == "membre" && afficher != false && !(_id in path("drafts.**"))] | order(ordre asc){ _updatedAt, nom, role, texte, "photo": photo${IMAGE} },
   "realisationsPage": *[_id == "pageRealisations"][0]{ ..., ${SEO} },
   "realisations": *[_type == "realisation" && !(_id in path("drafts.**"))] | order(ordre asc)${REALISATION},
   "contact": *[_id == "pageContact"][0]{ ..., ${SEO} },
-  "bienvenue": *[_id == "pageBienvenue"][0]{ ..., ${SEO} }
+  "bienvenue": *[_id == "pageBienvenue"][0]{ ..., ${SEO} },
+  "planDuSite": *[_id == "pagePlanDuSite"][0]{ ..., ${SEO} }
 }`;
 
 type Brut = {
@@ -100,6 +103,7 @@ type Brut = {
   realisations: Realisation[];
   contact: PageContact;
   bienvenue: PageBienvenue;
+  planDuSite: PagePlanDuSite;
 };
 
 export type Contenu = Omit<Brut, "services"> & { services: ServiceResume[] };
@@ -132,8 +136,24 @@ export function obtenirContenu(): Promise<Contenu> {
   return promesse;
 }
 
-/** Ce que toutes les pages partagent (menu, pied de page, bloc de contact...). */
+/**
+ * L'année du « © » au pied de page, à l'heure du Québec : la construction tourne en UTC chez Cloudflare,
+ * et le 31 décembre à 19 h, il y serait déjà l'année suivante. Calculée au BUILD (pages statiques) :
+ * elle change à la première publication de l'année, pas à minuit.
+ */
+function anneeAuQuebec(): number {
+  return Number(new Intl.DateTimeFormat("en-CA", { timeZone: "America/Toronto", year: "numeric" }).format(new Date()));
+}
+
+/** Ce que toutes les pages partagent (menu, pied de page, bloc de contact...), lu par app/layout.tsx. */
 export async function obtenirGlobal(): Promise<ContenuGlobal> {
   const c = await obtenirContenu();
-  return { parametres: c.parametres, navigation: c.navigation, blocContact: c.blocContact, page404: c.page404, services: c.services };
+  return {
+    parametres: c.parametres,
+    navigation: c.navigation,
+    blocContact: c.blocContact,
+    page404: c.page404,
+    services: c.services,
+    annee: anneeAuQuebec(),
+  };
 }

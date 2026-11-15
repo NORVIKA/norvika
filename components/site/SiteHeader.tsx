@@ -4,10 +4,14 @@ import Link from "next/link";
 
 import { useState } from "react";
 import { useContenuGlobal } from "@/components/site/ContenuGlobal";
+import { LienTelephone } from "@/components/site/LienTelephone";
 
 // Lockup horizontal de la marque (l'icone et le mot NORVIKA cote a cote), en SVG :
 // net a toutes les tailles. Le logo, les liens et le bouton viennent du Studio
 // (« Infos de l'entreprise » et « Menu et pied de page »).
+// Telephone (document de reference vitrine, phase 3) : a gauche du bouton sur ordinateur,
+// dans le menu deroulant sur telephone et tablette, ou la barre n'a de place que pour le
+// logo et le bouton du menu (components/site/LienTelephone.tsx).
 export function SiteHeader() {
   const [open, setOpen] = useState(false);
   const { parametres, navigation } = useContenuGlobal();
@@ -60,18 +64,23 @@ export function SiteHeader() {
             </Link>
           ))}
         </nav>
-        <a
-          href={LIEN_RDV}
-          className="nv-btn-primary nv-header-cta"
-          style={{
-            padding: "11px 20px",
-            borderRadius: 8,
-            fontSize: 13.5,
-            fontWeight: 600,
-          }}
-         target="_blank" rel="noopener noreferrer">
-          {navigation.boutonRendezVous}
-        </a>
+        <div className="nv-header-actions">
+          <LienTelephone variante="entete" />
+          <a
+            href={LIEN_RDV}
+            className="nv-btn-primary nv-header-cta"
+            style={{
+              padding: "11px 20px",
+              borderRadius: 8,
+              fontSize: 13.5,
+              fontWeight: 600,
+            }}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            {navigation.boutonRendezVous}
+          </a>
+        </div>
         <button
           type="button"
           className="nv-burger"
@@ -133,6 +142,7 @@ export function SiteHeader() {
               {l.label}
             </Link>
           ))}
+          <LienTelephone variante="panneau" onClick={() => setOpen(false)} />
           <a
             href={LIEN_RDV}
             onClick={() => setOpen(false)}

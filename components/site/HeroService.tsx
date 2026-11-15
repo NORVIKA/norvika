@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useContenuGlobal } from "@/components/site/ContenuGlobal";
+import { FilAriane } from "@/components/site/FilAriane";
 
 /**
  * Entete des pages de service, VOLONTAIREMENT differente de celle de l'accueil.
@@ -15,19 +16,24 @@ import { useContenuGlobal } from "@/components/site/ContenuGlobal";
  * - FOND SOMBRE. La rupture est immediate : on a change d'endroit.
  * - ALIGNE A GAUCHE, sur deux colonnes. L'accueil est centre ; l'oeil voit tout
  *   de suite que ce n'est pas la meme page.
- * - FIL D'ARIANE cliquable. On sait ou on est, et on peut remonter.
+ * - FIL D'ARIANE cliquable. On sait ou on est, et on peut remonter. Composant
+ *   partage avec les fiches des realisations (components/site/FilAriane.tsx).
+ * - PAS DE SUR-TITRE au-dessus du titre (regle d'agence 1, 2026-11-15) : le nom du
+ *   service y etait ecrit une troisieme fois, apres le fil d'Ariane juste au-dessus
+ *   et avant l'onglet actif juste en dessous.
  * - LES SERVICES VOISINS en pied d'entete. La navigation entre services se fait
  *   sans repasser par le menu, ce qui est justement le parcours qu'on veut.
  */
 
 export function HeroService({
-  eyebrow,
+  nom,
   titre,
   texte,
   courante,
   lienExtra,
 }: {
-  eyebrow: string;
+  /** Nom court du service : derniere etape du fil d'Ariane. */
+  nom: string;
   titre: string;
   texte: string;
   /** Chemin de la page, pour marquer le service actif et le fil d'Ariane. */
@@ -127,15 +133,7 @@ export function HeroService({
         className="nv-shell nv-hero-fil"
         style={{ position: "relative", maxWidth: 1240, margin: "0 auto", padding: "26px 32px 0" }}
       >
-        <nav aria-label="Fil d'Ariane" style={{ fontSize: 13 }}>
-          <Link href="/" style={{ color: "rgba(245,243,238,.8)" }}>
-            {navigation.filArianeAccueil}
-          </Link>
-          <span aria-hidden="true" style={{ color: "rgba(245,243,238,.34)", padding: "0 8px" }}>
-            ›
-          </span>
-          <span style={{ color: "#F5F3EE" }}>{eyebrow}</span>
-        </nav>
+        <FilAriane etapes={[{ libelle: nom, lien: courante }]} ton="sombre" />
       </div>
 
       <div
@@ -152,18 +150,6 @@ export function HeroService({
         }}
       >
         <div>
-          <p
-            style={{
-              margin: "0 0 16px",
-              fontSize: 11.5,
-              letterSpacing: ".2em",
-              textTransform: "uppercase",
-              color: "rgba(245,243,238,.78)",
-              fontWeight: 600,
-            }}
-          >
-            {eyebrow}
-          </p>
           <h1
             style={{
               margin: 0,

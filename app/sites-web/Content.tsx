@@ -53,7 +53,7 @@ function Page({ page }: { page: PageSitesWeb }) {
       <SiteHeader />
 
       <HeroService
-        eyebrow={page.nom}
+        nom={page.nom}
         titre={page.h1}
         texte={page.heroTexte}
         courante="/sites-web"

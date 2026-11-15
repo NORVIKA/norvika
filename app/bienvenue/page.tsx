@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { SiteShell } from "@/components/site/SiteShell";
 import { Reveal } from "@/components/ui/Reveal";
 import { obtenirContenu } from "@/lib/contenu";
+import { lienTelephone } from "@/lib/telephone";
 import { visible } from "@/lib/types-contenu";
 import { LeadForm } from "./LeadForm";
 
@@ -131,7 +132,7 @@ export default async function BienvenuePage() {
               </li>
               <li>
                 {t.contact.libelleTelephone}{" "}
-                <a href={`tel:+1${parametres.telephone.replace(/\D/g, "")}`} className="underline underline-offset-4">
+                <a href={lienTelephone(parametres.telephone)} className="underline underline-offset-4">
                   {parametres.telephone}
                 </a>
               </li>

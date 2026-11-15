@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { Sora, DM_Sans } from "next/font/google";
 import "./globals.css";
 import { FournisseurContenu } from "@/components/site/ContenuGlobal";
-import { obtenirContenu } from "@/lib/contenu";
+import { obtenirContenu, obtenirGlobal } from "@/lib/contenu";
 
 // Le design n'utilise Sora qu'en 600 (titres) et DM Sans qu'en 400/500/600.
 // Charger les autres graisses, c'est du poids de police pour rien.
@@ -86,13 +86,7 @@ export default async function RootLayout({
 }) {
   const contenu = await obtenirContenu();
   const { parametres } = contenu;
-  const global = {
-    parametres,
-    navigation: contenu.navigation,
-    blocContact: contenu.blocContact,
-    page404: contenu.page404,
-    services: contenu.services,
-  };
+  const global = await obtenirGlobal();
 
   return (
     <html lang="fr" className={`${sora.variable} ${dmSans.variable}`}>

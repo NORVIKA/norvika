@@ -492,3 +492,135 @@
    de place que lorsque Cloudflare affiche la case : `data-visible` suit sa hauteur réelle. */
 .zone-turnstile { width: 100%; line-height: 0; }
 .zone-turnstile[data-visible] { margin-top: 18px; }
+
+/* ===== Fil d'Ariane, declare une seule fois (components/site/FilAriane.tsx) =====
+   Deux tons : sombre (entete des pages de service) et clair (fiches des realisations).
+   Le survol ne vise que les liens (regle 10), et seulement avec une souris. */
+.nv-fil ol {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-size: 13px;
+  line-height: 1.5;
+}
+.nv-fil li { display: flex; align-items: center; min-width: 0; }
+.nv-fil a {
+  display: inline-block;
+  padding: 4px 0;
+  color: var(--fil-lien);
+  text-decoration-line: underline;
+  text-decoration-color: transparent;
+  text-underline-offset: 3px;
+  transition: color .2s, text-decoration-color .2s;
+}
+.nv-fil [aria-current="page"] { color: var(--fil-courant); }
+.nv-fil-sep { padding: 0 8px; color: var(--fil-sep); }
+.nv-fil-sombre { --fil-lien: rgba(245,243,238,.8); --fil-courant: #F5F3EE; --fil-sep: rgba(245,243,238,.34); }
+.nv-fil-clair { --fil-lien: rgba(12,25,47,.66); --fil-courant: var(--navy); --fil-sep: rgba(12,25,47,.3); }
+.nv-fil-sombre a:focus-visible { outline-color: #F5F3EE; }
+/* Au doigt, une cible de 40 px au lieu de 28 (WCAG 2.5.8 demande 24, on vise le confort). */
+@media (pointer: coarse) {
+  .nv-fil a { padding: 10px 0; }
+}
+@media (hover: hover) {
+  .nv-fil a:hover { color: var(--fil-courant); text-decoration-color: currentColor; }
+}
+
+/* ===== Telephone de la barre du haut (components/site/LienTelephone.tsx) =====
+   Ordinateur : a gauche du bouton de rendez-vous. Telephone et tablette (barre trop
+   etroite) : dans le menu deroulant, sous les liens.
+   ⚠️ Mesure du 2026-11-15 : logo + six liens + numero + bouton demandent environ 1170 px.
+   Entre 1025 et 1199 px, le numero faisait passer les liens et le bouton sur deux lignes
+   (barre de 59 a 80 px). Il n'apparait donc qu'a partir de 1200 px ; en dessous de 1025 px,
+   il est dans le menu deroulant. */
+.nv-header-actions { display: flex; align-items: center; gap: 22px; }
+.nv-tel {
+  color: var(--navy);
+  font-weight: 600;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+  text-decoration-line: underline;
+  text-decoration-color: transparent;
+  text-underline-offset: 4px;
+  text-decoration-thickness: 1.5px;
+  transition: color .2s, text-decoration-color .2s;
+}
+.nv-tel-entete { padding: 10px 2px; font-size: 14px; }
+.nv-tel-panneau { padding: 12px 4px; font-size: 16px; }
+@media (hover: hover) {
+  .nv-tel:hover { color: var(--navy-500); text-decoration-color: currentColor; }
+}
+@media (max-width: 1199px) {
+  .nv-tel-entete { display: none !important; }
+}
+
+/* ===== Liens du bas du pied de page (politique, plan du site) ===== */
+.nv-pied-lien {
+  color: rgba(12,25,47,.62);
+  text-decoration-line: underline;
+  text-decoration-color: transparent;
+  text-underline-offset: 3px;
+  transition: color .2s, text-decoration-color .2s;
+}
+@media (hover: hover) {
+  .nv-pied-lien:hover { color: var(--navy); text-decoration-color: currentColor; }
+}
+
+/* ===== Plan du site (app/plan-du-site/page.tsx) =====
+   Pas de .nv-shell ici : sa regle `section > .nv-shell` impose 64 px en !important sous
+   1024 px. Le cadre gere ses propres marges.
+   Telephone : les pages passent en DEUX colonnes de noms (sans leur description) au lieu
+   d'empiler dix blocs de texte (regle d'agence 6) ; chaque nom garde 44 px de cible au doigt. */
+.nv-plan-cadre { max-width: 1000px; margin: 0 auto; padding-left: 32px; padding-right: 32px; }
+.nv-plan-entete { background: var(--brand-soft); border-bottom: 1px solid rgba(12,25,47,.1); }
+.nv-plan-entete .nv-plan-cadre { padding-top: 64px; padding-bottom: 48px; }
+.nv-plan-entete h1 {
+  margin: 0;
+  font-size: clamp(32px, 4vw, 52px);
+  line-height: 1.06;
+  letter-spacing: -.035em;
+  text-wrap: balance;
+}
+.nv-plan-entete p { margin: 18px 0 0; max-width: 60ch; font-size: 17px; line-height: 1.62; color: rgba(12,25,47,.68); }
+.nv-plan-corps { display: grid; gap: 56px; padding-top: 56px; padding-bottom: 88px; }
+.nv-plan-corps h2 { margin: 0 0 20px; font-size: clamp(22px, 2.4vw, 28px); line-height: 1.15; letter-spacing: -.025em; }
+.nv-plan-pages, .nv-plan-fiches { display: grid; margin: 0; padding: 0; list-style: none; }
+.nv-plan-pages { grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: 48px; row-gap: 22px; }
+.nv-plan-pages p { margin: 4px 0 0; max-width: 52ch; font-size: 15px; line-height: 1.6; color: rgba(12,25,47,.66); text-wrap: pretty; }
+.nv-plan-fiches { grid-template-columns: repeat(4, minmax(0, 1fr)); column-gap: 32px; row-gap: 2px; }
+.nv-plan-lien {
+  display: inline-block;
+  padding: 6px 0;
+  font-size: 17px;
+  font-weight: 600;
+  color: var(--navy);
+  text-decoration-line: underline;
+  text-decoration-color: transparent;
+  text-underline-offset: 4px;
+  text-decoration-thickness: 1.5px;
+  transition: color .2s, text-decoration-color .2s;
+}
+.nv-plan-fiches .nv-plan-lien { font-size: 15.5px; font-weight: 500; }
+@media (hover: hover) {
+  .nv-plan-lien:hover { color: var(--navy-500); text-decoration-color: currentColor; }
+}
+@media (max-width: 1024px) {
+  .nv-plan-cadre { padding-left: 24px; padding-right: 24px; }
+}
+@media (max-width: 1000px) {
+  .nv-plan-fiches { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+@media (max-width: 680px) {
+  .nv-plan-cadre { padding-left: 18px; padding-right: 18px; }
+}
+@media (max-width: 640px) {
+  .nv-plan-entete .nv-plan-cadre { padding-top: 40px; padding-bottom: 30px; }
+  .nv-plan-corps { gap: 36px; padding-top: 32px; padding-bottom: 56px; }
+  .nv-plan-corps h2 { margin-bottom: 8px; }
+  .nv-plan-pages, .nv-plan-fiches { grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: 16px; row-gap: 0; }
+  .nv-plan-pages p { display: none; }
+  .nv-plan-lien, .nv-plan-fiches .nv-plan-lien { padding: 11px 0; font-size: 15.5px; line-height: 22px; }
+}

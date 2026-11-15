@@ -3,6 +3,7 @@ import { SiteShell } from "@/components/site/SiteShell";
 import { Reveal } from "@/components/ui/Reveal";
 import { obtenirContenu } from "@/lib/contenu";
 import { metaPage } from "@/lib/meta";
+import { lienTelephone } from "@/lib/telephone";
 import { ContactForm } from "./ContactForm";
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -56,7 +57,7 @@ export default async function ContactPage() {
                     {t.libelleTelephone}
                   </dt>
                   <dd className="mt-1">
-                    <a href={`tel:${telephone.replace(/\s/g, "")}`} className="text-base font-medium text-[var(--foreground)] hover:text-[var(--brand)] hover:underline">
+                    <a href={lienTelephone(telephone)} className="text-base font-medium text-[var(--foreground)] hover:text-[var(--brand)] hover:underline">
                       {telephone}
                     </a>
                   </dd>

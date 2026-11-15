@@ -37,7 +37,7 @@ function Page({ page }: { page: PageAutomatisation }) {
       <SiteHeader />
 
       <HeroService
-        eyebrow={page.nom}
+        nom={page.nom}
         titre={page.h1}
         texte={page.heroTexte}
         courante="/automatisation"

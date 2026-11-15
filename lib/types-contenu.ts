@@ -23,6 +23,9 @@ export type Seo = {
   partageImage?: Image | null;
 };
 
+/** Un document de page : ses champs Google, et sa date de dernière modification (sitemap). */
+export type DocumentPage = Seo & { _updatedAt: string };
+
 export type SectionListe = { afficher?: boolean | null; titre: string; phrases: string[] };
 export type SectionCartes = { afficher?: boolean | null; titre: string; cartes: Carte[] };
 export type SectionEtapes = { afficher?: boolean | null; titre: string; etapes: Etape[] };
@@ -31,6 +34,8 @@ export type SectionEtapes = { afficher?: boolean | null; titre: string; etapes: 
 
 export type Parametres = {
   nom: string;
+  /** Affiché après le © du pied de page. */
+  nomLegal: string;
   description: string;
   courriel: string;
   telephone: string;
@@ -52,15 +57,21 @@ export type Navigation = {
   liensMenu: Lien[];
   boutonRendezVous: string;
   boutonQuiz: string;
+  /** Premier lien du fil d'Ariane, et nom de l'accueil dans le plan du site. */
   filArianeAccueil: string;
+  /** Nom du fil d'Ariane annoncé par les lecteurs d'écran. */
+  filArianeLibelle: string;
+  /** Lu avant le numéro de la barre du haut par les lecteurs d'écran (« Appeler Norvika au »). */
+  enteteTelephone: string;
   basculeAvant: string;
   basculeApres: string;
   piedTitreServices: string;
   piedTitreContact: string;
   piedLiensContact: Lien[];
-  piedDroits: string;
-  piedDroitsCourt: string;
+  /** Après « © année nom légal », en bas du pied de page (facultatif). */
+  piedMention?: string | null;
   piedPolitique: string;
+  piedPlanDuSite: string;
   suiteTitre: string;
   suitePages: (Carte & { lien: string })[];
 };
@@ -100,6 +111,8 @@ export type ContenuGlobal = {
   blocContact: BlocContact;
   page404: Page404;
   services: ServiceResume[];
+  /** L'année du © au pied de page, calculée au moment de la construction (heure du Québec). */
+  annee: number;
 };
 
 /* ---------------------------------------------------------------- réalisations */
@@ -117,6 +130,7 @@ export type AvantApres = {
 };
 
 export type Realisation = {
+  _updatedAt: string;
   slug: string;
   nom: string;
   secteur: string;
@@ -137,7 +151,7 @@ export type Realisation = {
 
 /* ---------------------------------------------------------------- pages */
 
-export type PageService = Seo & {
+export type PageService = DocumentPage & {
   nom: string;
   schemaNom: string;
   schemaType: string;
@@ -168,9 +182,9 @@ export type PageFormation = PageService & {
   differemment: SectionCartes;
 };
 
-export type Avis = { nom: string; contexte: string; signature: string; accroche: string; suite: string[] | null; extraitGoogle?: string | null };
+export type Avis = { _updatedAt: string; nom: string; contexte: string; signature: string; accroche: string; suite: string[] | null; extraitGoogle?: string | null };
 
-export type PageAccueil = Seo & {
+export type PageAccueil = DocumentPage & {
   h1: string;
   heroTexte: string;
   heroBoutonSecondaire: string;
@@ -187,7 +201,8 @@ export type PageAccueil = Seo & {
 type Reponse = { libelle: string; miroir: string; points: number };
 export type Profil = { titre: string; miroir: string; bonneNouvelle: string; suite: string; volet: string; lien: string };
 
-export type PageDiagnostic = Seo & {
+export type PageDiagnostic = DocumentPage & {
+  nom: string;
   h1: string;
   intro: string;
   boutonDebut: string;
@@ -220,9 +235,10 @@ export type PageDiagnostic = Seo & {
   boutonRefaire: string;
 };
 
-export type Membre = { nom: string; role: string; photo?: Image | null; texte: string };
+export type Membre = { _updatedAt: string; nom: string; role: string; photo?: Image | null; texte: string };
 
-export type PageEquipe = Seo & {
+export type PageEquipe = DocumentPage & {
+  nom: string;
   h1: string;
   intro: string;
   origine: { afficher?: boolean | null; titre: string; texte: string[] };
@@ -232,7 +248,8 @@ export type PageEquipe = Seo & {
   conclusion: { afficher?: boolean | null; titre: string; texte: string };
 };
 
-export type PageRealisations = Seo & {
+export type PageRealisations = DocumentPage & {
+  nom: string;
   surtitre: string;
   h1: string;
   h1Accent: string;
@@ -241,7 +258,6 @@ export type PageRealisations = Seo & {
   categories: { siteWeb: string; photoVideo: string; automatisation: string; formation: string };
   aucun: string;
   portfolio: { afficher?: boolean | null; titre: string; bouton: string };
-  ficheRetour: string;
   ficheSite: string;
   ficheBesoinSurtitre: string;
   ficheBesoinTitre: string;
@@ -254,7 +270,8 @@ export type PageRealisations = Seo & {
   ficheOnglet: string;
 };
 
-export type PageContact = Seo & {
+export type PageContact = DocumentPage & {
+  nom: string;
   h1: string;
   intro: string;
   libelleCourriel: string;
@@ -271,7 +288,14 @@ export type PageContact = Seo & {
   merciTexte: string;
 };
 
-export type PageBienvenue = Seo & {
+export type PagePlanDuSite = DocumentPage & {
+  h1: string;
+  intro: string;
+  titrePages: string;
+  titreRealisations: string;
+};
+
+export type PageBienvenue = DocumentPage & {
   h1: string;
   intro: string;
   formTitre: string;

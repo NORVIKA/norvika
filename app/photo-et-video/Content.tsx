@@ -70,7 +70,7 @@ function Page({ page }: { page: PagePhotoVideo }) {
       <SiteHeader />
 
       <HeroService
-        eyebrow={page.nom}
+        nom={page.nom}
         titre={page.h1}
         texte={page.heroTexte}
         courante="/photo-et-video"
