@@ -2,6 +2,7 @@ import "server-only";
 import { cache } from "react";
 
 import { clientSanity } from "./sanity";
+import { typographier } from "./typographie";
 import type {
   Avis,
   BlocContact,
@@ -104,7 +105,8 @@ type Brut = {
 export type Contenu = Omit<Brut, "services"> & { services: ServiceResume[] };
 
 async function lire(): Promise<Contenu> {
-  const brut = await clientSanity.fetch<Brut>(REQUETE);
+  // Apostrophes typographiques à l'affichage (lib/typographie.ts), avant tout le reste.
+  const brut = typographier(await clientSanity.fetch<Brut>(REQUETE));
   const manquants = (Object.keys(brut) as (keyof Brut)[]).filter((cle) => brut[cle] == null);
   if (manquants.length) {
     throw new Error(`Sanity (k99pdqd1) : document(s) introuvable(s) : ${manquants.join(", ")}. Lancer le semis (studio/scripts/semer.ts).`);
