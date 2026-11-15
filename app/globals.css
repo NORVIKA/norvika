@@ -486,3 +486,9 @@
 @media (max-width: 620px) {
   .nv-bascule-url { display: none !important; }
 }
+
+/* Anti-robot (Turnstile), déclaré une seule fois pour les trois formulaires.
+   La zone occupe toute la largeur (sa largeur choisit le format de la case) et ne prend
+   de place que lorsque Cloudflare affiche la case : `data-visible` suit sa hauteur réelle. */
+.zone-turnstile { width: 100%; line-height: 0; }
+.zone-turnstile[data-visible] { margin-top: 18px; }

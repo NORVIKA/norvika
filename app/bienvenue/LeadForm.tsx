@@ -1,7 +1,9 @@
 "use client";
 
 import { useState, type FormEvent } from "react";
+import { AntiRobot, MESSAGE_JETON_ABSENT, lireJetonAntiRobot, reinitialiserAntiRobot } from "@/components/site/AntiRobot";
 import { MentionCollecte } from "@/components/site/MentionCollecte";
+import { CHAMP_JETON } from "@/lib/anti-robot-commun";
 
 export function LeadForm() {
   const [prenom, setPrenom] = useState("");
@@ -14,6 +16,8 @@ export function LeadForm() {
   async function onSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setErreur(null);
+    const formulaire = e.currentTarget;
+    const jeton = lireJetonAntiRobot(formulaire);
 
     if (!prenom.trim() || !courriel.trim() || !telephone.trim()) {
       setErreur("Tous les champs sont requis.");
@@ -21,6 +25,10 @@ export function LeadForm() {
     }
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(courriel)) {
       setErreur("Courriel invalide.");
+      return;
+    }
+    if (!jeton) {
+      setErreur(MESSAGE_JETON_ABSENT);
       return;
     }
 
@@ -36,6 +44,7 @@ export function LeadForm() {
           prenom: prenom.trim(),
           courriel: courriel.trim(),
           telephone: telephone.trim(),
+          [CHAMP_JETON]: jeton,
         }),
       });
       if (!res.ok) {
@@ -49,6 +58,7 @@ export function LeadForm() {
         "Une erreur est survenue. Veuillez réessayer ou nous écrire à info@norvika.ca.";
     }
     setEnvoi(false);
+    reinitialiserAntiRobot(formulaire);
 
     if (messageErreur) {
       setErreur(messageErreur);
@@ -109,6 +119,7 @@ export function LeadForm() {
           />
         </label>
       </div>
+      <AntiRobot />
       {erreur && <p className="mt-4 text-sm text-[var(--destructive)]">{erreur}</p>}
       <div className="mt-6 flex flex-col items-start gap-3 sm:flex-row sm:items-center sm:justify-between">
         <button

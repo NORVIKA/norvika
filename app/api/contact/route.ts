@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { supabaseService, verifierDebit } from "@/lib/rate-limit";
+import { CHAMP_JETON, verifierAntiRobot } from "@/lib/anti-robot";
 import { champTexte, ligneSimpleValide, lireCorpsJson, nettoyerObjet, texteLongValide } from "@/lib/garde-formulaire";
 
 const TO_EMAIL = "info@norvika.ca";
@@ -51,6 +52,13 @@ export async function POST(req: Request) {
   }
 
   // Limitation de débit : 3 soumissions par IP par heure.
+  // Anti-robot (Turnstile) AVANT la limite de débit, l'écriture et le courriel :
+  // un robot ne doit ni consommer le quota d'une IP, ni écrire dans la base.
+  const antiRobot = await verifierAntiRobot(req, champTexte(corps.donnees, CHAMP_JETON));
+  if (!antiRobot.ok) {
+    return NextResponse.json({ error: antiRobot.erreur }, { status: antiRobot.statut });
+  }
+
   const debit = await verifierDebit(req, "contact");
   if (!debit.permis) {
     return NextResponse.json({ error: debit.raison }, { status: 429 });

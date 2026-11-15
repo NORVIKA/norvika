@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { supabaseService, verifierDebit } from "@/lib/rate-limit";
+import { CHAMP_JETON, verifierAntiRobot } from "@/lib/anti-robot";
 import { champTexte, ligneSimpleValide, lireCorpsJson } from "@/lib/garde-formulaire";
 
 /**
@@ -40,6 +41,13 @@ export async function POST(req: Request) {
   }
   if (![prenom, courriel, telephone].every(ligneSimpleValide)) {
     return NextResponse.json({ error: "Un des champs contient des caractères non permis." }, { status: 400 });
+  }
+
+  // Anti-robot (Turnstile) AVANT la limite de débit, l'écriture et le courriel :
+  // un robot ne doit ni consommer le quota d'une IP, ni écrire dans la base.
+  const antiRobot = await verifierAntiRobot(req, champTexte(corps.donnees, CHAMP_JETON));
+  if (!antiRobot.ok) {
+    return NextResponse.json({ error: antiRobot.erreur }, { status: antiRobot.statut });
   }
 
   const debit = await verifierDebit(req, "lead");

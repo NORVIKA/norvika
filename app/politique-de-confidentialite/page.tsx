@@ -14,7 +14,7 @@ export default function PolitiquePage() {
         <h1 className="text-3xl font-semibold leading-tight tracking-tight text-[var(--foreground)] md:text-4xl">
           Politique de confidentialité
         </h1>
-        <p className="mt-4 text-sm text-[var(--muted-foreground)]">Dernière mise à jour : 15 août 2026</p>
+        <p className="mt-4 text-sm text-[var(--muted-foreground)]">Dernière mise à jour : 14 novembre 2026</p>
 
         <div className="prose prose-sm mt-10 max-w-none text-[var(--foreground)]">
           <h2 className="mt-8 text-xl font-semibold">1. Qui sommes-nous</h2>
@@ -138,6 +138,13 @@ export default function PolitiquePage() {
             <li>
               <strong className="text-[var(--foreground)]">Cloudflare</strong> : hébergement et
               diffusion du site
+            </li>
+            <li>
+              <strong className="text-[var(--foreground)]">Cloudflare Turnstile</strong> : vérification
+              anti-robot des formulaires. Pendant que vous remplissez un formulaire, votre navigateur
+              transmet à Cloudflare des signaux techniques (adresse IP, type de navigateur et
+              d&apos;appareil, comportement de la page) qui servent uniquement à distinguer une
+              personne d&apos;un robot. Turnstile ne dépose aucun témoin publicitaire ni de suivi.
             </li>
             <li>
               <strong className="text-[var(--foreground)]">Google (Analytics 4)</strong> : mesure

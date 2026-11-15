@@ -1,7 +1,9 @@
 "use client";
 
 import { useState, type FormEvent } from "react";
+import { AntiRobot, MESSAGE_JETON_ABSENT, lireJetonAntiRobot, reinitialiserAntiRobot } from "@/components/site/AntiRobot";
 import { MentionCollecte } from "@/components/site/MentionCollecte";
+import { CHAMP_JETON } from "@/lib/anti-robot-commun";
 
 export function ContactForm({ email }: { email: string }) {
   const [nom, setNom] = useState("");
@@ -15,6 +17,8 @@ export function ContactForm({ email }: { email: string }) {
   async function onSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setErreur(null);
+    const formulaire = e.currentTarget;
+    const jeton = lireJetonAntiRobot(formulaire);
 
     if (!nom.trim() || !courriel.trim() || !message.trim()) {
       setErreur("Le nom, le courriel et le message sont requis.");
@@ -24,14 +28,24 @@ export function ContactForm({ email }: { email: string }) {
       setErreur("Courriel invalide.");
       return;
     }
+    if (!jeton) {
+      setErreur(MESSAGE_JETON_ABSENT);
+      return;
+    }
 
     setEnvoi(true);
     const res = await fetch("/api/contact", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ nom, courriel, telephone, message }),
-    });
+      body: JSON.stringify({ nom, courriel, telephone, message, [CHAMP_JETON]: jeton }),
+    }).catch(() => null);
     setEnvoi(false);
+    reinitialiserAntiRobot(formulaire);
+
+    if (!res) {
+      setErreur(`Une erreur est survenue. Réessayez ou écrivez-nous à ${email}.`);
+      return;
+    }
 
     if (!res.ok) {
       // Le serveur explique lui-même le refus (champ invalide, ou trop de
@@ -106,6 +120,7 @@ export function ContactForm({ email }: { email: string }) {
           className="mt-2 block w-full rounded-md border border-[var(--hairline)] bg-[var(--background)] px-3 py-2.5 text-sm text-[var(--foreground)] outline-none focus:border-[var(--primary)]"
         />
       </label>
+      <AntiRobot />
       {erreur && <p className="mt-4 text-sm text-[var(--destructive)]">{erreur}</p>}
       <div className="mt-6 flex flex-col items-start gap-3 sm:flex-row sm:items-center sm:justify-between">
         <button

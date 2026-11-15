@@ -1,7 +1,9 @@
 "use client";
 
 import { useState, type FormEvent } from "react";
+import { AntiRobot, MESSAGE_JETON_ABSENT, lireJetonAntiRobot, reinitialiserAntiRobot } from "@/components/site/AntiRobot";
 import { MentionCollecte } from "@/components/site/MentionCollecte";
+import { CHAMP_JETON } from "@/lib/anti-robot-commun";
 import { LIEN_RDV } from "@/lib/liens";
 
 /**
@@ -49,6 +51,8 @@ export function ContactCTA() {
   async function onSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setErreur(null);
+    const formulaire = e.currentTarget;
+    const jeton = lireJetonAntiRobot(formulaire);
     if (!nom.trim() || !courriel.trim() || !message.trim()) {
       setErreur("Votre nom, votre courriel et un mot suffisent.");
       return;
@@ -57,13 +61,18 @@ export function ContactCTA() {
       setErreur("Ce courriel ne semble pas valide.");
       return;
     }
+    if (!jeton) {
+      setErreur(MESSAGE_JETON_ABSENT);
+      return;
+    }
     setEnvoi(true);
     try {
       const res = await fetch("/api/contact", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ nom, courriel, message }),
+        body: JSON.stringify({ nom, courriel, message, [CHAMP_JETON]: jeton }),
       });
+      reinitialiserAntiRobot(formulaire);
       if (!res.ok) {
         const data = (await res.json().catch(() => null)) as { error?: string } | null;
         setErreur(
@@ -74,6 +83,7 @@ export function ContactCTA() {
         return;
       }
     } catch {
+      reinitialiserAntiRobot(formulaire);
       setErreur("Une erreur est survenue. Écrivez-nous à info@norvika.ca.");
       setEnvoi(false);
       return;
@@ -222,6 +232,7 @@ export function ContactCTA() {
                 style={{ ...champ, resize: "vertical", minHeight: 84 }}
               />
             </label>
+            <AntiRobot theme="dark" />
             {erreur && (
               <p role="alert" style={{ margin: "12px 0 0", fontSize: 14, color: "#ffd7cf" }}>
                 {erreur}
