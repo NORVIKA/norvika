@@ -24,8 +24,8 @@ function Index({ page, avisListe }: { page: PageAccueil; avisListe: Avis[] }) {
   useReveal();
   const { parametres, navigation, services } = useContenuGlobal();
   const LIEN_RDV = parametres.lienRendezVous;
-  const SERVICES = services.map((s, i) => ({
-    num: String(i + 1).padStart(2, "0"),
+  // Pas de numéro 01, 02, 03 : les services sont parallèles, pas une suite (règle 3 de William).
+  const SERVICES = services.map((s) => ({
     title: s.nom,
     to: s.chemin,
     lead: s.accroche,
@@ -506,28 +506,19 @@ function Index({ page, avisListe }: { page: PageAccueil; avisListe: Avis[] }) {
                 de la ligne passent au-dessus de cette zone. */}
             {SERVICES.map((s, i) => (
               <div
-                key={s.num}
+                key={s.to}
                 data-reveal
                 className="nv-row nv-grid"
                 style={{
                   padding: "32px 24px",
                   display: "grid",
-                  gridTemplateColumns: "80px 1fr 1.1fr 120px",
+                  gridTemplateColumns: "1fr 1.1fr 120px",
                   gap: 24,
                   alignItems: "start",
                   borderTop:
                     i === 0 ? undefined : "1px solid rgba(12,25,47,.08)",
                 }}
               >
-                <span
-                  style={{
-                    fontFamily: "var(--font-display)",
-                    fontSize: 13,
-                    color: "rgba(12,25,47,.35)",
-                  }}
-                >
-                  {s.num}
-                </span>
                 <h3 style={{ margin: 0, fontSize: 26, letterSpacing: "-.02em" }}>
                   <Link href={s.to} className="nv-lien">
                     {s.title}
