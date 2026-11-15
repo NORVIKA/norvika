@@ -19,11 +19,9 @@ export default async function AdminDashboard() {
     { label: "Leads clients", value: leadsCount ?? 0, href: "/admin/leads", cta: "Voir les leads" },
   ];
 
-  const links = [
-    { href: "/admin/textes", label: "Modifier les textes" },
-    { href: "/admin/couleurs", label: "Modifier les couleurs" },
-    { href: "/admin/infos", label: "Modifier les informations" },
-  ];
+  // Le contenu du site (textes, images, infos) se modifie dans le Studio Sanity depuis la
+  // phase 4 (2026-11-14). Les anciens éditeurs Supabase de /admin sont retirés.
+  const links = [{ href: "https://norvika.sanity.studio", label: "Modifier le contenu du site (Studio Sanity)" }];
 
   return (
     <div className="max-w-3xl">
@@ -47,9 +45,9 @@ export default async function AdminDashboard() {
         <ul className="mt-4 space-y-2">
           {links.map((l) => (
             <li key={l.href}>
-              <Link href={l.href} className="text-sm text-[var(--brand)] hover:underline">
+              <a href={l.href} target="_blank" rel="noopener noreferrer" className="text-sm text-[var(--brand)] hover:underline">
                 {l.label}
-              </Link>
+              </a>
             </li>
           ))}
         </ul>

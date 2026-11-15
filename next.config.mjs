@@ -10,6 +10,8 @@ const nextConfig = {
   poweredByHeader: false,
   images: {
     remotePatterns: [
+      // Images du Studio Sanity (projet k99pdqd1), servies par son CDN.
+      { protocol: "https", hostname: "cdn.sanity.io" },
       { protocol: "https", hostname: "norvika.ca" },
       { protocol: "https", hostname: "**.supabase.co" },
       { protocol: "https", hostname: "placehold.co" },

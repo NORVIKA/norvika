@@ -4,10 +4,6 @@ import { AdminLogoutButton } from "./AdminLogoutButton";
 
 const NAV = [
   { href: "/admin", label: "Tableau de bord" },
-  { href: "/admin/textes", label: "Mes textes" },
-  { href: "/admin/images", label: "Mes images" },
-  { href: "/admin/couleurs", label: "Mes couleurs" },
-  { href: "/admin/infos", label: "Mes informations" },
   { href: "/admin/messages", label: "Messages reçus" },
   { href: "/admin/leads", label: "Leads clients" },
 ];
