@@ -10,6 +10,6 @@ export default defineCliConfig({
   api: { projectId: 'k99pdqd1', dataset: 'production' },
   studioHost: 'norvika',
   // Aucune mise à jour automatique du Studio hébergé : la version est celle du package.json,
-  // testée ici avant le déploiement. (appId à ajouter après le premier `sanity deploy`.)
-  deployment: { autoUpdates: false },
+  // testée ici avant le déploiement. appId : premier `sanity deploy`, 2026-11-14.
+  deployment: { autoUpdates: false, appId: 'q1cr9znyhi2qz6l1tt90abv6' },
 })
