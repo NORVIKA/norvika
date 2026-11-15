@@ -13,11 +13,11 @@
     "domaine": ""
   },
   "statut": "en_ligne",
-  "phase_active": "8",
+  "phase_active": "4",
   "liens": {
     "maquette_lovable": "https://norvika.lovable.app",
     "url_prod": "https://norvika.ca",
-    "url_studio": "",
+    "url_studio": "https://norvika.sanity.studio (pas encore déployé)",
     "github": "https://github.com/NORVIKA/norvika (branche next16-migration)"
   },
   "dates": {
@@ -130,12 +130,13 @@
       "skills": [
         "SKILL_ADMIN"
       ],
-      "statut": "sans_objet",
+      "statut": "en_cours",
       "gate": null,
       "gate_statut": null,
-      "debut": "",
+      "debut": "2026-11-14",
       "fin": "",
-      "rapport": "Site interne Norvika : pas de boutique, pas de Sanity, pas de livraison client."
+      "rapport": "2026-11-14, branche mise-a-niveau-2026-11 (rien de poussé). Studio Sanity en français dans studio/ (projet k99pdqd1, sanity 6.23.0), 17 types de documents, aide sous chaque champ, titres verrouillés. Contenu importé mot pour mot : 52 documents, 49 images. Toutes les pages publiques lisent Sanity au build (une requête GROQ, useCdn false, pages statiques). Texte rendu des 41 pages identique à la capture d'avant (seul écart voulu : apostrophes typographiques, commit à part). Éditeurs /admin Supabase retirés. Reste (Jarvis) : sanity deploy du Studio, Workers Builds + webhook Sanity, QA Pixel de l'admin.",
+      "date": "2026-11-14"
     },
     {
       "id": "5",
