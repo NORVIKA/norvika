@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
+import type { Etape } from "@/lib/types-contenu";
 
 /**
  * « Comment ça marche » : le parcours en N étapes, partagé par l'accueil et les
@@ -30,6 +31,10 @@ export type RoadStep = {
   title: string;
   body: string;
 };
+
+/** Les étapes du Studio vers le parcours. Le libellé court reprend le titre s'il est vide. */
+export const versRoadSteps = (etapes: Etape[]): RoadStep[] =>
+  etapes.map((e) => ({ label: e.libelle || e.titre, title: e.titre, body: e.texte }));
 
 const easeOutCubic = (t: number) => 1 - Math.pow(1 - t, 3);
 

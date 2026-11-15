@@ -3,8 +3,8 @@
 import { useState, type FormEvent } from "react";
 import { AntiRobot, MESSAGE_JETON_ABSENT, lireJetonAntiRobot, reinitialiserAntiRobot } from "@/components/site/AntiRobot";
 import { MentionCollecte } from "@/components/site/MentionCollecte";
+import { useContenuGlobal } from "@/components/site/ContenuGlobal";
 import { CHAMP_JETON } from "@/lib/anti-robot-commun";
-import { LIEN_RDV } from "@/lib/liens";
 
 /**
  * Bandeau de fin de page (present sur TOUTES les pages via SiteFooter).
@@ -16,6 +16,10 @@ import { LIEN_RDV } from "@/lib/liens";
  *
  * Le formulaire poste sur /api/contact (validation + limitation de debit + clef
  * service cote serveur). Il n'insere jamais dans la base depuis le navigateur.
+ *
+ * Les textes viennent du Studio (« Bloc de contact »). Restent dans le code, volontairement :
+ * les messages d'erreur du formulaire (exception de la phase 4, ils suivent la logique de
+ * validation) et la mention de collecte (texte légal, components/site/MentionCollecte.tsx).
  */
 
 const champ: React.CSSProperties = {
@@ -38,6 +42,8 @@ const etiquette: React.CSSProperties = {
 };
 
 export function ContactCTA() {
+  const { parametres, blocContact: t } = useContenuGlobal();
+  const LIEN_RDV = parametres.lienRendezVous;
   const [nom, setNom] = useState("");
   const [courriel, setCourriel] = useState("");
   const [message, setMessage] = useState("");
@@ -77,14 +83,14 @@ export function ContactCTA() {
         const data = (await res.json().catch(() => null)) as { error?: string } | null;
         setErreur(
           data?.error ??
-            "Une erreur est survenue. Écrivez-nous à info@norvika.ca.",
+            `Une erreur est survenue. Écrivez-nous à ${parametres.courriel}.`,
         );
         setEnvoi(false);
         return;
       }
     } catch {
       reinitialiserAntiRobot(formulaire);
-      setErreur("Une erreur est survenue. Écrivez-nous à info@norvika.ca.");
+      setErreur(`Une erreur est survenue. Écrivez-nous à ${parametres.courriel}.`);
       setEnvoi(false);
       return;
     }
@@ -138,7 +144,7 @@ export function ContactCTA() {
             }}
           />
           <h2 style={{ margin: 0, fontSize: "clamp(30px,3.6vw,50px)", lineHeight: 1.08 }}>
-            On regarde votre cas, gratuitement.
+            {t.titre}
           </h2>
           <p
             style={{
@@ -149,16 +155,14 @@ export function ContactCTA() {
               color: "rgba(245,243,238,.72)",
             }}
           >
-            Dites-nous en deux lignes ce qui vous freine. On vous revient vite,
-            par courriel ou par téléphone, avec une première piste concrète.
-            Vous préférez un appel tout de suite ?{" "}
+            {t.texte}{" "}
             <a
               href={LIEN_RDV}
               style={{ color: "#F5F3EE", textDecoration: "underline", textUnderlineOffset: 3 }}
              target="_blank" rel="noopener noreferrer">
-              Réservez vos 30 minutes
+              {t.lienTexte}
             </a>
-            .
+            {t.apresLien}
           </p>
         </div>
 
@@ -173,10 +177,10 @@ export function ContactCTA() {
             }}
           >
             <p style={{ margin: 0, fontSize: 19, fontWeight: 600 }}>
-              Merci, votre message est parti.
+              {t.merciTitre}
             </p>
             <p style={{ margin: "10px 0 0", fontSize: 15, color: "rgba(245,243,238,.72)" }}>
-              On vous revient rapidement, par courriel ou par téléphone.
+              {t.merciTexte}
             </p>
           </div>
         ) : (
@@ -186,7 +190,7 @@ export function ContactCTA() {
               style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}
             >
               <label style={etiquette}>
-                Nom
+                {t.champNom}
                 <input
                   type="text"
                   required
@@ -198,7 +202,7 @@ export function ContactCTA() {
                 />
               </label>
               <label style={etiquette}>
-                Courriel
+                {t.champCourriel}
                 <input
                   type="email"
                   required
@@ -222,7 +226,7 @@ export function ContactCTA() {
               <p style={{ margin: "8px 0 0", fontSize: 13, color: "#ffd7cf" }}>{champErreur}</p>
             )}
             <label style={{ ...etiquette, marginTop: 14 }}>
-              En quelques mots, ce qui vous freine
+              {t.champMessage}
               <textarea
                 required
                 rows={3}
@@ -255,7 +259,7 @@ export function ContactCTA() {
                 opacity: envoi ? 0.7 : 1,
               }}
             >
-              {envoi ? "Envoi en cours…" : "Envoyer"}
+              {envoi ? t.boutonEnvoi : t.bouton}
             </button>
             <MentionCollecte
               id="mention-collecte-cta"

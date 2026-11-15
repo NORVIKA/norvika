@@ -4,8 +4,11 @@ import { useState, type FormEvent } from "react";
 import { AntiRobot, MESSAGE_JETON_ABSENT, lireJetonAntiRobot, reinitialiserAntiRobot } from "@/components/site/AntiRobot";
 import { MentionCollecte } from "@/components/site/MentionCollecte";
 import { CHAMP_JETON } from "@/lib/anti-robot-commun";
+import type { PageBienvenue } from "@/lib/types-contenu";
 
-export function LeadForm() {
+// Étiquettes, bouton et remerciement : page « Bienvenue » du Studio. Les messages d'erreur restent
+// ici (exception de la phase 4 : ils suivent la logique de validation).
+export function LeadForm({ t }: { t: PageBienvenue }) {
   const [prenom, setPrenom] = useState("");
   const [courriel, setCourriel] = useState("");
   const [telephone, setTelephone] = useState("");
@@ -74,9 +77,9 @@ export function LeadForm() {
   if (envoye) {
     return (
       <div className="rounded-2xl border border-[var(--hairline)] bg-[var(--cream)] p-8 md:p-10">
-        <p className="text-lg font-medium text-[var(--foreground)]">Merci, on vous revient sous peu.</p>
+        <p className="text-lg font-medium text-[var(--foreground)]">{t.merciTitre}</p>
         <p className="mt-2 text-sm text-[var(--muted-foreground)]">
-          Vous recevrez un courriel ou un appel pour planifier la suite.
+          {t.merciTexte}
         </p>
       </div>
     );
@@ -86,7 +89,7 @@ export function LeadForm() {
     <form onSubmit={onSubmit} className="rounded-2xl border border-[var(--hairline)] bg-[var(--background)] p-6 md:p-8">
       <div className="grid gap-5 md:grid-cols-3">
         <label className="block">
-          <span className="text-sm font-medium text-[var(--foreground)]">Prénom</span>
+          <span className="text-sm font-medium text-[var(--foreground)]">{t.champPrenom}</span>
           <input
             type="text"
             required
@@ -97,7 +100,7 @@ export function LeadForm() {
           />
         </label>
         <label className="block">
-          <span className="text-sm font-medium text-[var(--foreground)]">Courriel</span>
+          <span className="text-sm font-medium text-[var(--foreground)]">{t.champCourriel}</span>
           <input
             type="email"
             required
@@ -108,7 +111,7 @@ export function LeadForm() {
           />
         </label>
         <label className="block">
-          <span className="block text-sm font-medium text-[var(--foreground)] md:whitespace-nowrap">Numéro de téléphone</span>
+          <span className="block text-sm font-medium text-[var(--foreground)] md:whitespace-nowrap">{t.champTelephone}</span>
           <input
             type="tel"
             required
@@ -127,7 +130,7 @@ export function LeadForm() {
           disabled={envoi}
           className="inline-flex items-center justify-center rounded-full bg-[var(--primary)] px-7 py-3.5 text-sm font-bold text-white transition-colors hover:bg-[var(--primary)]/90 disabled:opacity-60"
         >
-          {envoi ? "Envoi en cours…" : "Envoyer"}
+          {envoi ? t.boutonEnvoi : t.bouton}
         </button>
       </div>
       <div className="mt-5 text-[var(--muted-foreground)]">

@@ -1,13 +1,14 @@
 import type { Metadata } from "next";
 import Content from "./Content";
+import { obtenirContenu } from "@/lib/contenu";
+import { metaPage } from "@/lib/meta";
 
-export const metadata: Metadata = {
-  title: { absolute: "Diagnostic gratuit | Norvika" },
-  description: "Répondez à sept questions pour découvrir ce qui freine le plus votre entreprise: votre site, votre temps ou votre image.",
-  alternates: { canonical: "/diagnostic" },
-  openGraph: { title: "Diagnostic gratuit | Norvika", description: "Répondez à sept questions pour découvrir ce qui freine le plus votre entreprise: votre site, votre temps ou votre image.", url: "/diagnostic" },
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const { diagnostic } = await obtenirContenu();
+  return metaPage(diagnostic, "/diagnostic");
+}
 
-export default function Page() {
-  return <Content />;
+export default async function Page() {
+  const { diagnostic } = await obtenirContenu();
+  return <Content page={diagnostic} />;
 }

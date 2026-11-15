@@ -1,7 +1,10 @@
 import Link from "next/link";
 import { SiteShell } from "@/components/site/SiteShell";
+import { obtenirContenu } from "@/lib/contenu";
 
-export default function NotFound() {
+// Textes : « Page introuvable » du Studio.
+export default async function NotFound() {
+  const { page404: t } = await obtenirContenu();
   return (
     <SiteShell>
       <div
@@ -22,7 +25,7 @@ export default function NotFound() {
             color: "rgba(12,25,47,.45)",
           }}
         >
-          Erreur 404
+          {t.surtitre}
         </p>
         <h1
           style={{
@@ -31,7 +34,7 @@ export default function NotFound() {
             lineHeight: 1.1,
           }}
         >
-          Cette page n&apos;existe pas.
+          {t.titre}
         </h1>
         <p
           style={{
@@ -42,8 +45,7 @@ export default function NotFound() {
             color: "rgba(12,25,47,.6)",
           }}
         >
-          Elle a peut-être été déplacée ou renommée. Reprenez à l&apos;accueil,
-          ou regardez ce qu&apos;on fait pour d&apos;autres entreprises d&apos;ici.
+          {t.texte}
         </p>
         <div
           style={{
@@ -59,7 +61,7 @@ export default function NotFound() {
             className="nv-btn-primary"
             style={{ padding: "15px 26px", borderRadius: 10, fontWeight: 600 }}
           >
-            Retour à l&apos;accueil
+            {t.boutonAccueil}
           </Link>
           <Link
             href="/realisations"
@@ -71,7 +73,7 @@ export default function NotFound() {
               border: "1px solid rgba(12,25,47,.14)",
             }}
           >
-            Voir nos réalisations
+            {t.boutonRealisations}
           </Link>
         </div>
       </div>

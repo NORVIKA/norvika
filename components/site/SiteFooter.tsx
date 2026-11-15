@@ -2,9 +2,13 @@
 
 import Link from "next/link";
 import { ContactCTA } from "@/components/site/ContactCTA";
+import { useContenuGlobal } from "@/components/site/ContenuGlobal";
 
-const logoStack = { url: "/assets/norvika-stack.svg" };
+// Tout le texte vient du Studio : « Infos de l'entreprise » (logo, phrase, courriel)
+// et « Menu et pied de page » (colonnes, liens, ligne du bas).
 export function SiteFooter() {
+  const { parametres, navigation } = useContenuGlobal();
+  const logoStack = parametres.logoPied;
   return (
     <>
       <ContactCTA />
@@ -22,7 +26,7 @@ export function SiteFooter() {
           <div>
             <img loading="lazy" decoding="async"
               src={logoStack.url}
-              alt="Norvika"
+              alt={logoStack.alt ?? ""}
               style={{ height: 78, width: "auto", display: "block" }}
             />
             <p
@@ -34,8 +38,7 @@ export function SiteFooter() {
                 color: "rgba(12,25,47,.62)",
               }}
             >
-              Présence numérique pour les entreprises et les travailleurs
-              autonomes.
+              {parametres.description}
             </p>
           </div>
           <div>
@@ -48,7 +51,7 @@ export function SiteFooter() {
                 color: "rgba(12,25,47,.62)",
               }}
             >
-              Services
+              {navigation.piedTitreServices}
             </p>
             <div
               style={{
@@ -59,12 +62,11 @@ export function SiteFooter() {
                 fontSize: 14.5,
               }}
             >
-              <Link href="/sites-web">Sites web</Link>
-              <Link href="/automatisation">Automatisation</Link>
-              <Link href="/photo-et-video">Photo et vidéo</Link>
-              <Link href="/formation">Formation</Link>
-              <Link href="/realisations">Réalisations</Link>
-              <Link href="/equipe">L'équipe</Link>
+              {navigation.liensMenu.map((l) => (
+                <Link key={l.lien} href={l.lien}>
+                  {l.libelle}
+                </Link>
+              ))}
             </div>
           </div>
           <div>
@@ -77,7 +79,7 @@ export function SiteFooter() {
                 color: "rgba(12,25,47,.62)",
               }}
             >
-              Contact
+              {navigation.piedTitreContact}
             </p>
             <div
               style={{
@@ -88,13 +90,12 @@ export function SiteFooter() {
                 fontSize: 14.5,
               }}
             >
-              <a href="mailto:info@norvika.ca">info@norvika.ca</a>
-              <Link href="/contact" style={{ color: "rgba(12,25,47,.62)" }}>
-                Nous écrire
-              </Link>
-              <Link href="/diagnostic" style={{ color: "rgba(12,25,47,.62)" }}>
-                Diagnostic gratuit
-              </Link>
+              <a href={`mailto:${parametres.courriel}`}>{parametres.courriel}</a>
+              {navigation.piedLiensContact.map((l) => (
+                <Link key={l.lien} href={l.lien} style={{ color: "rgba(12,25,47,.62)" }}>
+                  {l.libelle}
+                </Link>
+              ))}
             </div>
           </div>
         </div>
@@ -117,12 +118,12 @@ export function SiteFooter() {
               justifyContent: "space-between",
             }}
           >
-            <span>© 2026 Norvika · Québec et Rive-Sud de Montréal</span>
+            <span>{navigation.piedDroits}</span>
             <Link
               href="/politique-de-confidentialite"
               style={{ color: "rgba(12,25,47,.62)" }}
             >
-              Politique de confidentialité
+              {navigation.piedPolitique}
             </Link>
           </div>
         </div>

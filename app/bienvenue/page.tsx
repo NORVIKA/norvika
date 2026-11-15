@@ -1,44 +1,25 @@
 import type { Metadata } from "next";
 import { SiteShell } from "@/components/site/SiteShell";
 import { Reveal } from "@/components/ui/Reveal";
+import { obtenirContenu } from "@/lib/contenu";
+import { visible } from "@/lib/types-contenu";
 import { LeadForm } from "./LeadForm";
 
-export const metadata: Metadata = {
-  title: "Bienvenue : espace client Norvika",
-  description:
-    "Guide d'accueil pour les nouveaux clients de sites web Norvika. Étapes simples, expliquées sans jargon.",
-  robots: { index: false, follow: false },
-};
+// Page cachée de Google (lien envoyé aux nouveaux clients). Ses textes : page « Bienvenue » du
+// Studio ; le courriel et le téléphone : « Infos de l'entreprise ».
+export async function generateMetadata(): Promise<Metadata> {
+  const { bienvenue } = await obtenirContenu();
+  return {
+    title: { absolute: bienvenue.seoTitre },
+    description: bienvenue.seoDescription,
+    robots: { index: false, follow: false },
+  };
+}
 
-const OUTILS = [
-  {
-    nom: "GoDaddy",
-    texte: "C'est l'adresse de votre site, ce que les gens tapent pour vous trouver, par exemple votrecommerce.com. Comme l'adresse civique de votre commerce.",
-  },
-  {
-    nom: "GitHub",
-    texte: "C'est l'endroit sécurisé où le code de votre site est gardé, avec tout son historique. Comme un coffre-fort qui contient les plans de votre site.",
-  },
-  {
-    nom: "Supabase",
-    texte: "C'est la mémoire de votre site, ce qui garde les informations comme les réservations, les formulaires et les contenus.",
-  },
-  {
-    nom: "Vercel",
-    texte: "C'est ce qui garde votre site en ligne en tout temps et le fait charger vite. Comme le terrain qui accueille votre site et le garde allumé.",
-  },
-];
-
-const ETAPES = [
-  { titre: "Vos coordonnées", texte: "Vous remplissez le formulaire ci-dessus." },
-  { titre: "On crée vos comptes ensemble", texte: "On configure GoDaddy, GitHub, Supabase et Vercel avec vous." },
-  { titre: "Le dépôt pour lancer", texte: "Un dépôt de 25 % confirme le projet et on se met au travail. On vous envoie les détails par courriel." },
-  { titre: "On monte votre site", texte: "On s'occupe de tout, vous n'avez rien à gérer." },
-  { titre: "Vous le voyez et vous approuvez", texte: "On ajuste jusqu'à ce que vous soyez satisfait." },
-  { titre: "Le solde et la mise en ligne", texte: "Vous réglez le reste (75 %), puis votre site devient public à votre adresse." },
-];
-
-export default function BienvenuePage() {
+export default async function BienvenuePage() {
+  const { bienvenue: t, parametres } = await obtenirContenu();
+  const OUTILS = t.outils.liste.map((o) => ({ nom: o.titre, texte: o.texte }));
+  const ETAPES = t.etapes.liste;
   return (
     <SiteShell>
       <>
@@ -46,12 +27,10 @@ export default function BienvenuePage() {
         <section className="border-b border-[var(--hairline)] bg-[var(--background)]">
           <div className="mx-auto max-w-4xl px-6 py-20 md:py-28">
             <h1 className="text-4xl font-semibold leading-tight tracking-tight text-[var(--foreground)] md:text-6xl">
-              Bienvenue. Voici comment on va s&apos;y prendre.
+              {t.h1}
             </h1>
             <p className="mt-6 max-w-2xl text-lg leading-relaxed text-[var(--muted-foreground)]">
-              On s&apos;occupe de presque tout. Ce guide vous explique chaque étape en mots simples,
-              pour que vous sachiez ce qui s&apos;en vient, sans stress. Vous n&apos;avez pas besoin
-              d&apos;être à l&apos;aise avec la technologie, c&apos;est notre travail.
+              {t.intro}
             </p>
           </div>
         </section>
@@ -60,24 +39,23 @@ export default function BienvenuePage() {
         <section className="border-b border-[var(--hairline)] bg-[var(--cream)]">
           <div className="mx-auto max-w-4xl px-6 py-20 md:py-24">
             <h2 className="text-3xl font-semibold leading-tight tracking-tight text-[var(--foreground)] md:text-4xl">
-              Pour commencer, laissez-nous vos coordonnées.
+              {t.formTitre}
             </h2>
             <div className="mt-10">
-              <LeadForm />
+              <LeadForm t={t} />
             </div>
           </div>
         </section>
 
         {/* OUTILS */}
+        {visible(t.outils) ? (
         <section className="border-b border-[var(--hairline)] bg-[var(--background)]">
           <div className="mx-auto max-w-5xl px-6 py-20 md:py-24">
             <h2 className="text-3xl font-semibold leading-tight tracking-tight text-[var(--foreground)] md:text-4xl">
-              Les outils qu&apos;on va utiliser, expliqués simplement.
+              {t.outils.titre}
             </h2>
             <p className="mt-6 max-w-2xl text-base leading-relaxed text-[var(--muted-foreground)]">
-              Pendant le projet, vous allez voir passer quelques noms. Pas de panique. Voici ce que
-              chacun fait, et on crée tous ces comptes avec vous, étape par étape. Vous ne serez jamais
-              laissé tout seul devant un écran.
+              {t.outils.texte}
             </p>
             <div className="mt-12 grid gap-6 md:grid-cols-2">
               {OUTILS.map((o, i) => (
@@ -91,19 +69,19 @@ export default function BienvenuePage() {
             </div>
             <div className="mt-8 rounded-2xl border border-[var(--hairline)] bg-[var(--cream)] p-6 md:p-8">
               <p className="text-base leading-relaxed text-[var(--foreground)]">
-                Ces comptes sont à vous. Votre site, votre domaine et vos données vous appartiennent.
-                Vous n&apos;êtes jamais pris en otage, et vous pouvez partir avec si un jour vous le
-                souhaitez.
+                {t.outils.propriete}
               </p>
             </div>
           </div>
         </section>
+        ) : null}
 
         {/* ÉTAPES */}
+        {visible(t.etapes) ? (
         <section className="border-b border-[var(--hairline)] bg-[var(--cream)]">
           <div className="mx-auto max-w-5xl px-6 py-20 md:py-24">
             <h2 className="text-3xl font-semibold leading-tight tracking-tight text-[var(--foreground)] md:text-4xl">
-              Ce qui s&apos;en vient, étape par étape.
+              {t.etapes.titre}
             </h2>
             <ol className="mt-12 grid gap-px overflow-hidden rounded-2xl border border-[var(--hairline)] bg-[var(--hairline)] md:grid-cols-2">
               {ETAPES.map((e, i) => (
@@ -118,47 +96,49 @@ export default function BienvenuePage() {
             </ol>
           </div>
         </section>
+        ) : null}
 
         {/* PAIEMENT */}
+        {visible(t.paiement) ? (
         <section className="border-b border-[var(--hairline)] bg-[var(--background)]">
           <div className="mx-auto max-w-4xl px-6 py-20 md:py-24">
             <h2 className="text-3xl font-semibold leading-tight tracking-tight text-[var(--foreground)] md:text-4xl">
-              Le paiement, simple et sans surprise.
+              {t.paiement.titre}
             </h2>
             <p className="mt-6 max-w-2xl text-base leading-relaxed text-[var(--muted-foreground)]">
-              Vous payez en deux fois. Un dépôt de 25 % au début pour lancer le projet, puis le solde
-              de 75 % à la fin, une fois que votre site vous plaît et avant la mise en ligne. On vous
-              envoie tous les détails et le moyen de paiement par courriel, à chaque étape. Rien de
-              compliqué, rien à faire sur cette page.
+              {t.paiement.texte}
             </p>
           </div>
         </section>
+        ) : null}
 
         {/* CONTACT */}
+        {visible(t.contact) ? (
         <section className="bg-[var(--primary)] text-white">
           <div className="mx-auto max-w-4xl px-6 py-20 md:py-24">
             <h2 className="text-3xl font-semibold leading-tight tracking-tight md:text-4xl">
-              Une question ? On est là.
+              {t.contact.titre}
             </h2>
             <p className="mt-6 max-w-2xl text-base leading-relaxed text-white/80">
-              Écrivez-nous ou appelez-nous n&apos;importe quand, on vous accompagne du début à la fin.
+              {t.contact.texte}
             </p>
             <ul className="mt-8 space-y-2 text-base">
               <li>
-                Courriel :{" "}
-                <a href="mailto:info@norvika.ca" className="underline underline-offset-4">
-                  info@norvika.ca
+                {t.contact.libelleCourriel}{" "}
+                <a href={`mailto:${parametres.courriel}`} className="underline underline-offset-4">
+                  {parametres.courriel}
                 </a>
               </li>
               <li>
-                Téléphone :{" "}
-                <a href="tel:+14385224275" className="underline underline-offset-4">
-                  438 522 4275
+                {t.contact.libelleTelephone}{" "}
+                <a href={`tel:+1${parametres.telephone.replace(/\D/g, "")}`} className="underline underline-offset-4">
+                  {parametres.telephone}
                 </a>
               </li>
             </ul>
           </div>
         </section>
+        ) : null}
       </>
     </SiteShell>
   );

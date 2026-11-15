@@ -3,8 +3,11 @@
 import Link from "next/link";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
+import { useContenuGlobal } from "@/components/site/ContenuGlobal";
 
+// Textes : « Page introuvable » du Studio (partie « réalisation introuvable »).
 export default function NotFound() {
+  const { page404: t } = useContenuGlobal();
   return (
     <div style={{ background: "#fff" }}>
       <SiteHeader />
@@ -21,7 +24,7 @@ export default function NotFound() {
             letterSpacing: "-.03em",
           }}
         >
-          Cette réalisation n'existe pas.
+          {t.realisationTitre}
         </h1>
         <div style={{ marginTop: 26 }}>
           <Link
@@ -29,7 +32,7 @@ export default function NotFound() {
             className="nv-btn-primary"
             style={{ display: "inline-block", padding: "14px 22px", borderRadius: 10, fontWeight: 600 }}
           >
-            Retour aux réalisations
+            {t.realisationBouton}
           </Link>
         </div>
       </div>

@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
 import { Sora, DM_Sans } from "next/font/google";
 import "./globals.css";
-import { getSiteData } from "@/lib/get-site-data";
+import { FournisseurContenu } from "@/components/site/ContenuGlobal";
+import { obtenirContenu } from "@/lib/contenu";
 
 // Le design n'utilise Sora qu'en 600 (titres) et DM Sans qu'en 400/500/600.
 // Charger les autres graisses, c'est du poids de police pour rien.
@@ -19,31 +20,35 @@ const dmSans = DM_Sans({
   display: "swap",
 });
 
-export const metadata: Metadata = {
-  title: {
-    default: "Norvika · Vos courtiers des outils numériques",
-    template: "%s | Norvika",
-  },
-  description:
-    "Sites web, automatisation, photo et vidéo pour les PME de la ville de Québec, de la Rive-Sud de Montréal et de partout en province. On comprend votre réalité, puis on bâtit une offre qui vous ressemble.",
-  metadataBase: new URL("https://norvika.ca"),
-  openGraph: {
-    type: "website",
-    locale: "fr_CA",
-    url: "https://norvika.ca",
-    siteName: "Norvika",
-    images: [
-      {
-        url: "/assets/lau-et-will-2.webp",
-        alt: "Laurianne Plouffe et William Simard, fondateurs de Norvika",
-      },
-    ],
-  },
-  twitter: { card: "summary_large_image" },
-  robots: { index: true, follow: true },
-  // Icônes : app/favicon.ico, app/icon.png et app/apple-icon.png, lus par Next.
-  // Générées sur fond navy plein par scripts/generer-icones.mjs.
-};
+// Les valeurs par défaut (titre, description, image de partage) viennent de « Infos de
+// l'entreprise » dans le Studio. Chaque page remplace le titre et la description par les siens.
+export async function generateMetadata(): Promise<Metadata> {
+  const { parametres } = await obtenirContenu();
+  return {
+    title: {
+      default: parametres.seoTitreDefaut,
+      template: `%s | ${parametres.nom}`,
+    },
+    description: parametres.seoDescriptionDefaut,
+    metadataBase: new URL("https://norvika.ca"),
+    openGraph: {
+      type: "website",
+      locale: "fr_CA",
+      url: "https://norvika.ca",
+      siteName: parametres.nom,
+      images: [
+        {
+          url: parametres.imagePartage.url,
+          alt: parametres.imagePartage.alt ?? "",
+        },
+      ],
+    },
+    twitter: { card: "summary_large_image" },
+    robots: { index: true, follow: true },
+    // Icônes : app/favicon.ico, app/icon.png et app/apple-icon.png, lus par Next.
+    // Générées sur fond navy plein par scripts/generer-icones.mjs.
+  };
+}
 
 // Identifiant GA4. Absent = aucun script de mesure n'est emis du tout, ce qui
 // est le defaut sain : on n'installe un traceur que si quelqu'un l'a demande.
@@ -69,8 +74,8 @@ const GA_ID = process.env.NEXT_PUBLIC_GA_ID;
 //    pour un resultat jamais conserve. C'est la charge par rendu qui mene a
 //    l'erreur 1102.
 //
-// « force-static » dit la verite : le contenu vient de Supabase au moment de la
-// construction et ne change que lorsqu'on redeploie (bouton Publier de /admin).
+// « force-static » dit la verite : le contenu vient de Sanity au moment de la
+// construction et ne change que lorsqu'on redeploie (publication dans le Studio).
 // Resultat mesurable : x-nextjs-cache passe de STALE a HIT.
 export const dynamic = "force-static";
 
@@ -79,8 +84,15 @@ export default async function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const { siteInfo } = await getSiteData();
-  const email = siteInfo.email || "info@norvika.ca";
+  const contenu = await obtenirContenu();
+  const { parametres } = contenu;
+  const global = {
+    parametres,
+    navigation: contenu.navigation,
+    blocContact: contenu.blocContact,
+    page404: contenu.page404,
+    services: contenu.services,
+  };
 
   return (
     <html lang="fr" className={`${sora.variable} ${dmSans.variable}`}>
@@ -149,62 +161,43 @@ gtag('config', '${GA_ID}', { anonymize_ip: true });`,
             __html: JSON.stringify({
               "@context": "https://schema.org",
               "@type": "ProfessionalService",
-              name: "Norvika",
+              name: parametres.nom,
               url: "https://norvika.ca",
-              email,
-              telephone: siteInfo.telephone || "438 522 4275",
-              description:
-                "Présence numérique pour les entreprises et les travailleurs autonomes.",
+              email: parametres.courriel,
+              telephone: parametres.telephone,
+              description: parametres.description,
               // Zone desservie PRECISE, invisible a l'ecran mais lue par Google : une
               // seule entree « Québec, Canada » ne dit rien pour une recherche locale
               // (veille SEO du 2026-09-14). Ville de Québec en premier : c'est la cible
               // de developpement (William, 2026-09-14). Pas d'adresse postale tant que
-              // le siege n'est pas confirme.
-              areaServed: [
-                { "@type": "City", name: "Québec" },
-                { "@type": "Place", name: "Rive-Sud de Montréal" },
-                { "@type": "AdministrativeArea", name: "Montérégie" },
-                { "@type": "AdministrativeArea", name: "Québec" },
-              ],
-              serviceType: [
-                "Création de sites web",
-                "Automatisation",
-                "Photo et vidéo",
-                "Formation",
-              ],
-              founder: [
-                { "@type": "Person", name: "Laurianne Plouffe" },
-                { "@type": "Person", name: "William Simard" },
-              ],
+              // le siege n'est pas confirme. Liste tenue dans « Infos de l'entreprise ».
+              areaServed: parametres.zonesDesservies.map((z) => ({ "@type": z.type, name: z.nom })),
+              serviceType: parametres.typesDeService,
+              founder: parametres.fondateurs.map((nom) => ({ "@type": "Person", name: nom })),
               // Note Google, affichee sur l'accueil (section « Avis Google »).
               // Sert les extraits enrichis et les reponses des moteurs IA (GEO).
               aggregateRating: {
                 "@type": "AggregateRating",
-                ratingValue: "5.0",
-                reviewCount: "6",
+                ratingValue: parametres.noteGoogle,
+                reviewCount: parametres.nombreAvisGoogle,
                 bestRating: "5",
               },
-              review: [
-                {
+              // Les avis qui ont un « Extrait lu par Google » dans le Studio.
+              review: contenu.avis
+                .filter((a) => a.extraitGoogle)
+                .map((a) => ({
                   "@type": "Review",
                   reviewRating: { "@type": "Rating", ratingValue: "5", bestRating: "5" },
-                  author: { "@type": "Person", name: "Marie-Claire Huard" },
-                  reviewBody:
-                    "Je recommande Norvika et Laurianne sans aucune hésitation. Un service humain, personnalisé et un résultat à la hauteur de nos attentes.",
-                },
-                {
-                  "@type": "Review",
-                  reviewRating: { "@type": "Rating", ratingValue: "5", bestRating: "5" },
-                  author: { "@type": "Person", name: "Mélodie Colpron" },
-                  reviewBody:
-                    "Une équipe professionnelle, dynamique et super agréable. Je recommande leurs services à 100 pour cent.",
-                },
-              ],
+                  author: { "@type": "Person", name: a.nom },
+                  reviewBody: a.extraitGoogle,
+                })),
             }),
           }}
         />
       </head>
-      <body>{children}</body>
+      <body>
+        <FournisseurContenu valeur={global}>{children}</FournisseurContenu>
+      </body>
     </html>
   );
 }

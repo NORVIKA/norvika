@@ -1,19 +1,26 @@
 import type { Metadata } from "next";
 import Content from "./Content";
 import SchemaService from "@/components/site/SchemaService";
+import { obtenirContenu } from "@/lib/contenu";
+import { metaPage } from "@/lib/meta";
 
-export const metadata: Metadata = {
-  title: { absolute: "Formation | Norvika" },
-  description: "On forme votre équipe sur place: photo et vidéo, site web, outils numériques. Pour que ce qui vous appartient, vous sachiez le faire vous-mêmes.",
-  alternates: { canonical: "/formation" },
-  openGraph: { title: "Formation | Norvika", description: "On forme votre équipe sur place: photo et vidéo, site web, outils numériques. Autonomes après, pas dépendants.", url: "/formation" },
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const { formation } = await obtenirContenu();
+  return metaPage(formation, "/formation");
+}
 
-export default function Page() {
+export default async function Page() {
+  const { formation, parametres } = await obtenirContenu();
   return (
     <>
-      <SchemaService nom="Formation aux outils numériques" type="Formation" description="On forme votre équipe sur place: photo et vidéo, site web, outils numériques. Pour que ce qui vous appartient, vous sachiez le faire vous-mêmes." chemin="/formation" />
-      <Content />
+      <SchemaService
+        nom={formation.schemaNom}
+        type={formation.schemaType}
+        description={formation.seoDescription}
+        chemin="/formation"
+        parametres={parametres}
+      />
+      <Content page={formation} />
     </>
   );
 }

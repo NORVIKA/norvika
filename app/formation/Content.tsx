@@ -5,109 +5,15 @@ import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
-import { Roadmap, type RoadStep } from "@/components/site/Roadmap";
+import { Roadmap, versRoadSteps } from "@/components/site/Roadmap";
 import { useReveal } from "@/lib/useReveal";
-import { LIEN_RDV } from "@/lib/liens";
 import { AutresPages } from "@/components/site/AutresPages";
 import { HeroService } from "@/components/site/HeroService";
+import { visible, type PageFormation } from "@/lib/types-contenu";
 
-const CHECKS = [
-  "Vous voulez publier des photos et des vidéos qui vous ressemblent, sans attendre un photographe à chaque fois.",
-  "Vous avez un site, mais vous n'osez pas y toucher de peur de tout briser.",
-  "Vous payez pour des outils que votre équipe utilise à moitié, parce que personne a jamais pris le temps d'expliquer.",
-  "Vous voulez comprendre ce que l'automatisation ou l'IA peut faire pour vous, avant d'investir quoi que ce soit.",
-];
-
-const GAINS = [
-  {
-    title: "Vous arrêtez d'attendre.",
-    desc: "Une photo à publier, une page à modifier, un outil à ajuster: vous le faites le jour même, au lieu d'ouvrir un ticket ou d'attendre une soumission.",
-  },
-  {
-    title: "Vous arrêtez de payer pour la même chose.",
-    desc: "Chaque fois que votre équipe sait faire elle-même, c'est une facture d'agence qui ne revient plus.",
-  },
-  {
-    title: "Vous reprenez le contrôle.",
-    desc: "Quand vous comprenez comment ça marche, vous savez ce qui vaut la peine d'acheter, ce qui ne sert à rien, et quand demander de l'aide.",
-  },
-  {
-    title: "Votre équipe gagne en confiance.",
-    desc: "Elle arrête de dire « je ne suis pas bonne là-dedans », et commence à dire « je m'en occupe ».",
-  },
-];
-
-const TEACH = [
-  {
-    num: "01",
-    title: "Vos photos et vidéos",
-    desc: "Cadrer, éclairer, monter, publier. On apporte l'équipement pour la formation, vous apprenez sur du vrai matériel avant de décider quoi acheter.",
-    after:
-      "Votre équipe produit du contenu qui vous ressemble, au rythme qu'elle veut.",
-  },
-  {
-    num: "02",
-    title: "Votre site web",
-    desc: "Comment le modifier, ajouter du contenu, comprendre ce qu'il fait pour vous.",
-    after:
-      "Un site que vous faites vivre vous-mêmes, au lieu d'un site qui vieillit parce que personne n'ose y toucher.",
-  },
-  {
-    num: "03",
-    title: "Vos outils numériques",
-    desc: "Comment ils fonctionnent, comment les faire parler ensemble, lesquels vous utilisez à moitié.",
-    after:
-      "Souvent, vous réalisez que vous n'avez pas besoin d'un nouvel outil, juste de mieux utiliser ceux que vous payez déjà.",
-  },
-];
-
-const STEPS = [
-  {
-    label: "Un appel de 30 minutes",
-    title: "Un appel de 30 minutes",
-    desc: "On comprend ce que votre équipe fait déjà, ce qu'elle aimerait faire, et où ça bloque. Gratuit, sans engagement.",
-  },
-  {
-    label: "On bâtit la formation autour de vous",
-    title: "On bâtit la formation autour de vous",
-    desc: "Pas de contenu générique. On part de vos vraies situations et de ce que vous voulez être capables de faire après.",
-  },
-  {
-    label: "On forme sur place",
-    title: "On forme sur place, avec votre équipe",
-    desc: "Une demi-journée, une journée ou deux, dans votre entreprise, en petit groupe ou en individuel. On pratique sur du vrai, pas sur des exemples.",
-  },
-  {
-    label: "Vous repartez autonomes",
-    title: "Vous repartez autonomes",
-    desc: "Avec ce qu'il faut pour continuer sans nous. Et si vous voulez qu'on reste dans le décor, on en parle.",
-  },
-];
-
-const ROAD_STEPS: RoadStep[] = STEPS.map((e) => ({ label: e.label, title: e.title, body: e.desc }));
-
-
-const DIFFERENTLY = [
-  {
-    title: "On enseigne ce qu'on fait nous-mêmes.",
-    desc: "On bâtit des sites, on tourne des vidéos, on implante des outils toutes les semaines. Vous apprenez notre pratique, pas de la théorie.",
-  },
-  {
-    title: "On forme dans votre réalité.",
-    desc: "Vos locaux, votre site, vos situations. Ce que vous apprenez le matin, vous l'appliquez l'après-midi.",
-  },
-  {
-    title: "Souvent, c'est admissible à une aide.",
-    desc: "Selon votre situation, la formation de vos employés peut être soutenue par Service Québec. On vous dit ce qui s'applique pendant l'appel.",
-  },
-  {
-    title: "La formation, c'est parfois tout ce qu'il vous faut.",
-    desc: "On préfère vous rendre autonomes que vous vendre un service dont vous n'avez pas besoin.",
-  },
-];
-
-
-function Page() {
+// Tout le texte vient de la page « Formation » du Studio.
+function Page({ page }: { page: PageFormation }) {
+  const ROAD_STEPS = versRoadSteps(page.parcours.etapes);
 
   useReveal();
 
@@ -116,16 +22,17 @@ function Page() {
       <SiteHeader />
 
       <HeroService
-        eyebrow="Formation"
-        titre="Ce qui vous appartient, vous devriez le comprendre, pas juste le payer."
-        texte="Votre site, vos photos, vos vidéos, vos outils: tout ça est à vous. Pourtant, vous dépendez souvent de quelqu'un d'autre pour y toucher. On forme votre équipe, sur place, pour qu'elle sache le faire elle-même."
+        eyebrow={page.nom}
+        titre={page.h1}
+        texte={page.heroTexte}
         courante="/formation"
       />
 
+      {visible(page.reconnaissez) ? (
       <section style={{ borderBottom: "1px solid rgba(12,25,47,.1)", background: "#ffffff" }}>
         <div className="nv-grid nv-shell" style={{ maxWidth: 1240, margin: "0 auto", padding: "88px 32px", display: "grid", gridTemplateColumns: ".85fr 1.15fr", gap: 56, alignItems: "start" }}>
           <h2 style={{ margin: 0, fontFamily: "var(--font-display)", fontWeight: 600, fontSize: "clamp(28px,3.4vw,44px)", lineHeight: 1.08, letterSpacing: "-.03em" }}>
-            Vous vous reconnaissez?
+            {page.reconnaissez.titre}
           </h2>
           <div
             style={{
@@ -139,7 +46,7 @@ function Page() {
               boxShadow: "0 1px 0 rgba(255,255,255,.95) inset, 0 30px 70px -46px rgba(12,25,47,.8)",
             }}
           >
-            {CHECKS.map((text, i) => (
+            {page.reconnaissez.phrases.map((text, i) => (
               <div
                 key={i}
                 data-reveal
@@ -186,14 +93,16 @@ function Page() {
           </div>
         </div>
       </section>
+      ) : null}
 
+      {visible(page.gains) ? (
       <section style={{ borderBottom: "1px solid rgba(12,25,47,.1)", background: "#EEF2FA" }}>
         <div className="nv-shell" style={{ maxWidth: 1240, margin: "0 auto", padding: "92px 32px" }}>
           <h2 style={{ margin: "0 0 44px", fontFamily: "var(--font-display)", fontWeight: 600, fontSize: "clamp(28px,3.4vw,44px)", lineHeight: 1.08, letterSpacing: "-.03em" }}>
-            Ce que vous gagnez, concrètement
+            {page.gains.titre}
           </h2>
           <div className="nv-grid" style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: 20 }}>
-            {GAINS.map((item, i) => (
+            {page.gains.cartes.map((item, i) => (
               <div
                 key={i}
                 data-reveal
@@ -209,24 +118,26 @@ function Page() {
                 }}
               >
                 <h3 style={{ margin: 0, fontFamily: "var(--font-display)", fontWeight: 600, fontSize: 21, letterSpacing: "-.02em" }}>
-                  {item.title}
+                  {item.titre}
                 </h3>
-                <p style={{ margin: "12px 0 0", fontSize: 16, lineHeight: 1.62, color: "rgba(12,25,47,.66)" }}>{item.desc}</p>
+                <p style={{ margin: "12px 0 0", fontSize: 16, lineHeight: 1.62, color: "rgba(12,25,47,.66)" }}>{item.texte}</p>
               </div>
             ))}
           </div>
         </div>
       </section>
+      ) : null}
 
+      {visible(page.enseigne) ? (
       <section style={{ borderBottom: "1px solid rgba(12,25,47,.1)", background: "#ffffff" }}>
         <div className="nv-shell" style={{ maxWidth: 1240, margin: "0 auto", padding: "92px 32px" }}>
           <h2 style={{ margin: "0 0 44px", fontFamily: "var(--font-display)", fontWeight: 600, fontSize: "clamp(28px,3.4vw,44px)", lineHeight: 1.08, letterSpacing: "-.03em" }}>
-            Trois choses qu'on peut vous montrer
+            {page.enseigne.titre}
           </h2>
           <div className="nv-grid nv-grid-3" style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 20 }}>
-            {TEACH.map((item) => (
+            {page.enseigne.liste.map((item, n) => (
               <div
-                key={item.num}
+                key={n}
                 data-reveal
                 className="nv-card-hover"
                 style={{
@@ -239,14 +150,14 @@ function Page() {
                   boxShadow: "0 1px 0 rgba(255,255,255,.95) inset, 0 30px 70px -46px rgba(12,25,47,.8)",
                 }}
               >
-                <span style={{ fontFamily: "var(--font-display)", fontSize: 13, color: "rgba(12,25,47,.35)" }}>{item.num}</span>
+                <span style={{ fontFamily: "var(--font-display)", fontSize: 13, color: "rgba(12,25,47,.35)" }}>{String(n + 1).padStart(2, "0")}</span>
                 <h3 style={{ margin: "12px 0 0", fontFamily: "var(--font-display)", fontWeight: 600, fontSize: 21, letterSpacing: "-.02em" }}>
-                  {item.title}
+                  {item.titre}
                 </h3>
-                <p style={{ margin: "12px 0 0", fontSize: 16, lineHeight: 1.62, color: "rgba(12,25,47,.66)" }}>{item.desc}</p>
+                <p style={{ margin: "12px 0 0", fontSize: 16, lineHeight: 1.62, color: "rgba(12,25,47,.66)" }}>{item.texte}</p>
                 <p style={{ margin: "18px 0 0", paddingTop: 16, borderTop: "1px solid rgba(12,25,47,.1)", fontSize: 15.5, lineHeight: 1.6, color: "rgba(12,25,47,.78)" }}>
-                  <strong style={{ fontWeight: 600 }}>Après: </strong>
-                  {item.after}
+                  <strong style={{ fontWeight: 600 }}>{page.enseigne.libelleApres}{" "}</strong>
+                  {item.apres}
                 </p>
               </div>
             ))}
@@ -257,24 +168,28 @@ function Page() {
 
         </div>
       </section>
+      ) : null}
 
+      {visible(page.parcours) ? (
       <section style={{ borderBottom: "1px solid rgba(12,25,47,.1)", background: "#EEF2FA" }}>
         <div className="nv-shell" style={{ maxWidth: 1240, margin: "0 auto", padding: "92px 32px" }}>
           <h2 style={{ margin: 0, fontFamily: "var(--font-display)", fontWeight: 600, fontSize: "clamp(28px,3.4vw,44px)", lineHeight: 1.08, letterSpacing: "-.03em" }}>
-            Comment ça se passe
+            {page.parcours.titre}
           </h2>
 
           <Roadmap steps={ROAD_STEPS} />
           </div>
       </section>
+      ) : null}
 
+      {visible(page.differemment) ? (
       <section style={{ borderBottom: "1px solid rgba(12,25,47,.1)", background: "#ffffff" }}>
         <div className="nv-shell" style={{ maxWidth: 1240, margin: "0 auto", padding: "92px 32px" }}>
           <h2 style={{ margin: "0 0 44px", fontFamily: "var(--font-display)", fontWeight: 600, fontSize: "clamp(28px,3.4vw,44px)", lineHeight: 1.08, letterSpacing: "-.03em" }}>
-            Ce qu'on fait différemment
+            {page.differemment.titre}
           </h2>
           <div className="nv-grid" style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: 20 }}>
-            {DIFFERENTLY.map((item, i) => (
+            {page.differemment.cartes.map((item, i) => (
               <div
                 key={i}
                 data-reveal
@@ -290,14 +205,15 @@ function Page() {
                 }}
               >
                 <h3 style={{ margin: 0, fontFamily: "var(--font-display)", fontWeight: 600, fontSize: 21, letterSpacing: "-.02em" }}>
-                  {item.title}
+                  {item.titre}
                 </h3>
-                <p style={{ margin: "12px 0 0", fontSize: 16, lineHeight: 1.62, color: "rgba(12,25,47,.66)" }}>{item.desc}</p>
+                <p style={{ margin: "12px 0 0", fontSize: 16, lineHeight: 1.62, color: "rgba(12,25,47,.66)" }}>{item.texte}</p>
               </div>
             ))}
           </div>
         </div>
       </section>
+      ) : null}
 
       <AutresPages courante="/formation" />
       <SiteFooter />

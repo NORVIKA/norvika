@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useRef } from "react";
+import { useContenuGlobal } from "@/components/site/ContenuGlobal";
 
 /**
  * « Continuer la visite » : les autres pages du site, en bas de chaque page.
@@ -14,51 +15,19 @@ import { useEffect, useRef } from "react";
  *
  * Il rend la page courante non cliquable (on ne se lie pas a soi-meme) et
  * revele ses propres cartes, sans dependre de l'observateur de la page hote.
+ *
+ * Le titre et les cartes viennent du Studio (« Menu et pied de page », onglet
+ * « Continuer la visite »).
  */
-
-type Page = { href: string; titre: string; texte: string };
-
-const PAGES: Page[] = [
-  {
-    href: "/sites-web",
-    titre: "Sites web",
-    texte: "Un site clair, bâti sur mesure, qui vous appartient.",
-  },
-  {
-    href: "/automatisation",
-    titre: "Automatisation",
-    texte: "Reprendre les heures que vos tâches répétitives vous prennent.",
-  },
-  {
-    href: "/photo-et-video",
-    titre: "Photo et vidéo",
-    texte: "Des images qui montrent votre entreprise telle qu'elle est.",
-  },
-  {
-    href: "/formation",
-    titre: "Formation",
-    texte: "On forme votre équipe sur place, pour qu'elle soit autonome.",
-  },
-  {
-    href: "/realisations",
-    titre: "Réalisations",
-    texte: "Les entreprises d'ici qui nous font confiance, et ce qu'on a fait.",
-  },
-  {
-    href: "/equipe",
-    titre: "L'équipe",
-    texte: "Laurianne et William, et notre façon de travailler.",
-  },
-];
-
 export function AutresPages({
   courante,
-  titre = "Continuer la visite",
 }: {
   /** Chemin de la page affichee, pour ne pas se lier a elle-meme. */
   courante?: string;
-  titre?: string;
 }) {
+  const { navigation } = useContenuGlobal();
+  const titre = navigation.suiteTitre;
+  const PAGES = navigation.suitePages.map((p) => ({ href: p.lien, titre: p.titre, texte: p.texte }));
   const ref = useRef<HTMLElement>(null);
 
   useEffect(() => {

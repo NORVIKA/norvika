@@ -1,0 +1,296 @@
+/**
+ * La forme du contenu lu dans Sanity (voir lib/contenu.ts pour la requête). Fichier sans
+ * dépendance serveur : les composants « client » importent ces types.
+ */
+
+export type Image = {
+  url: string;
+  alt?: string | null;
+  largeur?: number | null;
+  hauteur?: number | null;
+  hotspot?: { x: number; y: number } | null;
+};
+
+export type Lien = { libelle: string; lien: string };
+export type Carte = { titre: string; texte: string };
+export type Etape = { titre: string; libelle?: string | null; texte: string };
+
+export type Seo = {
+  seoTitre: string;
+  seoDescription: string;
+  partageTitre?: string | null;
+  partageDescription?: string | null;
+  partageImage?: Image | null;
+};
+
+export type SectionListe = { afficher?: boolean | null; titre: string; phrases: string[] };
+export type SectionCartes = { afficher?: boolean | null; titre: string; cartes: Carte[] };
+export type SectionEtapes = { afficher?: boolean | null; titre: string; etapes: Etape[] };
+
+/* ---------------------------------------------------------------- global */
+
+export type Parametres = {
+  nom: string;
+  description: string;
+  courriel: string;
+  telephone: string;
+  lienRendezVous: string;
+  lienPortfolio: string;
+  zonesDesservies: { type: string; nom: string }[];
+  typesDeService: string[];
+  fondateurs: string[];
+  noteGoogle: string;
+  nombreAvisGoogle: string;
+  seoTitreDefaut: string;
+  seoDescriptionDefaut: string;
+  imagePartage: Image;
+  logoEntete: Image;
+  logoPied: Image;
+};
+
+export type Navigation = {
+  liensMenu: Lien[];
+  boutonRendezVous: string;
+  boutonQuiz: string;
+  filArianeAccueil: string;
+  piedTitreServices: string;
+  piedTitreContact: string;
+  piedLiensContact: Lien[];
+  piedDroits: string;
+  piedDroitsCourt: string;
+  piedPolitique: string;
+  suiteTitre: string;
+  suitePages: (Carte & { lien: string })[];
+};
+
+export type BlocContact = {
+  titre: string;
+  texte: string;
+  lienTexte: string;
+  apresLien: string;
+  champNom: string;
+  champCourriel: string;
+  champMessage: string;
+  bouton: string;
+  boutonEnvoi: string;
+  merciTitre: string;
+  merciTexte: string;
+};
+
+export type Page404 = {
+  surtitre: string;
+  titre: string;
+  texte: string;
+  boutonAccueil: string;
+  boutonRealisations: string;
+  realisationTitre: string;
+  realisationBouton: string;
+  realisationOnglet: string;
+};
+
+/** Un service tel que listé sur l'accueil et dans les onglets des pages de services. */
+export type ServiceResume = { nom: string; chemin: string; accroche: string; detail: string };
+
+/** Ce que toutes les pages partagent : passé une fois par app/layout.tsx (ContenuGlobal). */
+export type ContenuGlobal = {
+  parametres: Parametres;
+  navigation: Navigation;
+  blocContact: BlocContact;
+  page404: Page404;
+  services: ServiceResume[];
+};
+
+/* ---------------------------------------------------------------- réalisations */
+
+export type CategorieId = "site-web" | "photo-video" | "automatisation" | "formation";
+
+export type AvantApres = {
+  avant: string;
+  avant2x?: string | null;
+  apres: string;
+  apres2x?: string | null;
+  alt: string;
+  adresse: string;
+  legende?: string | null;
+};
+
+export type Realisation = {
+  slug: string;
+  nom: string;
+  secteur: string;
+  categories: CategorieId[];
+  siteWeb?: string | null;
+  resume: string;
+  besoin: string;
+  mandat: string;
+  resultat?: string | null;
+  logo: Image;
+  logoStyle: "transparent" | "brand" | "dark" | "round";
+  logoForme: "wide" | "square";
+  logoEchelle?: number | null;
+  couverture?: Image | null;
+  avantApres?: AvantApres | null;
+  video?: { youtubeId: string; titre: string; legende: string; format?: "vertical" | "horizontal" | null } | null;
+};
+
+/* ---------------------------------------------------------------- pages */
+
+export type PageService = Seo & {
+  nom: string;
+  schemaNom: string;
+  schemaType: string;
+  h1: string;
+  heroTexte: string;
+};
+
+export type PageSitesWeb = PageService & { reconnaissez: SectionListe; parcours: SectionEtapes; differemment: SectionCartes };
+export type PageAutomatisation = PageService & {
+  reconnaissez: SectionListe;
+  parcours: SectionEtapes;
+  differemment: SectionCartes;
+  exemple: { afficher?: boolean | null; titre: string; texte: string };
+};
+export type PagePhotoVideo = PageService & {
+  heroLienTexte?: string | null;
+  reconnaissez: SectionListe;
+  capte: SectionCartes;
+  parcours: SectionEtapes;
+  differemment: SectionCartes;
+  tournage: { afficher?: boolean | null; photo: Image; titre: string; texte: string };
+};
+export type PageFormation = PageService & {
+  reconnaissez: SectionListe;
+  gains: SectionCartes;
+  enseigne: { afficher?: boolean | null; titre: string; libelleApres: string; liste: { titre: string; texte: string; apres: string }[] };
+  parcours: SectionEtapes;
+  differemment: SectionCartes;
+};
+
+export type Avis = { nom: string; contexte: string; signature: string; accroche: string; suite: string[] | null; extraitGoogle?: string | null };
+
+export type PageAccueil = Seo & {
+  h1: string;
+  heroTexte: string;
+  heroBoutonSecondaire: string;
+  videos: { afficher?: boolean | null; titre: string; sousTitre: string; bouton: string; liste: { youtubeId: string; titre: string; fiche?: string | null }[] };
+  avantApres: { afficher?: boolean | null; titre: string; sousTitre: string; texte: string; bouton: string; realisation: { slug: string; avantApres: AvantApres } };
+  quiz: { afficher?: boolean | null; titre: string; texte: string };
+  logos: { afficher?: boolean | null; titre: string; lien: string; liste: { nom: string; logoStyle: string; logo: Image }[] };
+  services: { afficher?: boolean | null; titre: string; ouvrir: string; fermer: string; lienPage: string };
+  parcours: { afficher?: boolean | null; surtitre: string; titre: string; etapes: Etape[] };
+  fondateurs: { afficher?: boolean | null; titre: string; texte: string; legende: string; photo: Image; citation: string };
+  avis: { afficher?: boolean | null; titre: string; etoiles: string; note: string };
+};
+
+type Reponse = { libelle: string; miroir: string; points: number };
+export type Profil = { titre: string; miroir: string; bonneNouvelle: string; suite: string; volet: string; lien: string };
+
+export type PageDiagnostic = Seo & {
+  h1: string;
+  intro: string;
+  boutonDebut: string;
+  encouragement: string;
+  boutonRetour: string;
+  questions: { question: string; precision?: string | null; reponses: Reponse[] }[];
+  resultatSurtitre: string;
+  barreSite: string;
+  barreTemps: string;
+  barreImage: string;
+  noteHaute: string;
+  noteMoyenne: string;
+  noteBasse: string;
+  carteMiroir: string;
+  carteBonneNouvelle: string;
+  carteSuite: string;
+  profilSite: Profil;
+  profilTemps: Profil;
+  profilImage: Profil;
+  profilAucun: Profil;
+  formTitre: string;
+  formTexte: string;
+  formNom: string;
+  formCourriel: string;
+  formBouton: string;
+  formNote: string;
+  merciTitre: string;
+  merciTexte: string;
+  boutonApproche: string;
+  boutonRefaire: string;
+};
+
+export type Membre = { nom: string; role: string; photo?: Image | null; texte: string };
+
+export type PageEquipe = Seo & {
+  h1: string;
+  intro: string;
+  origine: { afficher?: boolean | null; titre: string; texte: string[] };
+  quiFaitQuoi: { afficher?: boolean | null; titre: string; photoAVenir: string };
+  ensemble: { afficher?: boolean | null; photo: Image; titre: string; texte: string };
+  croyances: SectionCartes;
+  conclusion: { afficher?: boolean | null; titre: string; texte: string };
+};
+
+export type PageRealisations = Seo & {
+  surtitre: string;
+  h1: string;
+  h1Accent: string;
+  intro: string;
+  filtreTout: string;
+  categories: { siteWeb: string; photoVideo: string; automatisation: string; formation: string };
+  aucun: string;
+  portfolio: { afficher?: boolean | null; titre: string; bouton: string };
+  ficheRetour: string;
+  ficheSite: string;
+  ficheBesoinSurtitre: string;
+  ficheBesoinTitre: string;
+  ficheApercu: string;
+  ficheApercuBouton: string;
+  ficheMandatSurtitre: string;
+  ficheMandatTitre: string;
+  ficheResultat: string;
+  ficheAppel: string;
+  ficheOnglet: string;
+};
+
+export type PageContact = Seo & {
+  h1: string;
+  intro: string;
+  libelleCourriel: string;
+  libelleTelephone: string;
+  libelleRendezVous: string;
+  lienRendezVous: string;
+  champNom: string;
+  champCourriel: string;
+  champTelephone: string;
+  champMessage: string;
+  bouton: string;
+  boutonEnvoi: string;
+  merciTitre: string;
+  merciTexte: string;
+};
+
+export type PageBienvenue = Seo & {
+  h1: string;
+  intro: string;
+  formTitre: string;
+  champPrenom: string;
+  champCourriel: string;
+  champTelephone: string;
+  bouton: string;
+  boutonEnvoi: string;
+  merciTitre: string;
+  merciTexte: string;
+  outils: { afficher?: boolean | null; titre: string; texte: string; liste: Carte[]; propriete: string };
+  etapes: { afficher?: boolean | null; titre: string; liste: Carte[] };
+  paiement: { afficher?: boolean | null; titre: string; texte: string };
+  contact: { afficher?: boolean | null; titre: string; texte: string; libelleCourriel: string; libelleTelephone: string };
+};
+
+/** Une section s'affiche sauf si l'interrupteur « Afficher cette section » est décoché. */
+export const visible = (s: { afficher?: boolean | null } | null | undefined): boolean => !!s && s.afficher !== false;
+
+/** Position du point focal d'une image, pour object-position (repli : la valeur d'avant). */
+export function positionFocale(image: Image | null | undefined, repli: string): string {
+  const h = image?.hotspot;
+  return h ? `${Math.round(h.x * 1000) / 10}% ${Math.round(h.y * 1000) / 10}%` : repli;
+}

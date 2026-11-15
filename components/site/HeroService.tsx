@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { LIEN_RDV } from "@/lib/liens";
+import { useContenuGlobal } from "@/components/site/ContenuGlobal";
 
 /**
  * Entete des pages de service, VOLONTAIREMENT differente de celle de l'accueil.
@@ -19,13 +19,6 @@ import { LIEN_RDV } from "@/lib/liens";
  * - LES SERVICES VOISINS en pied d'entete. La navigation entre services se fait
  *   sans repasser par le menu, ce qui est justement le parcours qu'on veut.
  */
-
-const SERVICES = [
-  { href: "/sites-web", titre: "Sites web" },
-  { href: "/automatisation", titre: "Automatisation" },
-  { href: "/photo-et-video", titre: "Photo et vidéo" },
-  { href: "/formation", titre: "Formation" },
-] as const;
 
 export function HeroService({
   eyebrow,
@@ -46,6 +39,11 @@ export function HeroService({
    */
   lienExtra?: { href: string; libelle: string };
 }) {
+  // Onglets des services, fil d'Ariane et boutons : textes du Studio (pages de services,
+  // « Menu et pied de page »).
+  const { parametres, navigation, services } = useContenuGlobal();
+  const LIEN_RDV = parametres.lienRendezVous;
+  const SERVICES = services.map((s) => ({ href: s.chemin, titre: s.nom }));
   return (
     <section
       style={{
@@ -131,7 +129,7 @@ export function HeroService({
       >
         <nav aria-label="Fil d'Ariane" style={{ fontSize: 13 }}>
           <Link href="/" style={{ color: "rgba(245,243,238,.8)" }}>
-            Accueil
+            {navigation.filArianeAccueil}
           </Link>
           <span aria-hidden="true" style={{ color: "rgba(245,243,238,.34)", padding: "0 8px" }}>
             ›
@@ -199,7 +197,7 @@ export function HeroService({
               className="nv-btn-cream"
               style={{ padding: "14px 24px", borderRadius: 10, fontSize: 14.5, fontWeight: 600 }}
             >
-              Réserver mes 30 minutes
+              {navigation.boutonRendezVous}
             </a>
             <Link
               href="/diagnostic"
@@ -212,7 +210,7 @@ export function HeroService({
                 color: "#F5F3EE",
               }}
             >
-              Faire le quiz
+              {navigation.boutonQuiz}
             </Link>
             {lienExtra ? (
               <a

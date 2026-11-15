@@ -1,19 +1,26 @@
 import type { Metadata } from "next";
 import Content from "./Content";
 import SchemaService from "@/components/site/SchemaService";
+import { obtenirContenu } from "@/lib/contenu";
+import { metaPage } from "@/lib/meta";
 
-export const metadata: Metadata = {
-  title: { absolute: "Automatisation pour PME à Québec | Norvika" },
-  description: "Automatisation pour les PME de la ville de Québec, de la Rive-Sud de Montréal et de partout en province : on vous aide à comprendre vos outils, choisir ce qui manque, et retrouver du temps pour ce qui compte.",
-  alternates: { canonical: "/automatisation" },
-  openGraph: { title: "Automatisation pour PME à Québec | Norvika", description: "Automatisation pour les PME de la ville de Québec, de la Rive-Sud de Montréal et de partout en province : on vous aide à comprendre vos outils, choisir ce qui manque, et retrouver du temps pour ce qui compte.", url: "/automatisation" },
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const { automatisation } = await obtenirContenu();
+  return metaPage(automatisation, "/automatisation");
+}
 
-export default function Page() {
+export default async function Page() {
+  const { automatisation, parametres } = await obtenirContenu();
   return (
     <>
-      <SchemaService nom="Automatisation pour PME" type="Automatisation" description="Automatisation pour les PME de la ville de Québec, de la Rive-Sud de Montréal et de partout en province : on vous aide à comprendre vos outils, choisir ce qui manque, et retrouver du temps pour ce qui compte." chemin="/automatisation" />
-      <Content />
+      <SchemaService
+        nom={automatisation.schemaNom}
+        type={automatisation.schemaType}
+        description={automatisation.seoDescription}
+        chemin="/automatisation"
+        parametres={parametres}
+      />
+      <Content page={automatisation} />
     </>
   );
 }

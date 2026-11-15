@@ -5,39 +5,12 @@ import { useEffect, useRef, useState } from "react";
 
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
-import { Roadmap, type RoadStep } from "@/components/site/Roadmap";
-import { LIEN_RDV } from "@/lib/liens";
+import { Roadmap, versRoadSteps } from "@/components/site/Roadmap";
 import { AutresPages } from "@/components/site/AutresPages";
 import { HeroService } from "@/components/site/HeroService";
+import { visible, type PageSitesWeb } from "@/lib/types-contenu";
 
-const STEPS = [
-  {
-    title: "Un appel de 30 minutes",
-    text: "On comprend votre entreprise, vos clients, ce que votre site doit accomplir. Gratuit, sans engagement.",
-    x: 60,
-    y: 150,
-  },
-  {
-    title: "On conçoit votre site",
-    text: "À partir de votre réalité, vos clients et ce que votre site doit accomplir. Pas de gabarit générique.",
-    x: 392,
-    y: 100,
-  },
-  {
-    title: "Deux à trois semaines de construction",
-    text: "On bâtit, on ajuste avec vous, on soigne les détails.",
-    x: 784,
-    y: 115,
-  },
-  {
-    title: "Livraison et prise en main",
-    text: "On vous montre comment tout fonctionne. Vous repartez autonome, avec un site qui vous appartient.",
-    x: 1116,
-    y: 74,
-  },
-];
 
-const ROAD_STEPS: RoadStep[] = STEPS.map((e) => ({ label: e.title, title: e.title, body: e.text }));
 
 
 function useReveal() {
@@ -58,8 +31,10 @@ function useReveal() {
   return ref;
 }
 
-function Page() {
+// Tout le texte vient de la page « Sites web » du Studio.
+function Page({ page }: { page: PageSitesWeb }) {
   const containerRef = useReveal();
+  const ROAD_STEPS = versRoadSteps(page.parcours.etapes);
 
   const cardStyle: React.CSSProperties = {
     padding: "34px 30px",
@@ -78,12 +53,13 @@ function Page() {
       <SiteHeader />
 
       <HeroService
-        eyebrow="Sites web"
-        titre="Un site qui vous ressemble, et qui travaille pour vous."
-        texte="Pas de gabarit générique. On part de votre entreprise, on bâtit un site clair qui donne envie de vous contacter, et vous repartez en sachant comment il fonctionne."
+        eyebrow={page.nom}
+        titre={page.h1}
+        texte={page.heroTexte}
         courante="/sites-web"
       />
 
+      {visible(page.reconnaissez) ? (
       <section style={{ borderBottom: "1px solid rgba(12,25,47,.1)", background: "#ffffff" }}>
         <div className="nv-shell nv-grid"
           style={{
@@ -106,7 +82,7 @@ function Page() {
               letterSpacing: "-.03em",
             }}
           >
-            Vous vous reconnaissez?
+            {page.reconnaissez.titre}
           </h2>
           <div
             style={{
@@ -120,12 +96,7 @@ function Page() {
               boxShadow: "0 1px 0 rgba(255,255,255,.95) inset, 0 30px 70px -46px rgba(12,25,47,.8)",
             }}
           >
-            {[
-              "Vous n'avez pas de site, et vos clients vous cherchent en ligne sans vous trouver.",
-              "Votre site date, et il ne représente plus la qualité de votre travail.",
-              "Votre site est correct, mais personne ne vous contacte à partir de là.",
-              "Vous voulez un site à vous, sans mensualités qui n'en finissent plus.",
-            ].map((text, i) => (
+            {page.reconnaissez.phrases.map((text, i) => (
               <div
                 key={i}
                 data-check
@@ -169,7 +140,9 @@ function Page() {
           </div>
         </div>
       </section>
+      ) : null}
 
+      {visible(page.parcours) ? (
       <section style={{ borderBottom: "1px solid rgba(12,25,47,.1)", background: "#EEF2FA" }}>
         <div className="nv-shell" style={{ maxWidth: 1240, margin: "0 auto", padding: "92px 32px" }}>
           <h2
@@ -182,13 +155,15 @@ function Page() {
               letterSpacing: "-.03em",
             }}
           >
-            Comment ça se passe
+            {page.parcours.titre}
           </h2>
 
           <Roadmap steps={ROAD_STEPS} />
           </div>
       </section>
+      ) : null}
 
+      {visible(page.differemment) ? (
       <section style={{ borderBottom: "1px solid rgba(12,25,47,.1)", background: "#ffffff" }}>
         <div className="nv-shell" style={{ maxWidth: 1240, margin: "0 auto", padding: "92px 32px" }}>
           <h2
@@ -201,21 +176,10 @@ function Page() {
               letterSpacing: "-.03em",
             }}
           >
-            Ce qu'on fait différemment
+            {page.differemment.titre}
           </h2>
           <div className="nv-grid" style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: 20 }}>
-            {[
-              { title: "Le site vous appartient.", text: "Aucun frais mensuel obligatoire, aucun contrat qui vous retient. Il est à vous, point." },
-              {
-                title: "Bâti sur mesure.",
-                text: "Pas de forfait prédéfini: on monte le site autour de votre entreprise, avec ce dont vous avez besoin, rien de plus.",
-              },
-              {
-                title: "Fait pour convertir.",
-                text: "Un site clair, rapide, qui guide vos visiteurs vers la prochaine étape. Pas juste une belle vitrine.",
-              },
-              { title: "Prêt à évoluer.", text: "Quand vous voudrez ajouter une fonctionnalité ou connecter un outil, il pourra suivre." },
-            ].map((item, i) => (
+            {page.differemment.cartes.map((item, i) => (
               <div key={i} style={cardStyle}>
                 <h3
                   style={{
@@ -226,14 +190,15 @@ function Page() {
                     letterSpacing: "-.02em",
                   }}
                 >
-                  {item.title}
+                  {item.titre}
                 </h3>
-                <p style={{ margin: "12px 0 0", fontSize: 16, lineHeight: 1.62, color: "rgba(12,25,47,.66)" }}>{item.text}</p>
+                <p style={{ margin: "12px 0 0", fontSize: 16, lineHeight: 1.62, color: "rgba(12,25,47,.66)" }}>{item.texte}</p>
               </div>
             ))}
           </div>
         </div>
       </section>
+      ) : null}
 
       <AutresPages courante="/sites-web" />
       <SiteFooter />

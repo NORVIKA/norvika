@@ -5,35 +5,10 @@ import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
-import { Roadmap, type RoadStep } from "@/components/site/Roadmap";
-import { LIEN_RDV } from "@/lib/liens";
+import { Roadmap, versRoadSteps } from "@/components/site/Roadmap";
 import { AutresPages } from "@/components/site/AutresPages";
 import { HeroService } from "@/components/site/HeroService";
-
-const STEPS = [
-  { title: "Un appel de 30 minutes", label: "Un appel de 30 minutes", desc: "On regarde ensemble comment votre entreprise fonctionne aujourd'hui. Gratuit, sans engagement, et vous repartez avec un document d'analyse." },
-  { title: "On comprend vos façons de faire", label: "On comprend vos façons de faire", desc: "Vos outils actuels, vos étapes, où ça accroche. Avant de proposer quoi que ce soit." },
-  { title: "On trouve ce qui vous convient", label: "On trouve ce qui vous convient", desc: "Parfois c'est un outil que vous avez déjà, mal utilisé. Parfois c'est de l'automatisation, parfois de l'IA. On choisit pour votre réalité, pas pour la mode." },
-  { title: "On implante avec vous", label: "On implante avec vous", desc: "Petit à petit, sur vos propres comptes, avec votre équipe. Vous comprenez ce qui roule chez vous." },
-  { title: "On reste à vos côtés", label: "On reste à vos côtés", desc: "Vos outils évoluent, votre entreprise aussi. On vous accompagne pour que la compréhension reste, et que le temps gagné reste aussi." },
-];
-
-const ROAD_STEPS: RoadStep[] = STEPS.map((e) => ({ label: e.label, title: e.title, body: e.desc }));
-
-
-const CHECKS = [
-  "Vous payez pour des logiciels que vous utilisez à moitié.",
-  "Vous avez cinq outils, et rien ne se parle. Vous faites le pont vous-même, chaque jour.",
-  "Vous savez que ça pourrait rouler mieux, mais vous ne savez pas par où commencer.",
-  "Vous avez déjà essayé quelque chose, personne ne vous a expliqué, vous l'avez abandonné.",
-];
-
-const DIFFERENTLY = [
-  { title: "On commence par ce que vous avez déjà.", desc: "Avant d'ajouter un outil, on regarde si ceux que vous payez font le travail. Souvent, la réponse est oui." },
-  { title: "Vous comprenez, vous ne subissez pas.", desc: "On vous explique ce qui roule chez vous et pourquoi. Le but, c'est que vous soyez maître de vos outils, pas dépendant de nous." },
-  { title: "Rien n'est hébergé chez nous.", desc: "Tout est implanté sur vos comptes. Si on part demain, ça continue de rouler." },
-  { title: "Pas d'IA pour faire de l'IA.", desc: "Si le processus est mal organisé, ajouter de l'intelligence artificielle par-dessus rend juste ça plus compliqué. On règle l'ordre des choses d'abord." },
-];
+import { visible, type PageAutomatisation } from "@/lib/types-contenu";
 
 function useReveal() {
   useEffect(() => {
@@ -51,7 +26,9 @@ function useReveal() {
   }, []);
 }
 
-function Page() {
+// Tout le texte vient de la page « Automatisation » du Studio.
+function Page({ page }: { page: PageAutomatisation }) {
+  const ROAD_STEPS = versRoadSteps(page.parcours.etapes);
 
   useReveal();
 
@@ -60,16 +37,17 @@ function Page() {
       <SiteHeader />
 
       <HeroService
-        eyebrow="Automatisation"
-        titre="Vos outils devraient travailler pour vous. Pas l'inverse."
-        texte="La plupart des entreprises ont déjà des outils. Le problème, c'est qu'elles ne les comprennent pas vraiment, alors elles compensent à la main. On vous aide à comprendre ce que vous avez, à choisir ce qui manque, et à retrouver du temps pour ce qui compte."
+        eyebrow={page.nom}
+        titre={page.h1}
+        texte={page.heroTexte}
         courante="/automatisation"
       />
 
+      {visible(page.reconnaissez) ? (
       <section style={{ borderBottom: "1px solid rgba(12,25,47,.1)", background: "#ffffff" }}>
         <div className="nv-grid nv-shell" style={{ maxWidth: 1240, margin: "0 auto", padding: "88px 32px", display: "grid", gridTemplateColumns: ".85fr 1.15fr", gap: 56, alignItems: "start" }}>
           <h2 style={{ margin: 0, fontFamily: "var(--font-display)", fontWeight: 600, fontSize: "clamp(28px,3.4vw,44px)", lineHeight: 1.08, letterSpacing: "-.03em" }}>
-            Vous vous reconnaissez?
+            {page.reconnaissez.titre}
           </h2>
           <div
             style={{
@@ -83,7 +61,7 @@ function Page() {
               boxShadow: "0 1px 0 rgba(255,255,255,.95) inset, 0 30px 70px -46px rgba(12,25,47,.8)",
             }}
           >
-            {CHECKS.map((text, i) => (
+            {page.reconnaissez.phrases.map((text, i) => (
               <div
                 key={i}
                 data-check
@@ -132,24 +110,28 @@ function Page() {
           </div>
         </div>
       </section>
+      ) : null}
 
+      {visible(page.parcours) ? (
       <section style={{ borderBottom: "1px solid rgba(12,25,47,.1)", background: "#EEF2FA" }}>
         <div className="nv-shell" style={{ maxWidth: 1240, margin: "0 auto", padding: "92px 32px" }}>
           <h2 style={{ margin: 0, fontFamily: "var(--font-display)", fontWeight: 600, fontSize: "clamp(28px,3.4vw,44px)", lineHeight: 1.08, letterSpacing: "-.03em" }}>
-            Comment ça se passe
+            {page.parcours.titre}
           </h2>
 
           <Roadmap steps={ROAD_STEPS} />
           </div>
       </section>
+      ) : null}
 
+      {visible(page.differemment) ? (
       <section style={{ borderBottom: "1px solid rgba(12,25,47,.1)", background: "#ffffff" }}>
         <div className="nv-shell" style={{ maxWidth: 1240, margin: "0 auto", padding: "92px 32px" }}>
           <h2 style={{ margin: "0 0 44px", fontFamily: "var(--font-display)", fontWeight: 600, fontSize: "clamp(28px,3.4vw,44px)", lineHeight: 1.08, letterSpacing: "-.03em" }}>
-            Ce qu'on fait différemment
+            {page.differemment.titre}
           </h2>
           <div className="nv-grid" style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: 20 }}>
-            {DIFFERENTLY.map((item, i) => (
+            {page.differemment.cartes.map((item, i) => (
               <div
                 key={i}
                 data-reveal
@@ -165,20 +147,22 @@ function Page() {
                 }}
               >
                 <h3 style={{ margin: 0, fontFamily: "var(--font-display)", fontWeight: 600, fontSize: 21, letterSpacing: "-.02em" }}>
-                  {item.title}
+                  {item.titre}
                 </h3>
-                <p style={{ margin: "12px 0 0", fontSize: 16, lineHeight: 1.62, color: "rgba(12,25,47,.66)" }}>{item.desc}</p>
+                <p style={{ margin: "12px 0 0", fontSize: 16, lineHeight: 1.62, color: "rgba(12,25,47,.66)" }}>{item.texte}</p>
               </div>
             ))}
           </div>
         </div>
       </section>
+      ) : null}
 
+      {visible(page.exemple) ? (
       <section style={{ position: "relative", overflow: "hidden", borderBottom: "1px solid rgba(12,25,47,.1)", background: "#EEF2FA" }}>
         <div aria-hidden="true" style={{ position: "absolute", top: "-10%", left: "40%", width: 620, height: 620, borderRadius: "50%", pointerEvents: "none", background: "radial-gradient(circle, rgba(51,73,108,.12) 0%, rgba(51,73,108,0) 68%)", filter: "blur(40px)" }} />
         <div className="nv-grid nv-shell" style={{ position: "relative", maxWidth: 1240, margin: "0 auto", padding: "92px 32px", display: "grid", gridTemplateColumns: ".7fr 1.3fr", gap: 56, alignItems: "start" }}>
           <h2 style={{ margin: 0, fontFamily: "var(--font-display)", fontWeight: 600, fontSize: "clamp(28px,3.4vw,44px)", lineHeight: 1.08, letterSpacing: "-.03em" }}>
-            Un exemple simple
+            {page.exemple.titre}
           </h2>
           <div
             style={{
@@ -192,11 +176,12 @@ function Page() {
             }}
           >
             <p style={{ margin: 0, maxWidth: "68ch", fontSize: 17.5, lineHeight: 1.7, color: "rgba(12,25,47,.72)" }}>
-              Un entrepreneur recevait ses demandes par courriel, sur Facebook et sur son site web, et passait ses soirées à tout retranscrire pour faire ses suivis. On a regardé son processus au complet, puis on a centralisé ses demandes au même endroit, avec les outils qu'il avait déjà. Maintenant, chaque demande est classée automatiquement, il sait lesquelles relancer, et il comprend comment ça marche. Rien de spectaculaire. Juste ses soirées qui lui appartiennent de nouveau.
+              {page.exemple.texte}
             </p>
           </div>
         </div>
       </section>
+      ) : null}
 
       <AutresPages courante="/automatisation" />
       <SiteFooter />

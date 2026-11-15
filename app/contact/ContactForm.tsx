@@ -4,8 +4,11 @@ import { useState, type FormEvent } from "react";
 import { AntiRobot, MESSAGE_JETON_ABSENT, lireJetonAntiRobot, reinitialiserAntiRobot } from "@/components/site/AntiRobot";
 import { MentionCollecte } from "@/components/site/MentionCollecte";
 import { CHAMP_JETON } from "@/lib/anti-robot-commun";
+import type { PageContact } from "@/lib/types-contenu";
 
-export function ContactForm({ email }: { email: string }) {
+// Étiquettes, bouton et remerciement : page « Contact » du Studio. Les messages d'erreur restent
+// ici (exception de la phase 4 : ils suivent la logique de validation).
+export function ContactForm({ email, t }: { email: string; t: PageContact }) {
   const [nom, setNom] = useState("");
   const [courriel, setCourriel] = useState("");
   const [telephone, setTelephone] = useState("");
@@ -65,9 +68,9 @@ export function ContactForm({ email }: { email: string }) {
   if (envoye) {
     return (
       <div className="rounded-2xl border border-[var(--hairline)] bg-[var(--cream)] p-8 md:p-10">
-        <p className="text-lg font-medium text-[var(--foreground)]">Merci, votre message est parti.</p>
+        <p className="text-lg font-medium text-[var(--foreground)]">{t.merciTitre}</p>
         <p className="mt-2 text-sm text-[var(--muted-foreground)]">
-          On vous revient rapidement, par courriel ou par téléphone.
+          {t.merciTexte}
         </p>
       </div>
     );
@@ -77,7 +80,7 @@ export function ContactForm({ email }: { email: string }) {
     <form onSubmit={onSubmit} className="rounded-2xl border border-[var(--hairline)] bg-[var(--background)] p-6 md:p-8">
       <div className="grid gap-5 sm:grid-cols-2">
         <label className="block">
-          <span className="text-sm font-medium text-[var(--foreground)]">Nom</span>
+          <span className="text-sm font-medium text-[var(--foreground)]">{t.champNom}</span>
           <input
             type="text"
             required
@@ -88,7 +91,7 @@ export function ContactForm({ email }: { email: string }) {
           />
         </label>
         <label className="block">
-          <span className="text-sm font-medium text-[var(--foreground)]">Courriel</span>
+          <span className="text-sm font-medium text-[var(--foreground)]">{t.champCourriel}</span>
           <input
             type="email"
             required
@@ -100,7 +103,7 @@ export function ContactForm({ email }: { email: string }) {
         </label>
       </div>
       <label className="mt-5 block">
-        <span className="text-sm font-medium text-[var(--foreground)]">Téléphone (facultatif)</span>
+        <span className="text-sm font-medium text-[var(--foreground)]">{t.champTelephone}</span>
         <input
           type="tel"
           maxLength={50}
@@ -110,7 +113,7 @@ export function ContactForm({ email }: { email: string }) {
         />
       </label>
       <label className="mt-5 block">
-        <span className="text-sm font-medium text-[var(--foreground)]">Message</span>
+        <span className="text-sm font-medium text-[var(--foreground)]">{t.champMessage}</span>
         <textarea
           required
           rows={5}
@@ -128,7 +131,7 @@ export function ContactForm({ email }: { email: string }) {
           disabled={envoi}
           className="inline-flex items-center justify-center rounded-full bg-[var(--primary)] px-7 py-3.5 text-sm font-bold text-white transition-colors hover:bg-[var(--primary)]/90 disabled:opacity-60"
         >
-          {envoi ? "Envoi en cours…" : "Envoyer le message"}
+          {envoi ? t.boutonEnvoi : t.bouton}
         </button>
       </div>
       <div className="mt-5 text-[var(--muted-foreground)]">

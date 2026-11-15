@@ -1,31 +1,25 @@
 import type { Metadata } from "next";
 import { SiteShell } from "@/components/site/SiteShell";
-import { getSiteData } from "@/lib/get-site-data";
 import { Reveal } from "@/components/ui/Reveal";
+import { obtenirContenu } from "@/lib/contenu";
+import { metaPage } from "@/lib/meta";
 import { ContactForm } from "./ContactForm";
 
-export const metadata: Metadata = {
-  title: "Contact",
-  description:
-    "Parlez-nous de votre projet. On vous répond rapidement, par courriel ou par téléphone.",
-  openGraph: {
-    title: "Contact | Norvika",
-    description:
-      "Parlez-nous de votre projet. On vous répond rapidement, par courriel ou par téléphone.",
-    url: "/contact",
-  },
-  alternates: { canonical: "https://norvika.ca/contact" },
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const { contact } = await obtenirContenu();
+  return metaPage(contact, "/contact");
+}
 
 // Meme raison que dans app/layout.tsx : la revalidation ne pouvait rien
 // ecrire, elle ne servait qu'a marquer la page perimee pour toujours.
 export const dynamic = "force-static";
 
 export default async function ContactPage() {
-  const { siteInfo } = await getSiteData();
-  const email = siteInfo.email || "info@norvika.ca";
-  const telephone = siteInfo.telephone || "438 522 4275";
-  const rdvLink = siteInfo.lien_rdv || "https://calendar.app.google/W5SS5UmnJCTLXhw8A";
+  // Coordonnées : « Infos de l'entreprise ». Textes : page « Contact » du Studio.
+  const { parametres, contact: t } = await obtenirContenu();
+  const email = parametres.courriel;
+  const telephone = parametres.telephone;
+  const rdvLink = parametres.lienRendezVous;
 
   return (
     <SiteShell>
@@ -40,17 +34,16 @@ export default async function ContactPage() {
             {/* Colonne info */}
             <Reveal>
               <h1 className="text-4xl font-semibold leading-[1.05] tracking-tight text-[var(--foreground)] sm:text-5xl">
-                Parlons de votre projet.
+                {t.h1}
               </h1>
               <p className="mt-6 max-w-md text-base leading-relaxed text-[var(--muted-foreground)] md:text-lg">
-                Une question, un projet, ou juste l&apos;envie d&apos;en parler ? Écrivez-nous et on
-                vous revient rapidement.
+                {t.intro}
               </p>
 
               <dl className="mt-10 space-y-6">
                 <div>
                   <dt className="text-xs font-medium uppercase tracking-[0.2em] text-[var(--muted-foreground)]">
-                    Courriel
+                    {t.libelleCourriel}
                   </dt>
                   <dd className="mt-1">
                     <a href={`mailto:${email}`} className="text-base font-medium text-[var(--foreground)] hover:text-[var(--brand)] hover:underline">
@@ -60,7 +53,7 @@ export default async function ContactPage() {
                 </div>
                 <div>
                   <dt className="text-xs font-medium uppercase tracking-[0.2em] text-[var(--muted-foreground)]">
-                    Téléphone
+                    {t.libelleTelephone}
                   </dt>
                   <dd className="mt-1">
                     <a href={`tel:${telephone.replace(/\s/g, "")}`} className="text-base font-medium text-[var(--foreground)] hover:text-[var(--brand)] hover:underline">
@@ -70,11 +63,11 @@ export default async function ContactPage() {
                 </div>
                 <div>
                   <dt className="text-xs font-medium uppercase tracking-[0.2em] text-[var(--muted-foreground)]">
-                    Prendre rendez-vous
+                    {t.libelleRendezVous}
                   </dt>
                   <dd className="mt-1">
                     <a href={rdvLink} target="_blank" rel="noopener noreferrer" className="text-base font-medium text-[var(--brand)] hover:underline">
-                      Réserver un appel de 30 min
+                      {t.lienRendezVous}
                     </a>
                   </dd>
                 </div>
@@ -83,7 +76,7 @@ export default async function ContactPage() {
 
             {/* Colonne formulaire */}
             <Reveal delay={120}>
-              <ContactForm email={email} />
+              <ContactForm email={email} t={t} />
             </Reveal>
           </div>
         </div>

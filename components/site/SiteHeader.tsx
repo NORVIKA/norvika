@@ -3,23 +3,17 @@
 import Link from "next/link";
 
 import { useState } from "react";
-import { LIEN_RDV } from "@/lib/liens";
-// Lockup horizontal de la marque : l'icone et le mot NORVIKA cote a cote.
-// En SVG : net a toutes les tailles, 2,6 Ko, et pas de version floue sur
-// les ecrans a haute densite.
-const wordmark = { url: "/assets/norvika-horizontal.svg" };
-const links = [
-  { to: "/sites-web", label: "Sites web" },
-  { to: "/automatisation", label: "Automatisation" },
-  { to: "/photo-et-video", label: "Photo et vidéo" },
-  { to: "/formation", label: "Formation" },
-  { to: "/realisations", label: "Réalisations" },
-  { to: "/equipe", label: "L'équipe" },
-] as const;
+import { useContenuGlobal } from "@/components/site/ContenuGlobal";
 
-
+// Lockup horizontal de la marque (l'icone et le mot NORVIKA cote a cote), en SVG :
+// net a toutes les tailles. Le logo, les liens et le bouton viennent du Studio
+// (« Infos de l'entreprise » et « Menu et pied de page »).
 export function SiteHeader() {
   const [open, setOpen] = useState(false);
+  const { parametres, navigation } = useContenuGlobal();
+  const wordmark = parametres.logoEntete;
+  const links = navigation.liensMenu.map((l) => ({ to: l.lien, label: l.libelle }));
+  const LIEN_RDV = parametres.lienRendezVous;
 
   return (
     <header
@@ -50,7 +44,7 @@ export function SiteHeader() {
         <Link href="/" style={{ display: "flex", alignItems: "center", gap: 11 }}>
           <img
             src={wordmark.url}
-            alt="Norvika"
+            alt={wordmark.alt ?? ""}
             width={158}
             height={26}
             style={{ height: 26, width: "auto", display: "block" }}
@@ -76,7 +70,7 @@ export function SiteHeader() {
             fontWeight: 600,
           }}
          target="_blank" rel="noopener noreferrer">
-          Réserver mes 30 minutes
+          {navigation.boutonRendezVous}
         </a>
         <button
           type="button"
@@ -154,7 +148,7 @@ export function SiteHeader() {
             target="_blank"
             rel="noopener noreferrer"
           >
-            Réserver mes 30 minutes
+            {navigation.boutonRendezVous}
           </a>
         </nav>
       ) : null}
