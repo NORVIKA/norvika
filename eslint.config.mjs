@@ -8,7 +8,7 @@ import coreWebVitals from "eslint-config-next/core-web-vitals";
 
 export default [
   ...(Array.isArray(coreWebVitals) ? coreWebVitals : [coreWebVitals]),
-  { ignores: [".next/**", ".open-next/**", "node_modules/**"] },
+  { ignores: [".next/**", ".open-next/**", "node_modules/**", "studio/**"] },
   {
     rules: {
       // Les pages viennent de la maquette et sont ecrites en francais : les

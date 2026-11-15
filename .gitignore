@@ -28,3 +28,7 @@ PROJET.json
 
 # Sorties d'outils deposees a la racine ; ne font pas partie du site.
 Claude outputs/
+
+# Sorties du Studio Sanity (hébergé par Sanity sur norvika.sanity.studio, jamais servi d'ici)
+/studio/dist/
+/studio/.sanity/
