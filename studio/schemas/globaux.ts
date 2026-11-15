@@ -17,6 +17,7 @@ export const parametres = defineType({
   ],
   fields: [
     ligne('nom', 'Nom de l’entreprise', 'Le nom affiché à Google et dans les partages (ex. : « Norvika »).', { group: 'coordonnees' }),
+    ligne('nomLegal', 'Nom légal', 'Nom légal exact, affiché après le © dans le pied de page.', { group: 'coordonnees' }),
     paragraphe(
       'description',
       'Phrase de présentation',
@@ -31,7 +32,12 @@ export const parametres = defineType({
       description: 'L’adresse affichée dans le pied de page et sur la page Contact. Les liens « Écrivez-nous » s’en servent.',
       validation: (r) => r.required().email().error('Indiquez une adresse courriel valide.'),
     }),
-    ligne('telephone', 'Téléphone', 'Tel qu’il doit s’afficher (ex. : « 438 522 4275 »). Le lien d’appel est fait automatiquement.', { group: 'coordonnees' }),
+    ligne(
+      'telephone',
+      'Téléphone',
+      'Tel qu’il doit s’afficher (ex. : « 438 522 4275 »). Affiché dans la barre du haut et sur la page Contact ; le lien d’appel est fait automatiquement.',
+      { group: 'coordonnees' },
+    ),
     lien('lienRendezVous', 'Lien du calendrier de rendez-vous', 'L’adresse de la page où l’on réserve un appel de 30 minutes. Tous les boutons « Réserver mes 30 minutes » y mènent.', {
       group: 'coordonnees',
     }),
@@ -133,9 +139,24 @@ export const navigation = defineType({
     ligne('boutonQuiz', 'Texte du bouton du quiz', 'Le bouton qui mène au diagnostic, en haut des pages de services (ex. : « Faire le quiz »).', { group: 'boutons' }),
     ligne('basculeAvant', 'Bouton « avant » de la bascule', 'Le bouton qui montre l’ancien site, dans la bascule avant / après (ex. : « Avant »).', { group: 'boutons' }),
     ligne('basculeApres', 'Bouton « après » de la bascule', 'Le bouton qui montre le nouveau site, dans la bascule avant / après (ex. : « Après »).', { group: 'boutons' }),
-    ligne('filArianeAccueil', 'Premier lien du fil d’Ariane', 'Le lien vers l’accueil, au-dessus du titre des pages de services (ex. : « Accueil »).', {
-      group: 'boutons',
-    }),
+    ligne(
+      'filArianeAccueil',
+      'Nom de l’accueil',
+      'Le premier lien du fil d’Ariane (pages de services, fiches des réalisations) et le nom de l’accueil dans le plan du site (ex. : « Accueil »).',
+      { group: 'boutons' },
+    ),
+    ligne(
+      'filArianeLibelle',
+      'Nom du fil d’Ariane (lecteurs d’écran)',
+      'Invisible à l’écran : ce que les lecteurs d’écran annoncent avant le fil d’Ariane (ex. : « Fil d’Ariane »).',
+      { group: 'boutons' },
+    ),
+    ligne(
+      'enteteTelephone',
+      'Devant le téléphone (lecteurs d’écran)',
+      'Invisible à l’écran : lu juste avant le numéro de la barre du haut par les lecteurs d’écran (ex. : « Appeler Norvika au »). Le numéro se change dans « Infos de l’entreprise ».',
+      { group: 'menu' },
+    ),
     ligne('piedTitreServices', 'Titre de la colonne des pages', 'Au-dessus de la liste des pages, dans le pied de page (ex. : « Services »).', { group: 'pied' }),
     ligne('piedTitreContact', 'Titre de la colonne contact', 'Au-dessus du courriel, dans le pied de page (ex. : « Contact »).', { group: 'pied' }),
     defineField({
@@ -146,11 +167,29 @@ export const navigation = defineType({
       description: 'Les liens affichés sous le courriel, dans le pied de page (ex. : « Nous écrire »).',
       of: [lienMenu],
     }),
-    ligne('piedDroits', 'Ligne du bas du pied de page', 'Le texte en petit, en bas à gauche (ex. : « © 2026 Norvika · Québec et Rive-Sud de Montréal »).', {
+    ligne(
+      'piedMention',
+      'Mention après le nom légal',
+      'Le texte en petit après « © année nom légal », en bas à gauche du pied de page (ex. : « Québec et Rive-Sud de Montréal »). L’année est calculée automatiquement et le nom légal se change dans « Infos de l’entreprise ». Laissez vide pour n’afficher que le nom.',
+      { group: 'pied', requis: false },
+    ),
+    // ⚠️ REMPLACÉS par « © année nom légal » (année calculée, nom légal dans « Infos de l'entreprise ») et
+    //    par piedMention, le 2026-11-15. Cachés, pas retirés : le code en ligne les lit jusqu'à la fusion
+    //    de la branche mise-a-niveau-2026-11. À vider et retirer ensuite.
+    ligne('piedDroits', 'Ancienne ligne du bas (remplacée)', 'Remplacée par « © année nom légal » et la mention après le nom légal.', {
+      group: 'pied',
+      hidden: true,
+      requis: false,
+    }),
+    ligne('piedDroitsCourt', 'Ancienne ligne du bas courte (remplacée)', 'Remplacée par « © année nom légal ».', {
+      group: 'pied',
+      hidden: true,
+      requis: false,
+    }),
+    ligne('piedPolitique', 'Texte du lien vers la politique', 'Le lien vers la politique de confidentialité, en bas à droite. Sert aussi de nom à cette page dans le plan du site.', {
       group: 'pied',
     }),
-    ligne('piedDroitsCourt', 'Ligne du bas, version courte', 'Le pied de page réduit de la page du quiz (ex. : « © 2026 Norvika »).', { group: 'pied' }),
-    ligne('piedPolitique', 'Texte du lien vers la politique', 'Le lien vers la politique de confidentialité, en bas à droite.', { group: 'pied' }),
+    ligne('piedPlanDuSite', 'Texte du lien vers le plan du site', 'Le lien vers le plan du site, en bas à droite à côté de la politique (ex. : « Plan du site »).', { group: 'pied' }),
     ligne('suiteTitre', 'Titre du bloc', 'Au-dessus des cartes qui mènent aux autres pages, en bas de chaque page (ex. : « Continuer la visite »).', {
       group: 'suite',
     }),

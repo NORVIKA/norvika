@@ -9,6 +9,9 @@ export const parametres: Document = {
   _id: 'parametres',
   _type: 'parametres',
   nom: 'Norvika',
+  // Ajouté le 2026-11-15 (bloc D) : nom légal après le © du pied de page. Valeur provisoire, le vrai nom
+  // légal est à saisir dans le Studio.
+  nomLegal: 'Norvika',
   description: 'Présence numérique pour les entreprises et les travailleurs autonomes.',
   courriel: 'info@norvika.ca',
   telephone: '438 522 4275',
@@ -52,6 +55,9 @@ export const navigation: Document = {
   boutonRendezVous: 'Réserver mes 30 minutes',
   boutonQuiz: 'Faire le quiz',
   filArianeAccueil: 'Accueil',
+  // Ajoutés le 2026-11-15 (bloc D) : fil d'Ariane partagé et téléphone de la barre du haut.
+  filArianeLibelle: "Fil d'Ariane",
+  enteteTelephone: 'Appeler Norvika au',
   basculeAvant: 'Avant',
   basculeApres: 'Après',
   piedTitreServices: 'Services',
@@ -66,6 +72,9 @@ export const navigation: Document = {
   piedDroits: '© 2026 Norvika · Québec et Rive-Sud de Montréal',
   piedDroitsCourt: '© 2026 Norvika',
   piedPolitique: 'Politique de confidentialité',
+  // Ajoutés le 2026-11-15 (bloc D) : « © année nom légal · mention » et lien vers le plan du site.
+  piedMention: 'Québec et Rive-Sud de Montréal',
+  piedPlanDuSite: 'Plan du site',
   suiteTitre: 'Continuer la visite',
   suitePages: cles(
     [

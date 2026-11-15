@@ -9,6 +9,7 @@ import {
   pageEquipe,
   pageFormation,
   pagePhotoVideo,
+  pagePlanDuSite,
   pageRealisations,
   pageSitesWeb,
 } from './pages'
@@ -25,6 +26,7 @@ export const typesDuSchema = appliquerGardes([
   pageEquipe,
   pageRealisations,
   pageContact,
+  pagePlanDuSite,
   pageBienvenue,
   page404,
   parametres,
@@ -50,6 +52,7 @@ export const SANS_CREATION = [
   'pageEquipe',
   'pageRealisations',
   'pageContact',
+  'pagePlanDuSite',
   'pageBienvenue',
   'page404',
   'parametres',

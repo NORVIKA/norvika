@@ -76,6 +76,7 @@ export const pageRealisations: Document = {
   _id: 'pageRealisations',
   _type: 'pageRealisations',
   seoTitre: TITRES_PROTEGES.pageRealisations.seoTitre,
+  nom: 'Réalisations',
   surtitre: 'Réalisations',
   h1: TITRES_PROTEGES.pageRealisations.h1.h1,
   h1Accent: TITRES_PROTEGES.pageRealisations.h1.h1Accent,

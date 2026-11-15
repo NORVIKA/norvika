@@ -70,6 +70,7 @@ export const structure: StructureResolver = (S) =>
             .items([
               unique(S, 'pageDiagnostic', 'Diagnostic (quiz)', SearchIcon),
               unique(S, 'pageContact', 'Contact', EnvelopeIcon),
+              unique(S, 'pagePlanDuSite', 'Plan du site', DocumentTextIcon),
               unique(S, 'pageBienvenue', 'Bienvenue (nouveaux clients)', DocumentTextIcon),
               unique(S, 'page404', 'Page introuvable', DocumentTextIcon),
             ]),

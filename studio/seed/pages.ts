@@ -24,6 +24,7 @@ export const pageDiagnostic: Document = {
   _id: 'pageDiagnostic',
   _type: 'pageDiagnostic',
   ...t('pageDiagnostic'),
+  nom: 'Diagnostic gratuit',
   intro: "Répondez comme vous le pensez, pas comme vous aimeriez que ce soit. C'est là que ça devient utile.",
   boutonDebut: "C'est parti",
   encouragement: 'Plus que trois. Vous êtes bon là-dedans.',
@@ -156,6 +157,7 @@ export const pageEquipe: Document = {
   _id: 'pageEquipe',
   _type: 'pageEquipe',
   ...t('pageEquipe'),
+  nom: "L'équipe",
   intro: "Norvika, c'est Laurianne et William. Deux façons de penser qui se complètent, un même but: que la technologie vous serve, pas l'inverse.",
   origine: {
     afficher: true,
@@ -234,6 +236,7 @@ export const pageContact: Document = {
   _id: 'pageContact',
   _type: 'pageContact',
   ...t('pageContact'),
+  nom: 'Contact',
   intro: "Une question, un projet, ou juste l'envie d'en parler ? Écrivez-nous et on vous revient rapidement.",
   libelleCourriel: 'Courriel',
   libelleTelephone: 'Téléphone',
@@ -248,6 +251,19 @@ export const pageContact: Document = {
   merciTitre: 'Merci, votre message est parti.',
   merciTexte: 'On vous revient rapidement, par courriel ou par téléphone.',
   seoDescription: 'Parlez-nous de votre projet. On vous répond rapidement, par courriel ou par téléphone.',
+}
+
+/** Ajoutée le 2026-11-15 (bloc D) : la liste des pages et des fiches se fait toute seule dans le code. */
+export const pagePlanDuSite: Document = {
+  _id: 'pagePlanDuSite',
+  _type: 'pagePlanDuSite',
+  h1: 'Plan du site',
+  intro: "Toutes les pages du site au même endroit, avec les entreprises qu'on a accompagnées.",
+  titrePages: 'Les pages',
+  titreRealisations: 'Les réalisations',
+  seoTitre: 'Plan du site : toutes nos pages et réalisations | Norvika',
+  seoDescription:
+    "Toutes les pages de norvika.ca au même endroit : sites web, automatisation, photo et vidéo, formation, l'équipe, le diagnostic gratuit et nos réalisations.",
 }
 
 export const pageBienvenue: Document = {

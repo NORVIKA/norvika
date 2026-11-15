@@ -58,6 +58,7 @@ const documents: Document[] = [
   pages.pageEquipe,
   ...pages.membres,
   pages.pageContact,
+  pages.pagePlanDuSite,
   pages.pageBienvenue,
   accueil.pageAccueil,
   ...accueil.avis,

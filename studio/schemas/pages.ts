@@ -27,6 +27,20 @@ function section(name: string, title: string, description: string, fields: Field
   return defineField({ name, title, type: 'object', description, group, options: { collapsible: true, collapsed: false }, fields: [afficher(), ...fields] })
 }
 
+/**
+ * Le nom court d'une page, DÉCLARÉ UNE FOIS : plan du site, fil d'Ariane et fichier llms.txt lu par
+ * les assistants IA. Les pages de services ont déjà le leur (« Nom du service »), sous le même nom
+ * de champ, pour que le code lise `nom` partout.
+ */
+function nomPage(exemple: string) {
+  return ligne(
+    'nom',
+    'Nom de la page',
+    `Le nom court de la page, dans le plan du site, le fil d’Ariane et le fichier lu par les assistants IA (ex. : « ${exemple} »).`,
+    { group: 'contenu' },
+  )
+}
+
 const AIDE_RECONNAISSEZ = 'La section des cases cochées, juste sous le haut de la page.'
 const AIDE_PHRASES = 'Une situation par case, écrite comme le client la vit. Elles se cochent une à une à l’écran.'
 
@@ -135,7 +149,7 @@ export const pageAccueil = defineType({
 function champsService(): FieldDefinition[] {
   return [
     deverrouillage('contenu'),
-    ligne('nom', 'Nom du service', 'Le nom court, affiché dans le fil d’Ariane, au-dessus du grand titre et dans les onglets des services (ex. : « Sites web »).', { group: 'menu' }),
+    ligne('nom', 'Nom du service', 'Le nom court, affiché dans le fil d’Ariane, dans les onglets des services et dans le plan du site (ex. : « Sites web »).', { group: 'menu' }),
     defineField({
       name: 'ordre',
       title: 'Ordre d’affichage',
@@ -290,6 +304,7 @@ export const pageDiagnostic = defineType({
   groups: [...GROUPES_PAGE, { name: 'questions', title: 'Questions' }, { name: 'resultats', title: 'Résultats' }],
   fields: [
     deverrouillage('contenu'),
+    nomPage('Diagnostic gratuit'),
     grandTitre('h1', 'Grand titre', 'Le titre de l’écran d’accueil du quiz.', 'contenu'),
     paragraphe('intro', 'Texte d’accueil', 'La phrase sous le titre, avant de commencer.', { group: 'contenu' }),
     ligne('boutonDebut', 'Bouton pour commencer', 'Ex. : « C’est parti ».', { group: 'contenu' }),
@@ -380,6 +395,7 @@ export const pageEquipe = defineType({
   groups: GROUPES_PAGE,
   fields: [
     deverrouillage('contenu'),
+    nomPage('L’équipe'),
     grandTitre('h1', 'Grand titre', 'Le titre en gros, en haut de la page.', 'contenu'),
     paragraphe('intro', 'Texte sous le grand titre', 'Une ou deux phrases de présentation.', { group: 'contenu' }),
     section('origine', 'Comment Norvika est née', 'Le récit des débuts.', [
@@ -411,7 +427,8 @@ export const pageRealisations = defineType({
   groups: [...GROUPES_PAGE, { name: 'fiche', title: 'Fiches des clients' }],
   fields: [
     deverrouillage('contenu'),
-    ligne('surtitre', 'Petit titre', 'Le texte en capitales au-dessus du grand titre (ex. : « Réalisations »). Sert aussi au fil d’Ariane lu par Google.', {
+    nomPage('Réalisations'),
+    ligne('surtitre', 'Petit titre', 'Le texte en capitales au-dessus du grand titre (ex. : « Réalisations »).', {
       group: 'contenu',
     }),
     grandTitre('h1', 'Grand titre, début', 'La partie du grand titre en noir (ex. : « Ils nous font »).', 'contenu'),
@@ -436,7 +453,14 @@ export const pageRealisations = defineType({
       ligne('titre', 'Titre', 'Le titre du bandeau.'),
       ligne('bouton', 'Texte du bouton', 'Le bouton qui ouvre le portfolio.'),
     ]),
-    ligne('ficheRetour', 'Lien de retour', 'En haut de chaque fiche (ex. : « Toutes les réalisations »).', { group: 'fiche' }),
+    // ⚠️ REMPLACÉ le 2026-11-15 par le fil d'Ariane (Accueil, Réalisations, nom du client) en haut de
+    //    chaque fiche. Caché, pas retiré : le code en ligne le lit jusqu'à la fusion de la branche
+    //    mise-a-niveau-2026-11. À vider et retirer ensuite.
+    ligne('ficheRetour', 'Ancien lien de retour (remplacé)', 'Remplacé par le fil d’Ariane en haut de chaque fiche.', {
+      group: 'fiche',
+      hidden: true,
+      requis: false,
+    }),
     ligne('ficheSite', 'Bouton vers le site du client', 'Affiché si la fiche a l’adresse du site du client (ex. : « Visiter le site »).', { group: 'fiche' }),
     ligne('ficheBesoinSurtitre', 'Petit titre du besoin', 'Ex. : « 01 · Le point de départ ».', { group: 'fiche' }),
     ligne('ficheBesoinTitre', 'Titre du besoin', 'Ex. : « Le besoin ».', { group: 'fiche' }),
@@ -461,6 +485,7 @@ export const pageContact = defineType({
   groups: [...GROUPES_PAGE, { name: 'formulaire', title: 'Formulaire' }],
   fields: [
     deverrouillage('contenu'),
+    nomPage('Contact'),
     grandTitre('h1', 'Grand titre', 'Le titre en gros, à gauche du formulaire.', 'contenu'),
     paragraphe('intro', 'Texte sous le grand titre', 'Une ou deux phrases d’invitation.', { group: 'contenu' }),
     ligne('libelleCourriel', 'Étiquette du courriel', 'Au-dessus de l’adresse courriel (ex. : « Courriel »). L’adresse se change dans « Infos de l’entreprise ».', {
@@ -480,6 +505,33 @@ export const pageContact = defineType({
     ...champsGoogle(),
   ],
   preview: { prepare: () => ({ title: 'Contact' }) },
+})
+
+/* ================================================================ Plan du site */
+
+export const pagePlanDuSite = defineType({
+  name: 'pagePlanDuSite',
+  title: 'Plan du site',
+  type: 'document',
+  groups: GROUPES_PAGE,
+  fields: [
+    grandTitre('h1', 'Grand titre', 'Le titre en haut du plan du site.', 'contenu'),
+    paragraphe('intro', 'Texte sous le grand titre', 'Une phrase qui dit ce que la page contient.', { group: 'contenu', rows: 2 }),
+    ligne(
+      'titrePages',
+      'Titre de la liste des pages',
+      'Au-dessus de la liste des pages (ex. : « Les pages »). La liste se fait toute seule, avec le nom de chaque page. Sert aussi de titre dans le fichier lu par les assistants IA.',
+      { group: 'contenu' },
+    ),
+    ligne(
+      'titreRealisations',
+      'Titre de la liste des réalisations',
+      'Au-dessus de la liste des fiches des clients (ex. : « Les réalisations »). Une fiche publiée s’y ajoute toute seule. Sert aussi de titre dans le fichier lu par les assistants IA.',
+      { group: 'contenu' },
+    ),
+    ...champsGoogle(),
+  ],
+  preview: { prepare: () => ({ title: 'Plan du site' }) },
 })
 
 /* ================================================================ Bienvenue */
