@@ -1,17 +1,17 @@
-# Construit et deploie norvika.ca a chaque envoi sur la branche de production.
+# Verifie que norvika.ca se construit, a chaque envoi sur n'importe quelle branche.
 #
-# ⚠️ POURQUOI CETTE ACTION EXISTE
-# `wrangler deploy` NE CONSTRUIT RIEN : il envoie le contenu de .open-next/ tel
-# quel. Deployer sans avoir rebati, c'est remettre en ligne l'ancien paquet, sans
-# le moindre message d'erreur. Le piege est tombe le 2026-08-21 pendant la
-# refonte, sur une machine, avec une seule personne. A deux machines, il tombe
-# tout le temps. Ici la construction et le deploiement sont colles ensemble et
-# partent du depot, pas d'un dossier local qui peut avoir derive.
+# ⚠️ CETTE ACTION NE DEPLOIE PLUS (depuis le 2026-11-15).
+# Le deploiement est fait par Workers Builds, chez Cloudflare : le Worker « norvika »
+# est relie au depot NORVIKA/norvika, branche next16-migration, commande
+# `npm run deploy` (scripts/deploy.sh). Il part a chaque push sur cette branche ET a
+# chaque « Publier » dans Sanity (webhook vers le Deploy Hook du Worker).
+# Raison : aucun jeton Cloudflare ne vit plus dans GitHub. L'ancien deploiement d'ici
+# gardait un jeton capable de modifier le compte Cloudflare dans les secrets du depot.
 #
-# Sur toute autre branche, on construit SANS deployer : une erreur se voit avant
-# d'atteindre le domaine.
+# Ce qui reste ici : types, style de code et construction, pour qu'une erreur se
+# voie sur une branche de travail avant d'atteindre la production.
 
-name: Construire et deployer
+name: Verifier la construction
 
 on:
   push:
@@ -19,9 +19,9 @@ on:
   workflow_dispatch:
 
 concurrency:
-  # Deux envois rapproches ne doivent pas se deployer l'un par-dessus l'autre.
-  group: deploiement-norvika
-  cancel-in-progress: false
+  # Une seule verification a la fois par branche ; la plus recente remplace l'ancienne.
+  group: verification-norvika-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   build:
@@ -54,26 +54,3 @@ jobs:
           NEXT_PUBLIC_SUPABASE_URL: ${{ vars.NEXT_PUBLIC_SUPABASE_URL }}
           NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ vars.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
           NEXT_PUBLIC_GA_ID: ${{ vars.NEXT_PUBLIC_GA_ID }}
-
-      - name: Deployer
-        # Uniquement depuis la branche de production.
-        if: github.ref == 'refs/heads/next16-migration'
-        run: npx wrangler deploy
-        env:
-          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          # L'identifiant de compte n'est pas un secret : il apparait dans les
-          # URL du tableau de bord. En VARIABLE, il est lisible et verifiable.
-          # En secret, il etait masque, et un caractere colle en trop (espace ou
-          # retour de ligne) faisait echouer le deploiement avec « Invalid
-          # account ID » sans qu'on puisse voir la valeur pour comprendre.
-          CLOUDFLARE_ACCOUNT_ID: ${{ vars.CLOUDFLARE_ACCOUNT_ID }}
-
-      - name: Verifier que le site repond
-        if: github.ref == 'refs/heads/next16-migration'
-        run: |
-          sleep 8
-          for chemin in "" "realisations" "equipe" "diagnostic"; do
-            code=$(curl -s -o /dev/null -w "%{http_code}" "https://norvika.ca/$chemin")
-            echo "$code /$chemin"
-            [ "$code" = "200" ] || exit 1
-          done

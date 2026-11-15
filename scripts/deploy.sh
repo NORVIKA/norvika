@@ -15,11 +15,19 @@
 set -euo pipefail
 cd "$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 
-CF_SECRETS_FILE="${CF_SECRETS_FILE:-../../.secrets/.env}"
-if [ -z "${CLOUDFLARE_API_TOKEN:-}" ] && [ -f "$CF_SECRETS_FILE" ]; then
-  set -a; . "$CF_SECRETS_FILE"; set +a
+# Deux façons de lancer ce script :
+# - Workers Builds (WORKERS_CI=1, depuis le 2026-11-15) : c'est LA voie normale. Cloudflare
+#   construit à chaque push sur next16-migration et à chaque appel du Deploy Hook (webhook
+#   Sanity). Il authentifie lui-même wrangler avec le jeton « Workers Builds » du profil
+#   info@norvika.ca : aucun jeton à fournir ici, et un jeton VIDE exporté masquerait le sien.
+# - Sur le Mac, en dépannage : le jeton vient de l'environnement ou de CF_SECRETS_FILE.
+if [ "${WORKERS_CI:-}" != "1" ]; then
+  CF_SECRETS_FILE="${CF_SECRETS_FILE:-../../.secrets/.env}"
+  if [ -z "${CLOUDFLARE_API_TOKEN:-}" ] && [ -f "$CF_SECRETS_FILE" ]; then
+    set -a; . "$CF_SECRETS_FILE"; set +a
+  fi
+  [ -n "${CLOUDFLARE_API_TOKEN:-}" ] || { echo "ERREUR: CLOUDFLARE_API_TOKEN manquant." >&2; exit 1; }
 fi
-[ -n "${CLOUDFLARE_API_TOKEN:-}" ] || { echo "ERREUR: CLOUDFLARE_API_TOKEN manquant." >&2; exit 1; }
 
 echo "→ opennextjs-cloudflare build…"
 npx opennextjs-cloudflare build
