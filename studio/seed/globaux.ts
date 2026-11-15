@@ -58,6 +58,14 @@ export const navigation: Document = {
   // Ajoutés le 2026-11-15 (bloc D) : fil d'Ariane partagé et téléphone de la barre du haut.
   filArianeLibelle: "Fil d'Ariane",
   enteteTelephone: 'Appeler Norvika au',
+  // Ajoutés le 2026-11-15 : libellés lus par les lecteurs d'écran, sortis du code.
+  menuOuvrir: 'Ouvrir le menu',
+  ongletsServices: 'Nos services',
+  basculeComparer: 'Comparer avant et après :',
+  basculeImageAvant: 'avant la refonte',
+  basculeImageApres: 'après la refonte',
+  videoLire: 'Lire la vidéo :',
+  etapeLibelle: 'Étape',
   basculeAvant: 'Avant',
   basculeApres: 'Après',
   piedTitreServices: 'Services',
@@ -69,8 +77,6 @@ export const navigation: Document = {
     ],
     'lienMenu',
   ),
-  piedDroits: '© 2026 Norvika · Québec et Rive-Sud de Montréal',
-  piedDroitsCourt: '© 2026 Norvika',
   piedPolitique: 'Politique de confidentialité',
   // Ajoutés le 2026-11-15 (bloc D) : « © année nom légal · mention » et lien vers le plan du site.
   piedMention: 'Québec et Rive-Sud de Montréal',

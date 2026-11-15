@@ -90,7 +90,6 @@ export const pageRealisations: Document = {
   },
   aucun: 'Aucune réalisation dans cette catégorie pour le moment.',
   portfolio: { afficher: true, titre: 'Notre portfolio photo et vidéo complet', bouton: 'Voir le portfolio' },
-  ficheRetour: 'Toutes les réalisations',
   ficheSite: 'Visiter le site',
   ficheBesoinSurtitre: '01 · Le point de départ',
   ficheBesoinTitre: 'Le besoin',

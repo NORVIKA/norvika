@@ -157,6 +157,35 @@ export const navigation = defineType({
       'Invisible à l’écran : lu juste avant le numéro de la barre du haut par les lecteurs d’écran (ex. : « Appeler Norvika au »). Le numéro se change dans « Infos de l’entreprise ».',
       { group: 'menu' },
     ),
+    // Libellés lus par les lecteurs d'écran (invisibles à l'écran), déclarés ici plutôt que dans le code
+    // (zéro texte en dur, 2026-11-15).
+    ligne('menuOuvrir', 'Bouton du menu (lecteurs d’écran)', 'Invisible à l’écran : le nom du bouton à trois traits qui ouvre le menu sur téléphone (ex. : « Ouvrir le menu »).', {
+      group: 'menu',
+    }),
+    ligne(
+      'ongletsServices',
+      'Onglets des services (lecteurs d’écran)',
+      'Invisible à l’écran : le nom de la rangée d’onglets sous le haut des pages de services (ex. : « Nos services »).',
+      { group: 'boutons' },
+    ),
+    ligne(
+      'basculeComparer',
+      'Bascule avant / après (lecteurs d’écran)',
+      'Invisible à l’écran : lu avant la description de l’image, sur les boutons « avant » et « après » (ex. : « Comparer avant et après : »).',
+      { group: 'boutons' },
+    ),
+    ligne('basculeImageAvant', 'Fin de la description de l’image « avant »', 'Invisible à l’écran : ajoutée après la description de la capture, côté avant (ex. : « avant la refonte »).', {
+      group: 'boutons',
+    }),
+    ligne('basculeImageApres', 'Fin de la description de l’image « après »', 'Invisible à l’écran : ajoutée après la description de la capture, côté après (ex. : « après la refonte »).', {
+      group: 'boutons',
+    }),
+    ligne('videoLire', 'Bouton des vidéos (lecteurs d’écran)', 'Invisible à l’écran : lu avant le titre de la vidéo, sur l’image qui lance la lecture (ex. : « Lire la vidéo : »).', {
+      group: 'boutons',
+    }),
+    ligne('etapeLibelle', 'Points du parcours (lecteurs d’écran)', 'Invisible à l’écran : lu avant le numéro de chaque point du parcours animé (ex. : « Étape »).', {
+      group: 'boutons',
+    }),
     ligne('piedTitreServices', 'Titre de la colonne des pages', 'Au-dessus de la liste des pages, dans le pied de page (ex. : « Services »).', { group: 'pied' }),
     ligne('piedTitreContact', 'Titre de la colonne contact', 'Au-dessus du courriel, dans le pied de page (ex. : « Contact »).', { group: 'pied' }),
     defineField({
@@ -173,19 +202,6 @@ export const navigation = defineType({
       'Le texte en petit après « © année nom légal », en bas à gauche du pied de page (ex. : « Québec et Rive-Sud de Montréal »). L’année est calculée automatiquement et le nom légal se change dans « Infos de l’entreprise ». Laissez vide pour n’afficher que le nom.',
       { group: 'pied', requis: false },
     ),
-    // ⚠️ REMPLACÉS par « © année nom légal » (année calculée, nom légal dans « Infos de l'entreprise ») et
-    //    par piedMention, le 2026-11-15. Cachés, pas retirés : le code en ligne les lit jusqu'à la fusion
-    //    de la branche mise-a-niveau-2026-11. À vider et retirer ensuite.
-    ligne('piedDroits', 'Ancienne ligne du bas (remplacée)', 'Remplacée par « © année nom légal » et la mention après le nom légal.', {
-      group: 'pied',
-      hidden: true,
-      requis: false,
-    }),
-    ligne('piedDroitsCourt', 'Ancienne ligne du bas courte (remplacée)', 'Remplacée par « © année nom légal ».', {
-      group: 'pied',
-      hidden: true,
-      requis: false,
-    }),
     ligne('piedPolitique', 'Texte du lien vers la politique', 'Le lien vers la politique de confidentialité, en bas à droite. Sert aussi de nom à cette page dans le plan du site.', {
       group: 'pied',
     }),
@@ -242,7 +258,7 @@ export const page404 = defineType({
   title: 'Page introuvable',
   type: 'document',
   fields: [
-    ligne('surtitre', 'Petit texte au-dessus du titre', 'Ex. : « Erreur 404 ».'),
+    ligne('surtitre', 'Ancien petit texte au-dessus du titre (retiré)', 'Retiré du site le 2026-11-15 (règle d’agence 1 : pas de petit titre au-dessus d’un titre). Caché ici en attendant d’être vidé.', { hidden: true, requis: false }),
     ligne('titre', 'Titre', 'Le grand titre de la page introuvable.'),
     paragraphe('texte', 'Texte', 'Ce que la personne peut faire maintenant.'),
     ligne('boutonAccueil', 'Bouton vers l’accueil', 'Le texte du premier bouton.'),

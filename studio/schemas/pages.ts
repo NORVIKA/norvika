@@ -122,7 +122,7 @@ export const pageAccueil = defineType({
       ligne('lienPage', 'Début du lien vers la page', 'Suivi du nom du service, dans une ligne ouverte (ex. : « Voir la page »).'),
     ]),
     section('parcours', 'Comment ça marche', 'Le parcours animé de la démarche.', [
-      ligne('surtitre', 'Petit titre', 'Le texte en capitales au-dessus du titre.'),
+      ligne('surtitre', 'Ancien petit titre (retiré)', 'Retiré du site le 2026-11-15 (règle d’agence 1 : pas de petit titre au-dessus d’un titre). Caché ici en attendant d’être vidé.', { hidden: true, requis: false }),
       ligne('titre', 'Titre de la section', 'Le titre du parcours.'),
       etapes(),
     ]),
@@ -357,7 +357,7 @@ export const pageDiagnostic = defineType({
         }),
       ],
     }),
-    ligne('resultatSurtitre', 'Petit titre du résultat', 'Au-dessus du titre du résultat (ex. : « Votre résultat »).', { group: 'resultats' }),
+    ligne('resultatSurtitre', 'Ancien petit titre du résultat (retiré)', 'Retiré du site le 2026-11-15 (règle d’agence 1 : pas de petit titre au-dessus d’un titre). Caché ici en attendant d’être vidé.', { group: 'resultats', hidden: true, requis: false }),
     ligne('barreSite', 'Barre 1', 'Le nom de la première barre (ex. : « Votre site »).', { group: 'resultats' }),
     ligne('barreTemps', 'Barre 2', 'Le nom de la deuxième barre (ex. : « Votre temps »).', { group: 'resultats' }),
     ligne('barreImage', 'Barre 3', 'Le nom de la troisième barre (ex. : « Votre image »).', { group: 'resultats' }),
@@ -428,9 +428,7 @@ export const pageRealisations = defineType({
   fields: [
     deverrouillage('contenu'),
     nomPage('Réalisations'),
-    ligne('surtitre', 'Petit titre', 'Le texte en capitales au-dessus du grand titre (ex. : « Réalisations »).', {
-      group: 'contenu',
-    }),
+    ligne('surtitre', 'Ancien petit titre (retiré)', 'Retiré du site le 2026-11-15 (règle d’agence 1 : pas de petit titre au-dessus d’un titre). Caché ici en attendant d’être vidé.', { group: 'contenu', hidden: true, requis: false }),
     grandTitre('h1', 'Grand titre, début', 'La partie du grand titre en noir (ex. : « Ils nous font »).', 'contenu'),
     grandTitre('h1Accent', 'Grand titre, fin en couleur', 'La fin du grand titre, en bleu (ex. : « confiance. »).', 'contenu'),
     paragraphe('intro', 'Texte sous le grand titre', 'Une phrase qui explique comment utiliser la page.', { group: 'contenu' }),
@@ -453,22 +451,14 @@ export const pageRealisations = defineType({
       ligne('titre', 'Titre', 'Le titre du bandeau.'),
       ligne('bouton', 'Texte du bouton', 'Le bouton qui ouvre le portfolio.'),
     ]),
-    // ⚠️ REMPLACÉ le 2026-11-15 par le fil d'Ariane (Accueil, Réalisations, nom du client) en haut de
-    //    chaque fiche. Caché, pas retiré : le code en ligne le lit jusqu'à la fusion de la branche
-    //    mise-a-niveau-2026-11. À vider et retirer ensuite.
-    ligne('ficheRetour', 'Ancien lien de retour (remplacé)', 'Remplacé par le fil d’Ariane en haut de chaque fiche.', {
-      group: 'fiche',
-      hidden: true,
-      requis: false,
-    }),
     ligne('ficheSite', 'Bouton vers le site du client', 'Affiché si la fiche a l’adresse du site du client (ex. : « Visiter le site »).', { group: 'fiche' }),
-    ligne('ficheBesoinSurtitre', 'Petit titre du besoin', 'Ex. : « 01 · Le point de départ ».', { group: 'fiche' }),
+    ligne('ficheBesoinSurtitre', 'Ancien petit titre du besoin (retiré)', 'Retiré du site le 2026-11-15 (règle d’agence 1 : pas de petit titre au-dessus d’un titre). Caché ici en attendant d’être vidé.', { group: 'fiche', hidden: true, requis: false }),
     ligne('ficheBesoinTitre', 'Titre du besoin', 'Ex. : « Le besoin ».', { group: 'fiche' }),
     ligne('ficheApercu', 'Légende de la photo du mandat', 'Sous la photo de couverture (ex. : « Un aperçu du mandat. »).', { group: 'fiche' }),
     ligne('ficheApercuBouton', 'Bouton sous la photo du mandat', 'Ouvre le portfolio (ex. : « Voir le portfolio complet »).', { group: 'fiche' }),
-    ligne('ficheMandatSurtitre', 'Petit titre du mandat', 'Ex. : « 02 · Notre mandat ».', { group: 'fiche' }),
+    ligne('ficheMandatSurtitre', 'Ancien petit titre du mandat (retiré)', 'Retiré du site le 2026-11-15 (règle d’agence 1 : pas de petit titre au-dessus d’un titre). Caché ici en attendant d’être vidé.', { group: 'fiche', hidden: true, requis: false }),
     ligne('ficheMandatTitre', 'Titre du mandat', 'Ex. : « Ce qu’on a fait ».', { group: 'fiche' }),
-    ligne('ficheResultat', 'Petit titre du résultat', 'Au-dessus du résultat (ex. : « Le résultat »).', { group: 'fiche' }),
+    ligne('ficheResultat', 'Titre du résultat', 'Le titre de l’encadré du résultat, en bas de chaque fiche (ex. : « Le résultat »).', { group: 'fiche' }),
     ligne('ficheAppel', 'Titre du bandeau de fin', 'Au-dessus du bouton de rendez-vous, en bas de chaque fiche.', { group: 'fiche' }),
     ligne('ficheOnglet', 'Fin du titre dans Google', 'Ajoutée après le nom du client dans le titre de chaque fiche (ex. : « | Réalisations Norvika »).', { group: 'fiche' }),
     ...champsGoogle(),
