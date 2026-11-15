@@ -41,7 +41,7 @@ const easeOutCubic = (t: number) => 1 - Math.pow(1 - t, 3);
 export function Roadmap({ steps }: { steps: RoadStep[] }) {
   const n = steps.length;
   const fracs = useMemo(
-    () => steps.map((_, i) => (n === 1 ? 0 : i / (n - 1))),
+    () => Array.from({ length: n }, (_, i) => (n === 1 ? 0 : i / (n - 1))),
     [n],
   );
 
