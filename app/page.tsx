@@ -1,19 +1,14 @@
 import type { Metadata } from "next";
 import Content from "./Content";
+import { obtenirContenu } from "@/lib/contenu";
+import { metaPage } from "@/lib/meta";
 
-export const metadata: Metadata = {
-  title: { absolute: "Norvika · Vos courtiers des outils numériques" },
-  description:
-    "Sites web, automatisation, photo et vidéo pour les PME de la ville de Québec, de la Rive-Sud de Montréal et de partout en province. On comprend votre réalité, puis on bâtit une offre qui vous ressemble.",
-  alternates: { canonical: "/" },
-  openGraph: {
-    title: "Norvika · Vos courtiers des outils numériques",
-    description:
-      "Sites web, automatisation, photo et vidéo. 30 minutes gratuites pour comprendre ce qui vous freine.",
-    url: "/",
-  },
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const { accueil } = await obtenirContenu();
+  return metaPage(accueil, "/");
+}
 
-export default function Page() {
-  return <Content />;
+export default async function Page() {
+  const { accueil, avis } = await obtenirContenu();
+  return <Content page={accueil} avisListe={avis} />;
 }

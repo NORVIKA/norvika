@@ -1,12 +1,13 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { CLIENTS, getClient } from "@/lib/realisations";
+import { obtenirContenu } from "@/lib/contenu";
 import Content from "./Content";
 
-// Les 20+ fiches sont connues au build : on les prerend toutes pour que le
-// Worker serve du HTML deja pret au lieu de le rebatir a chaque visite.
-export function generateStaticParams() {
-  return CLIENTS.map((c) => ({ slug: c.slug }));
+// Les fiches sont connues au build (une par réalisation du Studio) : on les prerend toutes pour
+// que le Worker serve du HTML deja pret au lieu de le rebatir a chaque visite.
+export async function generateStaticParams() {
+  const { realisations } = await obtenirContenu();
+  return realisations.map((c) => ({ slug: c.slug }));
 }
 
 export async function generateMetadata({
@@ -15,18 +16,19 @@ export async function generateMetadata({
   params: Promise<{ slug: string }>;
 }): Promise<Metadata> {
   const { slug } = await params;
-  const client = getClient(slug);
+  const { realisations, realisationsPage, page404 } = await obtenirContenu();
+  const client = realisations.find((c) => c.slug === slug);
   if (!client) {
-    return { title: { absolute: "Réalisation introuvable | Norvika" }, robots: { index: false } };
+    return { title: { absolute: page404.realisationOnglet }, robots: { index: false } };
   }
-  const title = `${client.name} | Réalisations Norvika`;
+  const title = `${client.nom} ${realisationsPage.ficheOnglet}`;
   return {
     title: { absolute: title },
-    description: client.summary,
+    description: client.resume,
     alternates: { canonical: `/realisations/${client.slug}` },
     openGraph: {
       title,
-      description: client.summary,
+      description: client.resume,
       type: "article",
       url: `/realisations/${client.slug}`,
     },
@@ -39,7 +41,8 @@ export default async function Page({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const client = getClient(slug);
+  const { realisations, realisationsPage, navigation } = await obtenirContenu();
+  const client = realisations.find((c) => c.slug === slug);
   if (!client) notFound();
 
   // Fil d'Ariane structuré : aide Google et les moteurs IA à situer la page
@@ -48,17 +51,17 @@ export default async function Page({
     "@context": "https://schema.org",
     "@type": "BreadcrumbList",
     itemListElement: [
-      { "@type": "ListItem", position: 1, name: "Accueil", item: "https://norvika.ca" },
+      { "@type": "ListItem", position: 1, name: navigation.filArianeAccueil, item: "https://norvika.ca" },
       {
         "@type": "ListItem",
         position: 2,
-        name: "Réalisations",
+        name: realisationsPage.surtitre,
         item: "https://norvika.ca/realisations",
       },
       {
         "@type": "ListItem",
         position: 3,
-        name: client.name,
+        name: client.nom,
         item: `https://norvika.ca/realisations/${client.slug}`,
       },
     ],
@@ -70,7 +73,7 @@ export default async function Page({
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumb) }}
       />
-      <Content slug={slug} />
+      <Content client={client} page={realisationsPage} />
     </>
   );
 }

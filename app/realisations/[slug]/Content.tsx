@@ -5,14 +5,12 @@ import Link from "next/link";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
 import { useReveal } from "@/lib/useReveal";
-import { CATEGORIES, CLIENT_COVERS, getClient } from "@/lib/realisations";
-import { LIEN_RDV } from "@/lib/liens";
 import { AutresPages } from "@/components/site/AutresPages";
+import { useContenuGlobal } from "@/components/site/ContenuGlobal";
+import { categories, type PageRealisations, type Realisation } from "@/lib/types-contenu";
 import { VideoYoutube } from "@/components/site/VideoYoutube";
 import { BasculeAvantApres } from "@/components/site/BasculeAvantApres";
 
-const labelFor = (id: string) =>
-  CATEGORIES.find((c) => c.id === id)?.label ?? id;
 
 const blockLabel: React.CSSProperties = {
   margin: 0,
@@ -38,10 +36,14 @@ const blockText: React.CSSProperties = {
   color: "rgba(12,25,47,.72)",
 };
 
-export default function Page({ slug }: { slug: string }) {
+// Les textes de la fiche viennent de la réalisation (Studio) ; les libellés communs à toutes les
+// fiches, de la page « Réalisations », onglet « Fiches des clients ».
+export default function Page({ client, page }: { client: Realisation; page: PageRealisations }) {
   useReveal();
-  const client = getClient(slug)!;
-  const cover = CLIENT_COVERS[client.slug];
+  const { parametres, navigation } = useContenuGlobal();
+  const LIEN_RDV = parametres.lienRendezVous;
+  const labelFor = (id: string) => categories(page).find((c) => c.id === id)?.label ?? id;
+  const cover = client.couverture ? { url: client.couverture.url, alt: client.couverture.alt ?? "" } : null;
 
   return (
     <div style={{ position: "relative", overflowX: "hidden", background: "#fff" }}>
@@ -70,7 +72,7 @@ export default function Page({ slug }: { slug: string }) {
               fontWeight: 600,
             }}
           >
-            Toutes les réalisations
+            {page.ficheRetour}
           </Link>
 
           <div
@@ -97,8 +99,8 @@ export default function Page({ slug }: { slug: string }) {
               }}
             >
               <img loading="lazy" decoding="async"
-                src={client.logo}
-                alt={client.name}
+                src={client.logo.url}
+                alt={client.nom}
                 style={{
                   maxWidth: "100%",
                   maxHeight: 88,
@@ -118,7 +120,7 @@ export default function Page({ slug }: { slug: string }) {
                   fontWeight: 600,
                 }}
               >
-                {client.sector}
+                {client.secteur}
               </p>
               <h1
                 style={{
@@ -130,7 +132,7 @@ export default function Page({ slug }: { slug: string }) {
                   letterSpacing: "-.035em",
                 }}
               >
-                {client.name}
+                {client.nom}
               </h1>
               <p
                 style={{
@@ -141,7 +143,7 @@ export default function Page({ slug }: { slug: string }) {
                   color: "rgba(12,25,47,.64)",
                 }}
               >
-                {client.summary}
+                {client.resume}
               </p>
               <div
                 style={{ marginTop: 20, display: "flex", flexWrap: "wrap", gap: 8 }}
@@ -163,10 +165,10 @@ export default function Page({ slug }: { slug: string }) {
                   </span>
                 ))}
               </div>
-              {client.website ? (
+              {client.siteWeb ? (
                 <div style={{ marginTop: 24 }}>
                   <a
-                    href={client.website}
+                    href={client.siteWeb}
                     target="_blank"
                     rel="noopener"
                     className="nv-cta-outline"
@@ -179,7 +181,7 @@ export default function Page({ slug }: { slug: string }) {
                       fontWeight: 600,
                     }}
                   >
-                    Visiter le site
+                    {page.ficheSite}
                   </a>
                 </div>
               ) : null}
@@ -194,9 +196,9 @@ export default function Page({ slug }: { slug: string }) {
           style={{ maxWidth: 780, margin: "0 auto", padding: "78px 32px 88px" }}
         >
           <article data-reveal style={{ minWidth: 0 }}>
-            <p style={blockLabel}>01 · Le point de départ</p>
-            <h2 style={blockTitle}>Le besoin</h2>
-            <p style={blockText}>{client.context}</p>
+            <p style={blockLabel}>{page.ficheBesoinSurtitre}</p>
+            <h2 style={blockTitle}>{page.ficheBesoinTitre}</h2>
+            <p style={blockText}>{client.besoin}</p>
           </article>
 
           {cover ? (
@@ -248,9 +250,9 @@ export default function Page({ slug }: { slug: string }) {
                   color: "rgba(12,25,47,.6)",
                 }}
               >
-                <span>Un aperçu du mandat.</span>
+                <span>{page.ficheApercu}</span>
                 <a
-                  href="https://norvika.myportfolio.com/"
+                  href={parametres.lienPortfolio}
                   target="_blank"
                   rel="noopener"
                   className="nv-cta-outline"
@@ -262,7 +264,7 @@ export default function Page({ slug }: { slug: string }) {
                     fontWeight: 600,
                   }}
                 >
-                  Voir le portfolio complet
+                  {page.ficheApercuBouton}
                 </a>
               </figcaption>
             </figure>
@@ -277,19 +279,22 @@ export default function Page({ slug }: { slug: string }) {
           />
 
           <article data-reveal style={{ minWidth: 0 }}>
-            <p style={blockLabel}>02 · Notre mandat</p>
-            <h2 style={blockTitle}>Ce qu'on a fait</h2>
-            <p style={blockText}>{client.work}</p>
+            <p style={blockLabel}>{page.ficheMandatSurtitre}</p>
+            <h2 style={blockTitle}>{page.ficheMandatTitre}</h2>
+            <p style={blockText}>{client.mandat}</p>
           </article>
 
           {client.avantApres ? (
             <figure data-reveal style={{ margin: "44px 0 0" }}>
               <BasculeAvantApres
                 avant={client.avantApres.avant}
-                avant2x={client.avantApres.avant2x}
+                avant2x={client.avantApres.avant2x ?? undefined}
                 apres={client.avantApres.apres}
-                apres2x={client.avantApres.apres2x}
+                apres2x={client.avantApres.apres2x ?? undefined}
                 alt={client.avantApres.alt}
+                adresse={client.avantApres.adresse}
+                libelleAvant={navigation.basculeAvant}
+                libelleApres={navigation.basculeApres}
               />
               <figcaption
                 style={{
@@ -309,7 +314,7 @@ export default function Page({ slug }: { slug: string }) {
               <VideoYoutube
                 youtubeId={client.video.youtubeId}
                 titre={client.video.titre}
-                format={client.video.format}
+                format={client.video.format ?? undefined}
               />
               <figcaption
                 style={{
@@ -324,7 +329,7 @@ export default function Page({ slug }: { slug: string }) {
             </figure>
           ) : null}
 
-          {client.result ? (
+          {client.resultat ? (
             <div
               data-reveal
               style={{
@@ -336,7 +341,7 @@ export default function Page({ slug }: { slug: string }) {
                 borderLeft: "4px solid #0C192F",
               }}
             >
-              <p style={blockLabel}>Le résultat</p>
+              <p style={blockLabel}>{page.ficheResultat}</p>
               <p
                 style={{
                   margin: "14px 0 0",
@@ -348,7 +353,7 @@ export default function Page({ slug }: { slug: string }) {
                   color: "#0C192F",
                 }}
               >
-                {client.result}
+                {client.resultat}
               </p>
             </div>
           ) : null}
@@ -375,7 +380,7 @@ export default function Page({ slug }: { slug: string }) {
               letterSpacing: "-.03em",
             }}
           >
-            Un projet comme celui-ci?
+            {page.ficheAppel}
           </h2>
           <div style={{ marginTop: 26 }}>
             <a
@@ -389,7 +394,7 @@ export default function Page({ slug }: { slug: string }) {
                 fontWeight: 600,
               }}
              target="_blank" rel="noopener noreferrer">
-              Réserver mes 30 minutes
+              {navigation.boutonRendezVous}
             </a>
           </div>
         </div>

@@ -131,6 +131,8 @@ export const navigation = defineType({
       group: 'boutons',
     }),
     ligne('boutonQuiz', 'Texte du bouton du quiz', 'Le bouton qui mène au diagnostic, en haut des pages de services (ex. : « Faire le quiz »).', { group: 'boutons' }),
+    ligne('basculeAvant', 'Bouton « avant » de la bascule', 'Le bouton qui montre l’ancien site, dans la bascule avant / après (ex. : « Avant »).', { group: 'boutons' }),
+    ligne('basculeApres', 'Bouton « après » de la bascule', 'Le bouton qui montre le nouveau site, dans la bascule avant / après (ex. : « Après »).', { group: 'boutons' }),
     ligne('filArianeAccueil', 'Premier lien du fil d’Ariane', 'Le lien vers l’accueil, au-dessus du titre des pages de services (ex. : « Accueil »).', {
       group: 'boutons',
     }),

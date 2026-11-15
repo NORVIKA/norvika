@@ -53,6 +53,8 @@ export type Navigation = {
   boutonRendezVous: string;
   boutonQuiz: string;
   filArianeAccueil: string;
+  basculeAvant: string;
+  basculeApres: string;
   piedTitreServices: string;
   piedTitreContact: string;
   piedLiensContact: Lien[];
@@ -293,4 +295,14 @@ export const visible = (s: { afficher?: boolean | null } | null | undefined): bo
 export function positionFocale(image: Image | null | undefined, repli: string): string {
   const h = image?.hotspot;
   return h ? `${Math.round(h.x * 1000) / 10}% ${Math.round(h.y * 1000) / 10}%` : repli;
+}
+
+/** Les filtres des réalisations, dans l'ordre d'avant, avec les noms du Studio. */
+export function categories(page: PageRealisations): { id: CategorieId; label: string }[] {
+  return [
+    { id: "site-web", label: page.categories.siteWeb },
+    { id: "photo-video", label: page.categories.photoVideo },
+    { id: "automatisation", label: page.categories.automatisation },
+    { id: "formation", label: page.categories.formation },
+  ];
 }

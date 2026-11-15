@@ -26,6 +26,9 @@ export function BasculeAvantApres({
   apres,
   apres2x,
   alt,
+  adresse,
+  libelleAvant,
+  libelleApres,
 }: {
   avant: string;
   /** Version haute densité, servie aux écrans Retina. */
@@ -34,6 +37,11 @@ export function BasculeAvantApres({
   apres2x?: string;
   /** Le site montre, pour les lecteurs d'ecran. */
   alt: string;
+  /** L'adresse dans la fausse barre du navigateur (fiche de la réalisation, Studio). */
+  adresse: string;
+  /** Les deux boutons de la bascule (« Menu et pied de page » du Studio). */
+  libelleAvant: string;
+  libelleApres: string;
 }) {
   const [vue, setVue] = useState<"avant" | "apres">("avant");
   const ecran = useRef<HTMLDivElement>(null);
@@ -79,7 +87,7 @@ export function BasculeAvantApres({
             whiteSpace: "nowrap",
           }}
         >
-          crossfitsaintefoy.com
+          {adresse}
         </span>
 
         <div
@@ -116,7 +124,7 @@ export function BasculeAvantApres({
                 transition: "background .18s ease, color .18s ease",
               }}
             >
-              {v === "avant" ? "Avant" : "Après"}
+              {v === "avant" ? libelleAvant : libelleApres}
             </button>
           ))}
         </div>

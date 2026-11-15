@@ -6,166 +6,39 @@ import { useEffect, useRef, useState } from "react";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
 import { useReveal } from "@/lib/useReveal";
-import { Roadmap, type RoadStep } from "@/components/site/Roadmap";
-import { LIEN_RDV } from "@/lib/liens";
+import { Roadmap, versRoadSteps } from "@/components/site/Roadmap";
 import { AutresPages } from "@/components/site/AutresPages";
+import { useContenuGlobal } from "@/components/site/ContenuGlobal";
+import { positionFocale, visible, type Avis, type PageAccueil } from "@/lib/types-contenu";
 import { Aimant } from "@/components/site/Aimant";
 import { VideoYoutube } from "@/components/site/VideoYoutube";
 import { BasculeAvantApres } from "@/components/site/BasculeAvantApres";
-const lauEtWill = { url: "/assets/lau-et-will-2.webp" };
-// Bande de logos clients, choisie par William le 2026-08-24.
+// Tout le texte vient de l'« Accueil » du Studio ; les services, de leurs pages de service ;
+// les avis, des « Avis Google ».
 //
-// ⚠️ DEUX TRAITEMENTS, ET C'EST VOULU. Enfin Libre, le Roi des Cartes et TDT
-// existent en version detouree (fond transparent) : ils se posent directement
-// sur la bande. Desjardins et Anytime Fitness, eux, n'ont pas de version
-// detouree ici : leur logo est BLANC sur un bloc de couleur de marque. Poser
-// un rectangle vert et un rectangle mauve bruts au milieu de logos qui
-// flottent aurait l'air d'une erreur ; en pastille arrondie, ca se lit comme
-// un logo assume. On ne recolore pas le logo d'une institution financiere
-// pour l'harmoniser : c'est leur marque, pas la notre.
-const LOGOS_CLIENTS = [
-  { src: "/assets/client-desjardins.webp", nom: "Desjardins", pastille: true },
-  { src: "/assets/client-anytimefitness.webp", nom: "Anytime Fitness", pastille: true },
-  { src: "/assets/clean-enfin-libre.webp", nom: "Enfin Libre" },
-  { src: "/assets/clean-le-roi-des-cartes.webp", nom: "Roi des Cartes" },
-  { src: "/assets/clean-titan-diamond-tools.webp", nom: "Titan Diamond Tools" },
-];
-const SERVICES = [
-  {
-    num: "01",
-    title: "Sites web",
-    to: "/sites-web" as const,
-    lead: "Un site clair, à la hauteur de votre travail.",
-    more: "On vous en montre un aperçu avant même que vous décidiez quoi que ce soit. Et une fois livré, il est à vous: aucuns frais mensuels.",
-  },
-  {
-    num: "02",
-    title: "Automatisation",
-    to: "/automatisation" as const,
-    lead: "Une partie de vos semaines part dans des tâches qui vous font pas avancer.",
-    more: "On trouve les bons outils pour votre réalité, on les intègre avec vous, et on vous accompagne jusqu'à ce que ça roule.",
-  },
-  {
-    num: "03",
-    title: "Photo et vidéo",
-    to: "/photo-et-video" as const,
-    lead: "Vos photos et vidéos ne rendent pas justice à ce que vous faites.",
-    more: "On capte votre travail comme il mérite d'être vu.",
-  },
-  {
-    num: "04",
-    title: "Formation",
-    to: "/formation" as const,
-    lead: "Vos outils, vous aimeriez savoir les utiliser vous-mêmes.",
-    more: "On forme votre équipe sur place, sur vos vraies situations. Vous repartez autonomes, pas dépendants de nous.",
-  },
-];
-
-const ETAPES = [
-  {
-    num: "01",
-    label: "Un court appel",
-    title: "Un court appel",
-    text: "30 minutes, gratuit, sans engagement. On regarde ensemble ce qui vous freine.",
-  },
-  {
-    num: "02",
-    label: "On comprend votre réalité",
-    title: "On comprend votre réalité",
-    text: "Vos façons de faire, vos outils actuels, ce qui vous gruge du temps. Avant de proposer quoi que ce soit.",
-  },
-  {
-    num: "03",
-    label: "On bâtit votre offre",
-    title: "On bâtit votre offre",
-    text: "Pas de catalogue: une proposition montée pour votre entreprise, avec les outils qui vous conviennent.",
-  },
-  {
-    num: "04",
-    label: "Vous voyez avant de décider",
-    title: "Vous voyez avant de décider",
-    text: "Un aperçu concret de ce qu'on ferait, entre vos mains, avant d'investir quoi que ce soit.",
-  },
-  {
-    num: "05",
-    label: "On reste à vos côtés",
-    title: "On reste à vos côtés",
-    text: "On implante avec vous, on ajuste, et on vous accompagne pour que ça continue d'avancer.",
-  },
-];
-
-const AVIS = [
-  {
-    name: "Marie-Claire Huard",
-    meta: "Pataphil · il y a 3 semaines",
-    footer: "Marie-Claire Huard · Pataphil · 5,0 sur Google",
-    lead: "Je recommande Norvika et Laurianne sans aucune hésitation!",
-    body: [
-      "Faire un site web pour Pataphil représentait beaucoup pour moi. Après 46 ans d'histoire, je voulais un site qui reflète vraiment notre personnalité et nos valeurs. Laurianne a su comprendre exactement ce que je voulais, parfois même avant que je sois capable de l'expliquer!",
-      "Elle est à l'écoute, disponible, incroyablement patiente et très talentueuse. Chaque détail a été pensé avec soin, et tout au long du projet, je me suis sentie accompagnée et en confiance. Les échanges étaient rapides, simples et toujours agréables.",
-      "Le résultat dépasse mes attentes. Notre site est beau, moderne, convivial et représente parfaitement l'image de Pataphil.",
-      "Au-delà du résultat, c'est aussi l'expérience client qui mérite d'être soulignée. On sent que Laurianne aime ce qu'elle fait et qu'elle s'investit sincèrement dans les projets de ses clients.",
-      "Merci, Laurianne, pour ton professionnalisme, ta créativité et ton immense patience. Ce fut un réel plaisir de travailler avec toi. Je recommande Norvika à tous ceux qui recherchent un service humain, personnalisé et un résultat à la hauteur de leurs attentes.",
-    ],
-  },
-  {
-    name: "Mélodie Colpron",
-    meta: "Anytime Fitness · il y a 1 semaine",
-    footer: "Mélodie Colpron · Anytime Fitness · 5,0 sur Google",
-    lead: "Un énorme merci à Laurianne et toute son équipe pour leur excellent travail lors de notre party du 1er anniversaire d'ouverture!",
-    body: [
-      "Ils ont filmé plusieurs clips tout au long de l'événement et le résultat est tout simplement incroyable. L'équipe était professionnelle, dynamique et super agréable à côtoyer. Je recommande leurs services à 100% sans hésitation!",
-    ],
-  },
-  {
-    name: "Olee G",
-    meta: "GARNO photographe · il y a 6 jours",
-    footer: "Olee G · GARNO photographe · 5,0 sur Google",
-    lead: "J'ai eu la chance de faire affaire avec cette équipe incroyable! Professionnelle, soucieux du détails et super facile à travailler avec. Si vous cherchez une équipe différente et motivé c'est les bons!",
-    body: [],
-  },
-  {
-    name: "DSM Sports Cards Collectors",
-    meta: "Le roi des cartes · il y a 4 jours",
-    footer: "DSM Sports Cards Collectors · Le roi des cartes · 5,0 sur Google",
-    lead: "Excellant support, très bon travail et super bon rapport qualité/prix. réponses et solutions rapides!",
-    body: ["Je recommande."],
-  },
-  {
-    name: "François Timmons",
-    meta: "Bistro de la Gare · cette semaine",
-    footer: "François Timmons · Bistro de la Gare · 5,0 sur Google",
-    lead: "Super travail!! Très professionnel. Je suis vraiment très heureux de mon nouveau site web!!",
-    body: [],
-  },
-  {
-    name: "Théo Chastenay",
-    meta: "il y a 4 semaines",
-    footer: "Théo Chastenay · 5,0 sur Google",
-    lead: "Laurianne et Will! Deux machines de guerre digne du film Terminator! Service exceptionnel et ils savent rendre des comptes! Je vous recommande à 100%!",
-    body: [],
-  },
-  {
-    name: "Martin Desbiens",
-    meta: "TPM Hobby & Collection · il y a 10 semaines",
-    footer: "Martin Desbiens · TPM Hobby & Collection · 5,0 sur Google",
-    lead: "Excellent service. À l'écoute de nos besoins. Vous ne vous tromper pas avec Norvika.",
-    body: [],
-  },
-];
-
-const ROAD_STEPS: RoadStep[] = ETAPES.map((e) => ({
-  num: e.num,
-  label: e.label,
-  title: e.title,
-  body: e.text,
-}));
-
-function Index() {
+// Bande de logos (choisie par William le 2026-08-24) : DEUX TRAITEMENTS, ET C'EST VOULU. Les
+// logos détourés se posent directement sur la bande ; Desjardins et Anytime Fitness n'ont qu'un
+// logo BLANC sur un bloc de couleur de marque, donc en pastille arrondie (« Sur une tuile de
+// couleur » dans leur fiche). On ne recolore pas le logo d'une institution financière.
+function Index({ page, avisListe }: { page: PageAccueil; avisListe: Avis[] }) {
   useReveal();
+  const { parametres, navigation, services } = useContenuGlobal();
+  const LIEN_RDV = parametres.lienRendezVous;
+  const SERVICES = services.map((s, i) => ({
+    num: String(i + 1).padStart(2, "0"),
+    title: s.nom,
+    to: s.chemin,
+    lead: s.accroche,
+    more: s.detail,
+  }));
+  const LOGOS_CLIENTS = page.logos.liste.map((l) => ({ src: l.logo.url, nom: l.nom, pastille: l.logoStyle === "brand" }));
+  const ROAD_STEPS = versRoadSteps(page.parcours.etapes);
+  const lauEtWill = page.fondateurs.photo;
+  const AVIS = avisListe.map((a) => ({ name: a.nom, meta: a.contexte, footer: a.signature, lead: a.accroche, body: a.suite ?? [] }));
+  const bascule = page.avantApres.realisation;
   const [open, setOpen] = useState<Record<number, boolean>>({});
   const [avis, setAvis] = useState(0);
-  const selected = AVIS[avis]!;
+  const selected = AVIS[avis] ?? AVIS[0];
 
   return (
     <div
@@ -211,7 +84,7 @@ function Index() {
               color: "#FFFFFF",
             }}
           >
-            Vos courtiers des outils numériques.
+            {page.h1}
           </h1>
           <p
             data-reveal="hero"
@@ -223,9 +96,7 @@ function Index() {
               color: "rgba(245,243,238,.88)",
             }}
           >
-            Chaque entreprise est différente, la vôtre aussi. On prend le temps
-            de comprendre votre réalité, pis on bâtit une offre qui vous
-            ressemble.
+            {page.heroTexte}
           </p>
           <div
             data-reveal="hero"
@@ -250,7 +121,7 @@ function Index() {
                 target="_blank"
                 rel="noopener noreferrer"
               >
-                Réserver mes 30 minutes
+                {navigation.boutonRendezVous}
               </a>
             </Aimant>
             <Link
@@ -265,7 +136,7 @@ function Index() {
                 color: "#F5F3EE",
               }}
             >
-              Nos réalisations
+              {page.heroBoutonSecondaire}
             </Link>
           </div>
         </div>
@@ -278,6 +149,7 @@ function Index() {
           qui parle et un avant/apres convainquent plus vite qu'un paragraphe.
           La section ne ralentit pas l'accueil malgre sa position : les deux
           lecteurs ne chargent rien de YouTube tant que personne ne clique. */}
+      {visible(page.videos) ? (
       <section
         style={{
           borderBottom: "1px solid rgba(12,25,47,.1)",
@@ -299,7 +171,7 @@ function Index() {
                 fontWeight: 600,
               }}
             >
-              En vidéo
+              {page.videos.titre}
             </h2>
             <p
               style={{
@@ -312,7 +184,7 @@ function Index() {
                 color: "#0C192F",
               }}
             >
-              Nos clients en parlent mieux que nous.
+              {page.videos.sousTitre}
             </p>
           </div>
           {/* ⚠️ PAS `nv-grid` ICI. Cette classe force une seule colonne sous
@@ -330,30 +202,7 @@ function Index() {
               gap: 28,
             }}
           >
-            {[
-              {
-                youtubeId: "RSq7pu-hRjs",
-                titre: "Témoignage d'André et Jen",
-                // Andre et Jen tiennent le Bar Le Vox : la video est tournee
-                // dans leur bar, chandail, micro et affiche VOX a l'appui.
-                fiche: "/realisations/bar-le-vox",
-              },
-              {
-                youtubeId: "9g_IWhFRhIo",
-                titre: "Témoignage d'Ékip Jeunesse",
-                fiche: "/realisations/ekip-jeunesse",
-              },
-              {
-                youtubeId: "zAKFvYKTxfQ",
-                titre: "Nelly Dufour, avant et après",
-                fiche: "/realisations/nelly-dufour",
-              },
-              {
-                youtubeId: "iUQmSeDHcAk",
-                titre: "Témoignage de la Taverne du Collectionneur",
-                fiche: "/realisations/taverne-du-collectionneur",
-              },
-            ].map((v) => (
+            {page.videos.liste.map((v) => ({ ...v, fiche: v.fiche ? `/realisations/${v.fiche}` : null })).map((v) => (
               <figure key={v.youtubeId} style={{ margin: 0 }}>
                 <VideoYoutube
                   youtubeId={v.youtubeId}
@@ -374,7 +223,7 @@ function Index() {
                         fontWeight: 600,
                       }}
                     >
-                      Voir la réalisation
+                      {page.videos.bouton}
                     </Link>
                   </figcaption>
                 ) : null}
@@ -383,12 +232,14 @@ function Index() {
           </div>
         </div>
       </section>
+      ) : null}
 
       {/* Avant / apres
           Les videos montrent des clients qui DISENT que c'etait bon ; la
           bascule MONTRE le resultat. Deux natures de preuve, d'ou leur
           voisinage. Un seul exemple, assume au singulier : au deuxieme
           client, le titre passera au pluriel. */}
+      {visible(page.avantApres) ? (
       <section
         style={{
           borderBottom: "1px solid rgba(12,25,47,.1)",
@@ -410,7 +261,7 @@ function Index() {
                 fontWeight: 600,
               }}
             >
-              Avant / après
+              {page.avantApres.titre}
             </h2>
             <p
               style={{
@@ -423,7 +274,7 @@ function Index() {
                 color: "#0C192F",
               }}
             >
-              Ce qu'une refonte change.
+              {page.avantApres.sousTitre}
             </p>
             <p
               style={{
@@ -433,20 +284,23 @@ function Index() {
                 color: "rgba(12,25,47,.6)",
               }}
             >
-              Le gym CrossFit Sainte-Foy, avant et après son nouveau site.
+              {page.avantApres.texte}
             </p>
           </div>
           <div data-reveal>
             <BasculeAvantApres
-              avant="/assets/crossfit-avant-page.webp"
-              avant2x="/assets/crossfit-avant-page-2x.webp"
-              apres="/assets/crossfit-apres-page.webp"
-              apres2x="/assets/crossfit-apres-page-2x.webp"
-              alt="La page d'accueil de CrossFit Sainte-Foy"
+              avant={bascule.avantApres.avant}
+              avant2x={bascule.avantApres.avant2x ?? undefined}
+              apres={bascule.avantApres.apres}
+              apres2x={bascule.avantApres.apres2x ?? undefined}
+              alt={bascule.avantApres.alt}
+              adresse={bascule.avantApres.adresse}
+              libelleAvant={navigation.basculeAvant}
+              libelleApres={navigation.basculeApres}
             />
             <p style={{ margin: "22px 0 0", textAlign: "center" }}>
               <Link
-                href="/realisations/crossfit-sainte-foy"
+                href={`/realisations/${bascule.slug}`}
                 className="nv-cta-outline"
                 style={{
                   display: "inline-block",
@@ -457,14 +311,16 @@ function Index() {
                   fontWeight: 600,
                 }}
               >
-                Voir la réalisation
+                {page.avantApres.bouton}
               </Link>
             </p>
           </div>
         </div>
       </section>
+      ) : null}
 
       {/* Quiz band */}
+      {visible(page.quiz) ? (
       <section
         style={{
           borderBottom: "1px solid rgba(12,25,47,.1)",
@@ -492,7 +348,7 @@ function Index() {
                 textWrap: "balance",
               }}
             >
-              Est-ce que votre entreprise va bien, pour vrai?
+              {page.quiz.titre}
             </h2>
             <p
               data-reveal
@@ -504,8 +360,7 @@ function Index() {
                 color: "rgba(12,25,47,.64)",
               }}
             >
-              Sept questions, deux minutes, aucune bonne ou mauvaise réponse.
-              Juste un portrait honnête de ce qui vous freine en ce moment.
+              {page.quiz.texte}
             </p>
           </div>
           <div
@@ -522,13 +377,15 @@ function Index() {
                 fontWeight: 600,
               }}
             >
-              Faire le quiz
+              {navigation.boutonQuiz}
             </Link>
           </div>
         </div>
       </section>
+      ) : null}
 
       {/* Logos */}
+      {visible(page.logos) ? (
       <section
         style={{
           borderBottom: "1px solid rgba(12,25,47,.1)",
@@ -560,7 +417,7 @@ function Index() {
               textAlign: "center",
             }}
           >
-            Quelques entreprises avec qui nous avons collaboré
+            {page.logos.titre}
           </p>
           <div
             data-reveal
@@ -589,12 +446,14 @@ function Index() {
               color: "#33496C",
             }}
           >
-            Voir toutes nos réalisations
+            {page.logos.lien}
           </Link>
         </div>
       </section>
+      ) : null}
 
       {/* Services */}
+      {visible(page.services) ? (
       <section
         id="services"
         style={{
@@ -624,7 +483,7 @@ function Index() {
                 lineHeight: 1.08,
               }}
             >
-              Ce qu'on fait, et pour régler quoi.
+              {page.services.titre}
             </h2>
           </div>
 
@@ -710,7 +569,7 @@ function Index() {
                           color: "#33496C",
                         }}
                       >
-                        Voir la page {s.title}
+                        {page.services.lienPage} {s.title}
                       </Link>
                     </>
                   )}
@@ -723,15 +582,17 @@ function Index() {
                     color: "#33496C",
                   }}
                 >
-                  {open[i] ? "Réduire" : "Le détail"}
+                  {open[i] ? page.services.fermer : page.services.ouvrir}
                 </span>
               </div>
             ))}
           </div>
         </div>
       </section>
+      ) : null}
 
       {/* Comment ça marche */}
+      {visible(page.parcours) ? (
       <section
         style={{
           position: "relative",
@@ -775,7 +636,7 @@ function Index() {
               fontWeight: 600,
             }}
           >
-            Comment ça marche
+            {page.parcours.surtitre}
           </p>
           <h2
             data-reveal
@@ -786,13 +647,15 @@ function Index() {
               lineHeight: 1.08,
             }}
           >
-            On regarde votre cas, pas un cas type.
+            {page.parcours.titre}
           </h2>
           <Roadmap steps={ROAD_STEPS} />
         </div>
       </section>
+      ) : null}
 
       {/* Fondateurs */}
+      {visible(page.fondateurs) ? (
       <section style={{ background: "#0C192F", color: "#F5F3EE" }}>
         <div className="nv-shell nv-grid"
           style={{
@@ -813,7 +676,7 @@ function Index() {
                 lineHeight: 1.08,
               }}
             >
-              On rattache l'humain à l'efficience.
+              {page.fondateurs.titre}
             </h2>
             <p
               style={{
@@ -824,10 +687,7 @@ function Index() {
                 color: "rgba(245,243,238,.68)",
               }}
             >
-              Derrière Norvika, deux personnes qui prennent le temps de
-              comprendre votre réalité avant de proposer quoi que ce soit. Pas
-              une présence en ligne de plus à cocher sur une liste, une qui
-              travaille vraiment pour vous.
+              {page.fondateurs.texte}
             </p>
             <p
               style={{
@@ -838,7 +698,7 @@ function Index() {
                 color: "rgba(245,243,238,.5)",
               }}
             >
-              Fondateurs de Norvika
+              {page.fondateurs.legende}
             </p>
           </div>
           <div
@@ -852,13 +712,13 @@ function Index() {
           >
             <img loading="lazy" decoding="async"
               src={lauEtWill.url}
-              alt="Laurianne et William, cofondateurs de Norvika"
+              alt={lauEtWill.alt ?? ""}
               style={{
                 display: "block",
                 width: "100%",
                 height: 520,
                 objectFit: "cover",
-                objectPosition: "center 22%",
+                objectPosition: positionFocale(lauEtWill, "center 22%"),
               }}
             />
             <div
@@ -883,13 +743,15 @@ function Index() {
                 color: "#F5F3EE",
               }}
             >
-              « On règle le vrai problème avec vous, jamais à votre place. »
+              {page.fondateurs.citation}
             </p>
           </div>
         </div>
       </section>
+      ) : null}
 
       {/* Avis Google */}
+      {visible(page.avis) && selected ? (
       <section
         id="realisations"
         style={{
@@ -920,7 +782,7 @@ function Index() {
                 fontWeight: 600,
               }}
             >
-              Avis Google
+              {page.avis.titre}
             </h2>
             <span
               style={{
@@ -932,13 +794,13 @@ function Index() {
               }}
             >
               <span style={{ color: "#33496C", letterSpacing: ".1em" }}>
-                ★★★★★
+                {page.avis.etoiles}
               </span>{" "}
               {/* Pas de nombre d'avis ici. Il etait fige a « 6 » et la page en
                   montrait deja plus : un compteur ecrit en dur ment des le
                   prochain avis recu. « 5,0 sur Google » reste vrai tant que la
                   note l'est. */}
-              5,0 sur Google
+              {page.avis.note}
             </span>
           </div>
 
@@ -1084,6 +946,7 @@ function Index() {
           </div>
         </div>
       </section>
+      ) : null}
 
       <AutresPages courante="/" />
       <SiteFooter />

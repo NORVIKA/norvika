@@ -5,11 +5,19 @@ import { SiteHeader } from "@/components/site/SiteHeader";
 import { ClientLogoCard } from "@/components/site/ClientLogoCard";
 import { SiteFooter } from "@/components/site/SiteFooter";
 import { useReveal } from "@/lib/useReveal";
-import { CATEGORIES, CLIENTS, type CategoryId } from "@/lib/realisations";
 import { AutresPages } from "@/components/site/AutresPages";
+import { useContenuGlobal } from "@/components/site/ContenuGlobal";
+import { categories, visible, type CategorieId, type PageRealisations, type Realisation } from "@/lib/types-contenu";
 
-function Page() {
+type CategoryId = CategorieId;
+
+
+// Tout le texte vient de la page « Réalisations » du Studio ; les logos, des fiches des clients.
+function Page({ page, realisations }: { page: PageRealisations; realisations: Realisation[] }) {
   useReveal();
+  const { parametres } = useContenuGlobal();
+  const CATEGORIES = categories(page);
+  const CLIENTS = realisations;
   const [filter, setFilter] = useState<CategoryId | "all">("all");
 
   const clients =
@@ -49,7 +57,7 @@ function Page() {
               fontWeight: 700,
             }}
           >
-            Réalisations
+            {page.surtitre}
           </p>
           <h1
             style={{
@@ -62,8 +70,8 @@ function Page() {
               color: "#0C192F",
             }}
           >
-            Ils nous font{" "}
-            <span style={{ color: "#33496C" }}>confiance.</span>
+            {page.h1}{" "}
+            <span style={{ color: "#33496C" }}>{page.h1Accent}</span>
           </h1>
           <p
             style={{
@@ -74,8 +82,7 @@ function Page() {
               color: "rgba(12,25,47,.62)",
             }}
           >
-            Filtrez par service et cliquez sur un logo pour voir ce que nous
-            avons fait pour ce client.
+            {page.intro}
           </p>
         </div>
       </section>
@@ -95,7 +102,7 @@ function Page() {
             }}
           >
             {[
-              { id: "all" as const, label: "Tout" },
+              { id: "all" as const, label: page.filtreTout },
               ...CATEGORIES.filter((cat) =>
                 CLIENTS.some((cl) => cl.categories.includes(cat.id)),
               ),
@@ -133,12 +140,13 @@ function Page() {
 
           {clients.length === 0 ? (
             <p style={{ textAlign: "center", color: "rgba(12,25,47,.55)" }}>
-              Aucune réalisation dans cette catégorie pour le moment.
+              {page.aucun}
             </p>
           ) : null}
         </div>
       </section>
 
+      {visible(page.portfolio) ? (
       <section style={{ background: "#0C192F", color: "#fff" }}>
         <div
           className="nv-shell"
@@ -160,11 +168,11 @@ function Page() {
               color: "#fff",
             }}
           >
-            Notre portfolio photo et vidéo complet
+            {page.portfolio.titre}
           </h2>
           <div style={{ marginTop: 26 }}>
             <a
-              href="https://norvika.myportfolio.com/"
+              href={parametres.lienPortfolio}
               target="_blank"
               rel="noopener"
               style={{
@@ -178,11 +186,12 @@ function Page() {
                 transition: "all .2s ease",
               }}
             >
-              Voir le portfolio
+              {page.portfolio.bouton}
             </a>
           </div>
         </div>
       </section>
+      ) : null}
 
       <AutresPages courante="/realisations" />
       <SiteFooter />

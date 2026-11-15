@@ -52,6 +52,8 @@ export const navigation: Document = {
   boutonRendezVous: 'Réserver mes 30 minutes',
   boutonQuiz: 'Faire le quiz',
   filArianeAccueil: 'Accueil',
+  basculeAvant: 'Avant',
+  basculeApres: 'Après',
   piedTitreServices: 'Services',
   piedTitreContact: 'Contact',
   piedLiensContact: cles(

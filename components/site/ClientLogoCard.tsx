@@ -2,19 +2,19 @@
 
 import Link from "next/link";
 
-import type { Client } from "@/lib/realisations";
+import type { Realisation } from "@/lib/types-contenu";
 
-export function ClientLogoCard({ client }: { client: Client }) {
-  const scale = client.logoScale ?? 1;
-  const isSquare = client.logoShape === "square";
+export function ClientLogoCard({ client }: { client: Realisation }) {
+  const scale = client.logoEchelle ?? 1;
+  const isSquare = client.logoForme === "square";
 
   let media: React.ReactNode;
 
   if (client.logoStyle === "transparent") {
     media = (
       <img
-        src={client.logo}
-        alt={client.name}
+        src={client.logo.url}
+        alt={client.nom}
         loading="lazy"
         className="nv-logo-img"
         style={{
@@ -24,10 +24,10 @@ export function ClientLogoCard({ client }: { client: Client }) {
       />
     );
   } else if (client.logoStyle === "round") {
-    const size = 96 * (client.logoScale ? 1 : 1);
+    const size = 96 * (client.logoEchelle ? 1 : 1);
     media = (
       <span className="nv-logo-round" style={{ width: size, height: size }}>
-        <img src={client.logo} alt={client.name} loading="lazy" />
+        <img src={client.logo.url} alt={client.nom} loading="lazy" />
       </span>
     );
   } else if (client.logoStyle === "brand") {
@@ -39,7 +39,7 @@ export function ClientLogoCard({ client }: { client: Client }) {
           height: isSquare ? 84 : 74,
         }}
       >
-        <img src={client.logo} alt={client.name} loading="lazy" />
+        <img src={client.logo.url} alt={client.nom} loading="lazy" />
       </span>
     );
   } else {
@@ -49,8 +49,8 @@ export function ClientLogoCard({ client }: { client: Client }) {
         style={{ width: isSquare ? 84 : 168, height: isSquare ? 84 : 74 }}
       >
         <img
-          src={client.logo}
-          alt={client.name}
+          src={client.logo.url}
+          alt={client.nom}
           loading="lazy"
           style={{ objectFit: "contain", padding: "10px 14px" }}
         />
@@ -64,7 +64,7 @@ export function ClientLogoCard({ client }: { client: Client }) {
       className="nv-logo-card"
     >
       <span className="nv-logo-zone">{media}</span>
-      <span className="nv-logo-name">{client.name}</span>
+      <span className="nv-logo-name">{client.nom}</span>
     </Link>
   );
 }

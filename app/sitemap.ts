@@ -1,7 +1,9 @@
 import type { MetadataRoute } from "next";
-import { CLIENTS } from "@/lib/realisations";
+import { obtenirContenu } from "@/lib/contenu";
 
-export default function sitemap(): MetadataRoute.Sitemap {
+// Les fiches de réalisation viennent du Studio : une fiche ajoutée entre au sitemap à la publication.
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
+  const { realisations: CLIENTS } = await obtenirContenu();
   const base = "https://norvika.ca";
   const now = new Date();
 
