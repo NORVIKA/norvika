@@ -41,6 +41,8 @@ export default function Page({ client, page }: { client: Realisation; page: Page
   return (
     <div style={{ position: "relative", overflowX: "hidden", background: "#fff" }}>
       <SiteHeader />
+      {/* Repère « contenu principal » (lecteurs d'écran) et cible du lien d'évitement de l'en-tête. */}
+      <main id="contenu">
 
       <section
         style={{
@@ -391,6 +393,7 @@ export default function Page({ client, page }: { client: Realisation; page: Page
       </section>
 
       <AutresPages courante="/realisations" />
+      </main>
       <SiteFooter />
     </div>
   );

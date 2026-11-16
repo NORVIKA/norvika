@@ -8,7 +8,8 @@ import { defineArrayMember, defineField } from 'sanity'
 
 import { AVIS_TITRE_PROTEGE, estProtege, idPublie, TITRES_PROTEGES } from '../titres-proteges'
 
-type Options = { requis?: boolean; group?: string; rows?: number; hidden?: boolean }
+/** `initial` : valeur d'un document neuf (un document existant reçoit la sienne par un script). */
+type Options = { requis?: boolean; group?: string; rows?: number; hidden?: boolean; initial?: string }
 
 /* ---------------------------------------------------------------- textes */
 
@@ -21,6 +22,7 @@ export function ligne(name: string, title: string, description: string, o: Optio
     description,
     group: o.group,
     hidden: o.hidden,
+    initialValue: o.initial,
     validation: (r) => (o.requis === false ? r : r.required().error('Ce texte s’affiche sur le site : il ne peut pas être vide.')),
   })
 }

@@ -28,6 +28,8 @@ function Page({ page, realisations }: { page: PageRealisations; realisations: Re
   return (
     <div style={{ position: "relative", overflowX: "hidden", background: "#fff" }}>
       <SiteHeader />
+      {/* Repère « contenu principal » (lecteurs d'écran) et cible du lien d'évitement de l'en-tête. */}
+      <main id="contenu">
 
       <section
         style={{
@@ -174,6 +176,7 @@ function Page({ page, realisations }: { page: PageRealisations; realisations: Re
       ) : null}
 
       <AutresPages courante="/realisations" />
+      </main>
       <SiteFooter />
     </div>
   );

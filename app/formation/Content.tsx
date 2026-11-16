@@ -20,6 +20,8 @@ function Page({ page }: { page: PageFormation }) {
   return (
     <div style={{ position: "relative", overflowX: "hidden", background: "#fff" }}>
       <SiteHeader />
+      {/* Repère « contenu principal » (lecteurs d'écran) et cible du lien d'évitement de l'en-tête. */}
+      <main id="contenu">
 
       <HeroService
         nom={page.nom}
@@ -216,6 +218,7 @@ function Page({ page }: { page: PageFormation }) {
       ) : null}
 
       <AutresPages courante="/formation" />
+      </main>
       <SiteFooter />
     </div>
   );

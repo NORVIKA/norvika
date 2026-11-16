@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useContenuGlobal } from "@/components/site/ContenuGlobal";
 import { LienTelephone } from "@/components/site/LienTelephone";
 
@@ -14,7 +14,26 @@ import { LienTelephone } from "@/components/site/LienTelephone";
 // logo et le bouton du menu (components/site/LienTelephone.tsx).
 export function SiteHeader() {
   const [open, setOpen] = useState(false);
+  const bouton = useRef<HTMLButtonElement>(null);
   const { parametres, navigation } = useContenuGlobal();
+
+  // Menu de téléphone ouvert (constat 8 de Pixel) : Échap le ferme et rend le focus au bouton,
+  // et la page ne défile plus derrière (patron « body scroll lock » du CLAUDE.md).
+  useEffect(() => {
+    if (!open) return;
+    const surTouche = (e: KeyboardEvent) => {
+      if (e.key !== "Escape") return;
+      setOpen(false);
+      bouton.current?.focus();
+    };
+    const avant = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    document.addEventListener("keydown", surTouche);
+    return () => {
+      document.body.style.overflow = avant;
+      document.removeEventListener("keydown", surTouche);
+    };
+  }, [open]);
   const wordmark = parametres.logoEntete;
   const links = navigation.liensMenu.map((l) => ({ to: l.lien, label: l.libelle }));
   const LIEN_RDV = parametres.lienRendezVous;
@@ -34,6 +53,11 @@ export function SiteHeader() {
         WebkitBackdropFilter: "blur(34px) saturate(190%)",
       }}
     >
+      {/* Lien d'évitement (WCAG 2.4.1) : premier arrêt du clavier sur chaque page, invisible tant
+          qu'il n'a pas le focus. Il mène au <main id="contenu"> de la page. */}
+      <a href="#contenu" className="nv-evitement">
+        {navigation.lienEvitement}
+      </a>
       <div
         className="nv-shell nv-header-shell"
         style={{
@@ -82,10 +106,12 @@ export function SiteHeader() {
           </a>
         </div>
         <button
+          ref={bouton}
           type="button"
           className="nv-burger"
-          aria-label={navigation.menuOuvrir}
+          aria-label={open ? navigation.menuFermer : navigation.menuOuvrir}
           aria-expanded={open}
+          aria-controls={open ? "menu-mobile" : undefined}
           onClick={() => setOpen((o) => !o)}
           style={{
             alignItems: "center",
@@ -119,6 +145,7 @@ export function SiteHeader() {
 
       {open ? (
         <nav
+          id="menu-mobile"
           className="nv-burger-panel"
           style={{
             display: "flex",

@@ -11,7 +11,7 @@ export function SiteShell({ children }: { children: ReactNode }) {
   return (
     <div style={{ background: "#fff" }}>
       <SiteHeader />
-      <main>{children}</main>
+      <main id="contenu">{children}</main>
       <SiteFooter />
     </div>
   );

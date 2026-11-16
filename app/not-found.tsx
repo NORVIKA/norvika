@@ -1,6 +1,14 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { SiteShell } from "@/components/site/SiteShell";
 import { obtenirContenu } from "@/lib/contenu";
+
+// Onglet propre à la page introuvable (« Page introuvable » du Studio) : avant, elle portait le
+// titre de l'accueil (constat 16 de Pixel). Le « noindex » est posé par Next.
+export async function generateMetadata(): Promise<Metadata> {
+  const { page404 } = await obtenirContenu();
+  return { title: { absolute: page404.onglet } };
+}
 
 // Textes : « Page introuvable » du Studio.
 export default async function NotFound() {

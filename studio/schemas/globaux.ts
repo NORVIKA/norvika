@@ -163,6 +163,18 @@ export const navigation = defineType({
       group: 'menu',
     }),
     ligne(
+      'menuFermer',
+      'Bouton du menu ouvert (lecteurs d’écran)',
+      'Invisible à l’écran : le nom du même bouton quand le menu est ouvert (ex. : « Fermer le menu »).',
+      { group: 'menu', initial: 'Fermer le menu' },
+    ),
+    ligne(
+      'lienEvitement',
+      'Lien « aller au contenu » (clavier)',
+      'Le tout premier lien de chaque page. Invisible, il n’apparaît qu’en naviguant au clavier (touche Tab) et saute le menu (ex. : « Aller au contenu »).',
+      { group: 'menu', initial: 'Aller au contenu' },
+    ),
+    ligne(
       'ongletsServices',
       'Onglets des services (lecteurs d’écran)',
       'Invisible à l’écran : le nom de la rangée d’onglets sous le haut des pages de services (ex. : « Nos services »).',
@@ -259,6 +271,7 @@ export const page404 = defineType({
   type: 'document',
   fields: [
     ligne('surtitre', 'Ancien petit texte au-dessus du titre (retiré)', 'Retiré du site le 2026-11-15 (règle d’agence 1 : pas de petit titre au-dessus d’un titre). Caché ici en attendant d’être vidé.', { hidden: true, requis: false }),
+    ligne('onglet', 'Nom d’onglet', 'Le titre de l’onglet du navigateur sur une adresse qui n’existe pas (ex. : « Page introuvable | Norvika »).', { initial: 'Page introuvable | Norvika' }),
     ligne('titre', 'Titre', 'Le grand titre de la page introuvable.'),
     paragraphe('texte', 'Texte', 'Ce que la personne peut faire maintenant.'),
     ligne('boutonAccueil', 'Bouton vers l’accueil', 'Le texte du premier bouton.'),

@@ -46,6 +46,8 @@ function Page({ page }: { page: PagePhotoVideo }) {
   return (
     <div style={{ position: "relative", overflowX: "hidden", background: "#fff" }}>
       <SiteHeader />
+      {/* Repère « contenu principal » (lecteurs d'écran) et cible du lien d'évitement de l'en-tête. */}
+      <main id="contenu">
 
       <HeroService
         nom={page.nom}
@@ -264,6 +266,7 @@ function Page({ page }: { page: PagePhotoVideo }) {
       ) : null}
 
       <AutresPages courante="/photo-et-video" />
+      </main>
       <SiteFooter />
     </div>
   );

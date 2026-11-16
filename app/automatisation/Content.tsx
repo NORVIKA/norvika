@@ -19,6 +19,8 @@ function Page({ page }: { page: PageAutomatisation }) {
   return (
     <div style={{ position: "relative", overflowX: "hidden", background: "#fff" }}>
       <SiteHeader />
+      {/* Repère « contenu principal » (lecteurs d'écran) et cible du lien d'évitement de l'en-tête. */}
+      <main id="contenu">
 
       <HeroService
         nom={page.nom}
@@ -168,6 +170,7 @@ function Page({ page }: { page: PageAutomatisation }) {
       ) : null}
 
       <AutresPages courante="/automatisation" />
+      </main>
       <SiteFooter />
     </div>
   );

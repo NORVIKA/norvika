@@ -111,6 +111,24 @@
   box-shadow: 0 0 0 6px var(--focus-halo) !important;
 }
 
+/* ===== Lien d'evitement (components/site/SiteHeader.tsx) =====
+   Hors de l'ecran tant qu'il n'a pas le focus ; au clavier, il apparait en haut a gauche,
+   au-dessus de l'en-tete colle, avec le contour de selection global. */
+.nv-evitement {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  z-index: 60;
+  padding: 10px 16px;
+  border-radius: 8px;
+  background: var(--navy);
+  color: #fff;
+  font-size: 14px;
+  font-weight: 600;
+  transform: translateY(-160%);
+}
+.nv-evitement:focus { transform: none; color: #fff; }
+
 /* ===== Animations ===== */
 @keyframes dash { to { stroke-dashoffset: -320; } }
 @keyframes pulseNode { 0%, 100% { opacity: .35; } 50% { opacity: 1; } }

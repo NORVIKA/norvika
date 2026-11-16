@@ -65,6 +65,10 @@ export type Navigation = {
   enteteTelephone: string;
   /** Libellés lus par les lecteurs d'écran (invisibles à l'écran). */
   menuOuvrir: string;
+  /** Le même bouton, menu ouvert (« Fermer le menu »). */
+  menuFermer: string;
+  /** Premier lien de chaque page, visible au clavier seulement (« Aller au contenu »). */
+  lienEvitement: string;
   ongletsServices: string;
   basculeComparer: string;
   basculeImageAvant: string;
@@ -99,6 +103,8 @@ export type BlocContact = {
 };
 
 export type Page404 = {
+  /** Titre de l'onglet du navigateur sur la page introuvable. */
+  onglet: string;
   titre: string;
   texte: string;
   boutonAccueil: string;

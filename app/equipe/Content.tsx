@@ -14,6 +14,8 @@ function Page({ page, membres }: { page: PageEquipe; membres: Membre[] }) {
   return (
     <div style={{ position: "relative", overflowX: "hidden", background: "#fff" }}>
       <SiteHeader />
+      {/* Repère « contenu principal » (lecteurs d'écran) et cible du lien d'évitement de l'en-tête. */}
+      <main id="contenu">
 
       <section style={{ position: "relative", overflow: "hidden", borderBottom: "1px solid rgba(12,25,47,.1)" }}>
         <div aria-hidden="true" style={{ position: "absolute", inset: "-20% -10% auto", height: 800, pointerEvents: "none" }}>
@@ -205,6 +207,7 @@ function Page({ page, membres }: { page: PageEquipe; membres: Membre[] }) {
       ) : null}
 
       <AutresPages courante="/equipe" />
+      </main>
       <SiteFooter />
     </div>
   );
