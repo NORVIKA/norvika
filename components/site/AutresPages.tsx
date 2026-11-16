@@ -1,8 +1,9 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useRef } from "react";
+import { useRef } from "react";
 import { useContenuGlobal } from "@/components/site/ContenuGlobal";
+import { useReveal } from "@/lib/useReveal";
 
 /**
  * « Continuer la visite » : les autres pages du site, en bas de chaque page.
@@ -29,29 +30,8 @@ export function AutresPages({
   const titre = navigation.suiteTitre;
   const PAGES = navigation.suitePages.map((p) => ({ href: p.lien, titre: p.titre, texte: p.texte }));
   const ref = useRef<HTMLElement>(null);
-
-  useEffect(() => {
-    const el = ref.current;
-    if (!el) return;
-    const cibles = Array.from(el.querySelectorAll<HTMLElement>("[data-reveal]"));
-    if (!("IntersectionObserver" in window)) {
-      cibles.forEach((c) => c.classList.add("is-in"));
-      return;
-    }
-    const io = new IntersectionObserver(
-      (entrees) => {
-        entrees.forEach((e) => {
-          if (e.isIntersecting) {
-            e.target.classList.add("is-in");
-            io.unobserve(e.target);
-          }
-        });
-      },
-      { rootMargin: "0px 0px -8% 0px", threshold: 0.05 },
-    );
-    cibles.forEach((c) => io.observe(c));
-    return () => io.disconnect();
-  }, []);
+  // Le composant se révèle seul : il ne dépend pas de l'observateur de la page hôte.
+  useReveal(ref);
 
   const pages = PAGES.filter((p) => p.href !== courante);
 

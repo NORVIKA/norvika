@@ -123,10 +123,6 @@ export default async function RootLayout({
         {GA_ID ? <script dangerouslySetInnerHTML={{ __html: SCRIPT_CONSENTEMENT_DEFAUT }} /> : null}
 
         {/* GSC VERIFICATION INSERT HERE */}
-        {/* Sans JS, l'observateur ne pose jamais .is-in et le contenu resterait invisible. */}
-        <noscript>
-          <style>{`[data-reveal]{opacity:1 !important;transform:none !important}`}</style>
-        </noscript>
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{

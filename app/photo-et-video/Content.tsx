@@ -2,7 +2,6 @@
 
 import Link from "next/link";
 
-import { useEffect, useRef, useState } from "react";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
 import { Roadmap, versRoadSteps } from "@/components/site/Roadmap";
@@ -10,6 +9,7 @@ import { AutresPages } from "@/components/site/AutresPages";
 import { HeroService } from "@/components/site/HeroService";
 import { useContenuGlobal } from "@/components/site/ContenuGlobal";
 import { visible, type PagePhotoVideo } from "@/lib/types-contenu";
+import { useReveal } from "@/lib/useReveal";
 const cardStyle: React.CSSProperties = {
   padding: "34px 30px",
   borderRadius: 20,
@@ -40,33 +40,11 @@ function Page({ page }: { page: PagePhotoVideo }) {
   const { parametres } = useContenuGlobal();
   const ROAD_STEPS = versRoadSteps(page.parcours.etapes);
   const tournage = page.tournage.photo;
-  const rootRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    const els = rootRef.current?.querySelectorAll<HTMLElement>(
-      "[data-reveal], [data-check]",
-    );
-    if (!els || els.length === 0) return;
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            entry.target.classList.add("is-in");
-          }
-        });
-      },
-      { threshold: 0.2 },
-    );
-    els.forEach((el) => observer.observe(el));
-    return () => observer.disconnect();
-  }, []);
+  useReveal();
 
 
   return (
-    <div
-      ref={rootRef}
-      style={{ position: "relative", overflowX: "hidden", background: "#fff" }}
-    >
+    <div style={{ position: "relative", overflowX: "hidden", background: "#fff" }}>
       <SiteHeader />
 
       <HeroService

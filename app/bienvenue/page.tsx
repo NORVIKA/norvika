@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import { SiteShell } from "@/components/site/SiteShell";
-import { Reveal } from "@/components/ui/Reveal";
 import { obtenirContenu } from "@/lib/contenu";
 import { lienTelephone } from "@/lib/telephone";
 import { visible } from "@/lib/types-contenu";
@@ -59,13 +58,11 @@ export default async function BienvenuePage() {
               {t.outils.texte}
             </p>
             <div className="mt-12 grid gap-6 md:grid-cols-2">
-              {OUTILS.map((o, i) => (
-                <Reveal key={o.nom} delay={i * 80}>
-                  <div className="rounded-2xl border border-[var(--hairline)] bg-[var(--background)] p-8">
-                    <h3 className="text-lg font-semibold text-[var(--foreground)]">{o.nom}</h3>
-                    <p className="mt-3 text-base leading-relaxed text-[var(--muted-foreground)]">{o.texte}</p>
-                  </div>
-                </Reveal>
+              {OUTILS.map((o) => (
+                <div key={o.nom} className="rounded-2xl border border-[var(--hairline)] bg-[var(--background)] p-8">
+                  <h3 className="text-lg font-semibold text-[var(--foreground)]">{o.nom}</h3>
+                  <p className="mt-3 text-base leading-relaxed text-[var(--muted-foreground)]">{o.texte}</p>
+                </div>
               ))}
             </div>
             <div className="mt-8 rounded-2xl border border-[var(--hairline)] bg-[var(--cream)] p-6 md:p-8">

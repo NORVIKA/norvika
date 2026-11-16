@@ -7,7 +7,7 @@
 
    Les pages sont ecrites en styles en ligne + classes `nv-*`, pas en classes
    utilitaires Tailwind. Tailwind ne sert plus qu'aux quelques pages heritees
-   (/contact, /bienvenue, /admin). C'est pour ca que ce fichier porte a la fois
+   (/contact, /bienvenue). C'est pour ca que ce fichier porte a la fois
    les jetons de marque et les composants `nv-*`.
 
    Les familles Sora et DM Sans viennent de next/font (layout.tsx), donc on les
@@ -107,35 +107,33 @@
 @keyframes stepIn { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
 @keyframes popIn { 0% { opacity: 0; transform: scale(.9); } 100% { opacity: 1; transform: scale(1); } }
 
-/* ===== Apparition au defilement ===== */
+/* ===== Apparition au defilement =====
+   Le HTML livre ne cache RIEN (bloc F, 2026-11-16). Avant, tout [data-reveal] partait de
+   opacity:0 et attendait que React hydrate puis qu'un observateur pose .is-in. Sur telephone,
+   tout ce qui tombait dans le premier ecran sous l'entete (le texte d'origine de /equipe, par
+   exemple) etait peint apres le JavaScript, et devenait l'element LCP en retard.
+   Maintenant : visible par defaut. Au demarrage, lib/useReveal.ts (suivreApparitions) cache
+   SEULEMENT ce qui est sous l'ecran, d'un coup et sans transition (.nv-attente), puis le revele
+   en fondu a son arrivee. Le premier ecran, quel que soit l'appareil ou le texte du Studio, est
+   donc peint des la premiere image. Sans JavaScript, rien n'est jamais cache. */
 [data-reveal] {
-  opacity: 0;
-  transform: translateY(16px);
   transition: opacity .8s cubic-bezier(.2,0,0,1), transform .8s cubic-bezier(.2,0,0,1);
 }
-[data-reveal].is-in { opacity: 1; transform: none; }
+[data-reveal].nv-attente {
+  opacity: 0;
+  transform: translateY(16px);
+  transition: none;
+}
 
-/* Le premier ecran ne doit pas attendre le JavaScript.
-   L'apparition normale part de opacity:0 et n'arrive que quand React a
-   hydrate, puis que l'observateur a pose .is-in : mesure sur mobile, ca
-   retardait l'affichage du titre de 4,2 s et plombait le LCP. Au-dessus de la
-   ligne de flottaison, l'element est donc opaque des la premiere image et seul
-   le deplacement s'anime, en CSS pur, sans dependre du JS. */
+/* Le haut de l'accueil : opaque des la premiere image, seul le deplacement s'anime, en CSS pur.
+   Jamais cache par l'observateur (lib/useReveal.ts l'ignore). */
 [data-reveal="hero"] {
-  opacity: 1;
-  transform: none;
   transition: none;
   animation: nvHero .8s cubic-bezier(.2, 0, 0, 1) both;
 }
 @keyframes nvHero {
   from { transform: translateY(16px); }
   to { transform: none; }
-}
-
-
-/* Sans JS, l'observateur ne pose jamais .is-in : le contenu resterait invisible. */
-@media (scripting: none) {
-  [data-reveal] { opacity: 1; transform: none; }
 }
 
 /* ===== Boutons, liens, cartes =====

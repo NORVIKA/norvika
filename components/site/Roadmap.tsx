@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { Etape } from "@/lib/types-contenu";
+import { suivreApparitions } from "@/lib/useReveal";
 import { useContenuGlobal } from "@/components/site/ContenuGlobal";
 
 /**
@@ -72,29 +73,13 @@ export function Roadmap({ steps }: { steps: RoadStep[] }) {
   // `[data-reveal]`. Resultat, en y posant cette roadmap, tout le bloc restait
   // a opacity 0 : courbe, pastilles et carte invisibles, pas seulement la piece.
   // Un composant qui se cache doit savoir se montrer tout seul.
-  useEffect(() => {
-    const cibles = [wrapRef.current, carteRef.current].filter(
-      (el): el is HTMLDivElement => el !== null,
-    );
-    if (!cibles.length) return;
-    if (!("IntersectionObserver" in window)) {
-      cibles.forEach((el) => el.classList.add("is-in"));
-      return;
-    }
-    const io = new IntersectionObserver(
-      (entrees) => {
-        entrees.forEach((e) => {
-          if (e.isIntersecting) {
-            e.target.classList.add("is-in");
-            io.unobserve(e.target);
-          }
-        });
-      },
-      { rootMargin: "0px 0px -8% 0px", threshold: 0.05 },
-    );
-    cibles.forEach((el) => io.observe(el));
-    return () => io.disconnect();
-  }, []);
+  useEffect(
+    () =>
+      suivreApparitions(
+        [wrapRef.current, carteRef.current].filter((el): el is HTMLDivElement => el !== null),
+      ),
+    [],
+  );
 
   // Largeur mesuree -> orientation + hauteur de la zone.
   // Un ResizeObserver plutot que l'evenement `resize` : il capte aussi le

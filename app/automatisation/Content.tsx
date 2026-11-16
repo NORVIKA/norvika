@@ -2,29 +2,13 @@
 
 import Link from "next/link";
 
-import { useEffect, useRef, useState } from "react";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
 import { Roadmap, versRoadSteps } from "@/components/site/Roadmap";
 import { AutresPages } from "@/components/site/AutresPages";
 import { HeroService } from "@/components/site/HeroService";
 import { visible, type PageAutomatisation } from "@/lib/types-contenu";
-
-function useReveal() {
-  useEffect(() => {
-    const els = document.querySelectorAll("[data-reveal]:not(.is-in)");
-    const io = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) entry.target.classList.add("is-in");
-        });
-      },
-      { threshold: 0.15 }
-    );
-    els.forEach((el) => io.observe(el));
-    return () => io.disconnect();
-  }, []);
-}
+import { useReveal } from "@/lib/useReveal";
 
 // Tout le texte vient de la page « Automatisation » du Studio.
 function Page({ page }: { page: PageAutomatisation }) {

@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import { SiteShell } from "@/components/site/SiteShell";
-import { Reveal } from "@/components/ui/Reveal";
 import { obtenirContenu } from "@/lib/contenu";
 import { metaPage } from "@/lib/meta";
 import { lienTelephone } from "@/lib/telephone";
@@ -33,7 +32,7 @@ export default async function ContactPage() {
         <div className="relative mx-auto max-w-6xl px-6 pb-24 pt-20 md:pb-32 md:pt-28">
           <div className="grid gap-12 lg:grid-cols-[1fr_1.3fr] lg:gap-20">
             {/* Colonne info */}
-            <Reveal>
+            <div>
               <h1 className="text-4xl font-semibold leading-[1.05] tracking-tight text-[var(--foreground)] sm:text-5xl">
                 {t.h1}
               </h1>
@@ -73,12 +72,12 @@ export default async function ContactPage() {
                   </dd>
                 </div>
               </dl>
-            </Reveal>
+            </div>
 
             {/* Colonne formulaire */}
-            <Reveal delay={120}>
+            <div>
               <ContactForm email={email} t={t} />
-            </Reveal>
+            </div>
           </div>
         </div>
       </section>

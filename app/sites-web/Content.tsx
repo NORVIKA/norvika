@@ -1,7 +1,6 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useRef, useState } from "react";
 
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
@@ -9,31 +8,11 @@ import { Roadmap, versRoadSteps } from "@/components/site/Roadmap";
 import { AutresPages } from "@/components/site/AutresPages";
 import { HeroService } from "@/components/site/HeroService";
 import { visible, type PageSitesWeb } from "@/lib/types-contenu";
-
-
-
-
-function useReveal() {
-  const ref = useRef<HTMLDivElement>(null);
-  useEffect(() => {
-    const els = document.querySelectorAll<HTMLElement>("[data-check]:not(.is-in)");
-    const io = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) entry.target.classList.add("is-in");
-        });
-      },
-      { threshold: 0.15 }
-    );
-    els.forEach((el) => io.observe(el));
-    return () => io.disconnect();
-  }, []);
-  return ref;
-}
+import { useReveal } from "@/lib/useReveal";
 
 // Tout le texte vient de la page « Sites web » du Studio.
 function Page({ page }: { page: PageSitesWeb }) {
-  const containerRef = useReveal();
+  useReveal();
   const ROAD_STEPS = versRoadSteps(page.parcours.etapes);
 
   const cardStyle: React.CSSProperties = {
@@ -49,7 +28,7 @@ function Page({ page }: { page: PageSitesWeb }) {
 
 
   return (
-    <div ref={containerRef} style={{ position: "relative", overflowX: "hidden", background: "#fff" }}>
+    <div style={{ position: "relative", overflowX: "hidden", background: "#fff" }}>
       <SiteHeader />
 
       <HeroService
