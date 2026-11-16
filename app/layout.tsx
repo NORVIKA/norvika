@@ -1,7 +1,9 @@
 import type { Metadata } from "next";
 import { Sora, DM_Sans } from "next/font/google";
 import "./globals.css";
+import { Consentement } from "@/components/site/Consentement";
 import { FournisseurContenu } from "@/components/site/ContenuGlobal";
+import { SCRIPT_CONSENTEMENT_DEFAUT, idGaValide } from "@/lib/consentement";
 import { obtenirContenu, obtenirGlobal } from "@/lib/contenu";
 
 // Le design n'utilise Sora qu'en 600 (titres) et DM Sans qu'en 400/500/600.
@@ -54,7 +56,7 @@ export async function generateMetadata(): Promise<Metadata> {
 // est le defaut sain : on n'installe un traceur que si quelqu'un l'a demande.
 // ⚠️ Variable NEXT_PUBLIC_*, donc FIGEE AU MOMENT DE LA CONSTRUCTION : elle doit
 // exister dans les variables du depot pour que l'action GitHub la voie.
-const GA_ID = process.env.NEXT_PUBLIC_GA_ID;
+const GA_ID = idGaValide(process.env.NEXT_PUBLIC_GA_ID);
 
 // Pages entierement statiques, batties une fois au deploiement.
 //
@@ -99,7 +101,12 @@ export default async function RootLayout({
             Le chargement synchrone est VOULU et ne doit pas etre « corrige ».
             La banniere doit exister avant qu'un traceur puisse se declencher ;
             en `async`, GA4 pourrait partir avant elle et deposer un temoin sans
-            consentement, ce qui est exactement ce que la Loi 25 interdit. */}
+            consentement, ce qui est exactement ce que la Loi 25 interdit.
+            Depuis le 2026-11-16, GA4 attend l'evenement d'acceptation de CookieYes
+            (components/site/Consentement.tsx) : la conformite ne depend plus de cet
+            ordre. Garde synchrone sur decision (bloc F). Risque connu a surveiller en
+            production : erreur d'hydratation 418 qui efface la banniere (memoire
+            globale cookieyes-et-ga4-le-montage-conforme, vecu sur crossfit). */}
         <script
           id="cookieyes"
           type="text/javascript"
@@ -107,42 +114,13 @@ export default async function RootLayout({
         />
 
         {/* GA4 INSERT HERE */}
-        {/* ⛔ LOI 25, art. 8.1 : AUCUN temoin de mesure avant un consentement
-            explicite. Le mode consentement de Google est donc pose a « refuse »
-            par defaut, AVANT le chargement de gtag. Sans ce bloc, GA4 depose
-            _ga des la premiere visite et le cas 2 du test (refuser, verifier
-            qu'il n'y a toujours rien) echoue.
-            CookieYes envoie ensuite un `consent: update` quand le visiteur
-            accepte, et seulement a ce moment-la GA4 se met a mesurer. */}
-        {GA_ID ? (
-          <>
-            <script
-              dangerouslySetInnerHTML={{
-                __html: `
-window.dataLayer = window.dataLayer || [];
-function gtag(){dataLayer.push(arguments);}
-gtag('consent', 'default', {
-  ad_storage: 'denied',
-  ad_user_data: 'denied',
-  ad_personalization: 'denied',
-  analytics_storage: 'denied',
-  functionality_storage: 'granted',
-  security_storage: 'granted',
-  wait_for_update: 500
-});
-gtag('set', 'ads_data_redaction', true);`,
-              }}
-            />
-            <script async src={`https://www.googletagmanager.com/gtag/js?id=${GA_ID}`} />
-            <script
-              dangerouslySetInnerHTML={{
-                __html: `
-gtag('js', new Date());
-gtag('config', '${GA_ID}', { anonymize_ip: true });`,
-              }}
-            />
-          </>
-        ) : null}
+        {/* ⛔ LOI 25, art. 8.1 : RIEN ne part vers Google avant un consentement explicite.
+            Ici, seulement l'etat « refuse » par defaut (aucun identifiant, aucun chargement).
+            La balise gtag.js n'est chargee QUE quand la categorie « Analytique » est acceptee
+            dans CookieYes : components/site/Consentement.tsx, patron d'agence (lib/consentement.ts).
+            Avant le 2026-11-16, gtag.js se chargeait ici d'office (mode « avance ») et envoyait
+            un page_view sans temoin a google-analytics.com des l'arrivee, et apres un refus. */}
+        {GA_ID ? <script dangerouslySetInnerHTML={{ __html: SCRIPT_CONSENTEMENT_DEFAUT }} /> : null}
 
         {/* GSC VERIFICATION INSERT HERE */}
         {/* Sans JS, l'observateur ne pose jamais .is-in et le contenu resterait invisible. */}
@@ -191,6 +169,7 @@ gtag('config', '${GA_ID}', { anonymize_ip: true });`,
       </head>
       <body>
         <FournisseurContenu valeur={global}>{children}</FournisseurContenu>
+        <Consentement idGa={GA_ID} />
       </body>
     </html>
   );
