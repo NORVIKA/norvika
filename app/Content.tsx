@@ -38,13 +38,14 @@ function Index({ page, avisListe }: { page: PageAccueil; avisListe: Avis[] }) {
   const bascule = page.avantApres.realisation;
   const [open, setOpen] = useState<Record<number, boolean>>({});
   const [avis, setAvis] = useState(0);
-  const selected = AVIS[avis] ?? AVIS[0];
 
   return (
     <div
       style={{ position: "relative", overflowX: "hidden", background: "#fff" }}
     >
       <SiteHeader />
+      {/* Repère « contenu principal » (lecteurs d'écran) et cible du lien d'évitement de l'en-tête. */}
+      <main id="contenu">
 
       {/* Hero
           Fond sombre uni, sans decor. Il a porte un temps trois aurores
@@ -158,22 +159,12 @@ function Index({ page, avisListe }: { page: PageAccueil; avisListe: Avis[] }) {
           className="nv-shell"
           style={{ maxWidth: 1040, margin: "0 auto", padding: "76px 32px 82px" }}
         >
+          {/* Plus de sur-titre « En vidéo » (règle d'agence 1, constat 5 de Pixel) : il était le h2,
+              et la vraie phrase de titre un simple paragraphe. La phrase EST le titre. */}
           <div data-reveal style={{ textAlign: "center" }}>
             <h2
               style={{
-                margin: 0,
-                fontSize: 11.5,
-                letterSpacing: ".2em",
-                textTransform: "uppercase",
-                color: "#33496C",
-                fontWeight: 600,
-              }}
-            >
-              {page.videos.titre}
-            </h2>
-            <p
-              style={{
-                margin: "18px 0 40px",
+                margin: "0 0 40px",
                 fontFamily: "var(--font-display)",
                 fontWeight: 600,
                 fontSize: "clamp(24px,2.8vw,34px)",
@@ -183,7 +174,7 @@ function Index({ page, avisListe }: { page: PageAccueil; avisListe: Avis[] }) {
               }}
             >
               {page.videos.sousTitre}
-            </p>
+            </h2>
           </div>
           {/* ⚠️ PAS `nv-grid` ICI. Cette classe force une seule colonne sous
               1024 px : les trois videos verticales s'empilaient et mettaient
@@ -248,22 +239,11 @@ function Index({ page, avisListe }: { page: PageAccueil; avisListe: Avis[] }) {
           className="nv-shell"
           style={{ maxWidth: 1240, margin: "0 auto", padding: "76px 32px 82px" }}
         >
+          {/* Plus de sur-titre « Avant / après » (règle d'agence 1) : la phrase EST le titre. */}
           <div data-reveal style={{ textAlign: "center" }}>
             <h2
               style={{
-                margin: 0,
-                fontSize: 11.5,
-                letterSpacing: ".2em",
-                textTransform: "uppercase",
-                color: "#33496C",
-                fontWeight: 600,
-              }}
-            >
-              {page.avantApres.titre}
-            </h2>
-            <p
-              style={{
-                margin: "18px 0 10px",
+                margin: "0 0 10px",
                 fontFamily: "var(--font-display)",
                 fontWeight: 600,
                 fontSize: "clamp(24px,2.8vw,34px)",
@@ -273,7 +253,7 @@ function Index({ page, avisListe }: { page: PageAccueil; avisListe: Avis[] }) {
               }}
             >
               {page.avantApres.sousTitre}
-            </p>
+            </h2>
             <p
               style={{
                 margin: "0 0 30px",
@@ -535,8 +515,9 @@ function Index({ page, avisListe }: { page: PageAccueil; avisListe: Avis[] }) {
                   >
                     {s.lead}
                   </p>
-                  {open[i] && (
-                    <>
+                  {/* Toujours dans le HTML livré (lisible sans JavaScript et par Google), caché à
+                      l'œil tant que la ligne est fermée. Avant, ce texte n'existait qu'après le clic. */}
+                  <div id={`service-detail-${i}`} hidden={!open[i]}>
                       <p
                         style={{
                           margin: "14px 0 0",
@@ -562,13 +543,13 @@ function Index({ page, avisListe }: { page: PageAccueil; avisListe: Avis[] }) {
                       >
                         {page.services.lienPage} {s.title}
                       </Link>
-                    </>
-                  )}
+                  </div>
                 </div>
                 <button
                   type="button"
                   className="nv-row-bouton"
                   aria-expanded={!!open[i]}
+                  aria-controls={`service-detail-${i}`}
                   onClick={() => setOpen((o) => ({ ...o, [i]: !o[i] }))}
                 >
                   {open[i] ? page.services.fermer : page.services.ouvrir}
@@ -729,7 +710,7 @@ function Index({ page, avisListe }: { page: PageAccueil; avisListe: Avis[] }) {
       ) : null}
 
       {/* Avis Google */}
-      {visible(page.avis) && selected ? (
+      {visible(page.avis) && AVIS.length ? (
       <section
         id="realisations"
         style={{
@@ -813,6 +794,7 @@ function Index({ page, avisListe }: { page: PageAccueil; avisListe: Avis[] }) {
                   type="button"
                   className="nv-avis"
                   aria-pressed={avis === i}
+                  aria-controls={`avis-${i}`}
                   onClick={() => setAvis(i)}
                   style={{
                     padding: "22px 26px 22px 0",
@@ -883,51 +865,58 @@ function Index({ page, avisListe }: { page: PageAccueil; avisListe: Avis[] }) {
               >
                 “
               </span>
-              <div style={{ position: "relative" }}>
-                <blockquote
-                  // ⚠️ `columnCount` etait pose en style EN LIGNE, donc aucune
-                  // media query ne pouvait le defaire : sur telephone, l'avis
-                  // se coupait en deux colonnes de deux mots qui se
-                  // chevauchaient. Le decoupage passe par une classe, qui
-                  // retombe a une seule colonne sous 900 px.
-                  className={selected.body.length > 2 ? "nv-avis-2col" : undefined}
-                  style={{
-                    margin: 0,
-                    maxWidth: selected.body.length > 2 ? "62ch" : "56ch",
-                    fontSize: 15.5,
-                    lineHeight: 1.72,
-                    color: "rgba(12,25,47,.74)",
-                  }}
-                >
+              {/* Les sept avis sont tous dans le HTML livré (lisibles sans JavaScript et par Google) ;
+                  seul celui choisi à gauche est montré, les autres portent l'attribut hidden. Avant,
+                  six avis sur sept n'existaient qu'après un clic (constat 6 de Pixel). */}
+              {AVIS.map((a, k) => (
+                <div key={a.name} id={`avis-${k}`} hidden={avis !== k}>
+                  <div style={{ position: "relative" }}>
+                    <blockquote
+                      // ⚠️ `columnCount` etait pose en style EN LIGNE, donc aucune
+                      // media query ne pouvait le defaire : sur telephone, l'avis
+                      // se coupait en deux colonnes de deux mots qui se
+                      // chevauchaient. Le decoupage passe par une classe, qui
+                      // retombe a une seule colonne sous 900 px.
+                      className={a.body.length > 2 ? "nv-avis-2col" : undefined}
+                      style={{
+                        margin: 0,
+                        maxWidth: a.body.length > 2 ? "62ch" : "56ch",
+                        fontSize: 15.5,
+                        lineHeight: 1.72,
+                        color: "rgba(12,25,47,.74)",
+                      }}
+                    >
+                      <p
+                        style={{
+                          margin: "0 0 14px",
+                          fontFamily: "var(--font-display)",
+                          fontSize: a.body.length > 2 ? 21 : 24,
+                          lineHeight: 1.4,
+                          color: "#0C192F",
+                        }}
+                      >
+                        {a.lead}
+                      </p>
+                      {a.body.map((p, i) => (
+                        <p key={i} style={{ margin: "0 0 14px" }}>
+                          {p}
+                        </p>
+                      ))}
+                    </blockquote>
+                  </div>
                   <p
                     style={{
-                      margin: "0 0 14px",
-                      fontFamily: "var(--font-display)",
-                      fontSize: selected.body.length > 2 ? 21 : 24,
-                      lineHeight: 1.4,
-                      color: "#0C192F",
+                      margin: "36px 0 0",
+                      fontSize: 12.5,
+                      letterSpacing: ".16em",
+                      textTransform: "uppercase",
+                      color: "rgba(12,25,47,.42)",
                     }}
                   >
-                    {selected.lead}
+                    {a.footer}
                   </p>
-                  {selected.body.map((p, i) => (
-                    <p key={i} style={{ margin: "0 0 14px" }}>
-                      {p}
-                    </p>
-                  ))}
-                </blockquote>
-              </div>
-              <p
-                style={{
-                  margin: "36px 0 0",
-                  fontSize: 12.5,
-                  letterSpacing: ".16em",
-                  textTransform: "uppercase",
-                  color: "rgba(12,25,47,.42)",
-                }}
-              >
-                {selected.footer}
-              </p>
+                </div>
+              ))}
             </div>
           </div>
         </div>
@@ -935,6 +924,7 @@ function Index({ page, avisListe }: { page: PageAccueil; avisListe: Avis[] }) {
       ) : null}
 
       <AutresPages courante="/" />
+      </main>
       <SiteFooter />
     </div>
   );

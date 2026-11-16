@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useId, useMemo, useRef, useState } from "react";
 import type { Etape } from "@/lib/types-contenu";
 import { suivreApparitions } from "@/lib/useReveal";
 import { useContenuGlobal } from "@/components/site/ContenuGlobal";
@@ -50,6 +50,7 @@ export function Roadmap({ steps }: { steps: RoadStep[] }) {
   );
 
   const [step, setStep] = useState(0);
+  const idCarte = useId();
   const [mode, setMode] = useState<"h" | "v">("h");
   const [box, setBox] = useState({ w: 1100, h: 220 });
 
@@ -252,7 +253,10 @@ export function Roadmap({ steps }: { steps: RoadStep[] }) {
   }, [step, d, mode, fracs]);
 
   // Avance automatique, en pause des que le visiteur choisit une etape.
+  // Jamais avec « réduire les animations » (constat 15 de Pixel) : un contenu qui change tout seul
+  // toutes les 3,8 s, sans bouton pause, est exactement ce que ce réglage demande d'éviter.
   useEffect(() => {
+    if (window.matchMedia?.("(prefers-reduced-motion: reduce)").matches) return;
     const id = setInterval(() => {
       if (userTouched.current) return;
       setStep((s) => (s + 1) % n);
@@ -260,7 +264,6 @@ export function Roadmap({ steps }: { steps: RoadStep[] }) {
     return () => clearInterval(id);
   }, [n]);
 
-  const current = steps[step]!;
   const isV = mode === "v";
 
   return (
@@ -328,6 +331,7 @@ export function Roadmap({ steps }: { steps: RoadStep[] }) {
               aria-label={`${navigation.etapeLibelle} ${e.num ?? String(i + 1).padStart(2, "0")} : ${e.label}`}
               className="nv-etape-point"
               aria-current={step === i ? "step" : undefined}
+              aria-controls={`${idCarte}-${i}`}
               style={{
                 position: "absolute",
                 width: 44,
@@ -398,33 +402,43 @@ export function Roadmap({ steps }: { steps: RoadStep[] }) {
             "0 1px 0 rgba(255,255,255,.95) inset, 0 30px 70px -44px rgba(12,25,47,.8)",
         }}
       >
-        <div style={{ display: "flex", alignItems: "baseline", gap: 18 }}>
-          <span
-            style={{
-              fontFamily: "var(--font-display)",
-              fontSize: 13,
-              color: "rgba(12,25,47,.35)",
-            }}
+        {/* Toutes les étapes sont dans le HTML livré (lisibles sans JavaScript et par Google) ;
+            seule l'étape choisie est montrée. Avant, les étapes 02 et suivantes n'existaient
+            qu'après un clic ou l'avance automatique (constat 6 de Pixel). */}
+        {steps.map((e, i) => (
+          <div
+            key={i}
+            id={`${idCarte}-${i}`}
+            hidden={i !== step}
+            style={{ display: i === step ? "flex" : undefined, alignItems: "baseline", gap: 18 }}
           >
-            {current.num ?? String(step + 1).padStart(2, "0")}
-          </span>
-          <div>
-            <h3 style={{ margin: 0, fontSize: 21, letterSpacing: "-.02em" }}>
-              {current.title}
-            </h3>
-            <p
+            <span
               style={{
-                margin: "10px 0 0",
-                maxWidth: "62ch",
-                fontSize: 16,
-                lineHeight: 1.62,
-                color: "rgba(12,25,47,.66)",
+                fontFamily: "var(--font-display)",
+                fontSize: 13,
+                color: "rgba(12,25,47,.35)",
               }}
             >
-              {current.body}
-            </p>
+              {e.num ?? String(i + 1).padStart(2, "0")}
+            </span>
+            <div>
+              <h3 style={{ margin: 0, fontSize: 21, letterSpacing: "-.02em" }}>
+                {e.title}
+              </h3>
+              <p
+                style={{
+                  margin: "10px 0 0",
+                  maxWidth: "62ch",
+                  fontSize: 16,
+                  lineHeight: 1.62,
+                  color: "rgba(12,25,47,.66)",
+                }}
+              >
+                {e.body}
+              </p>
+            </div>
           </div>
-        </div>
+        ))}
       </div>
     </>
   );

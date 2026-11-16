@@ -57,8 +57,8 @@ export const pageAccueil = defineType({
     paragraphe('heroTexte', 'Texte sous le grand titre', 'Deux ou trois phrases qui disent ce que vous faites et pour qui.', { group: 'contenu' }),
     ligne('heroBoutonSecondaire', 'Second bouton', 'Le bouton à côté de « Réserver mes 30 minutes ». Il mène aux réalisations.', { group: 'contenu' }),
     section('videos', 'Vidéos de clients', 'Les témoignages vidéo, juste sous le haut de la page.', [
-      ligne('titre', 'Titre de la section', 'Le petit titre en capitales (ex. : « En vidéo »).'),
-      ligne('sousTitre', 'Phrase sous le titre', 'La phrase en gros sous le petit titre.'),
+      ligne('titre', 'Ancien petit titre en capitales (retiré)', 'Retiré du site le 2026-11-16 (règle d’agence 1 : pas de petit titre au-dessus d’un titre). Caché ici en attendant d’être vidé.', { hidden: true, requis: false }),
+      ligne('sousTitre', 'Titre de la section', 'La phrase en gros au-dessus des vidéos (ex. : « Nos clients en parlent mieux que nous. »).'),
       ligne('bouton', 'Texte du bouton sous chaque vidéo', 'Le bouton qui mène à la fiche du client (ex. : « Voir la réalisation »).'),
       defineField({
         name: 'liste',
@@ -87,8 +87,8 @@ export const pageAccueil = defineType({
       }),
     ]),
     section('avantApres', 'Avant / après', 'La bascule qui montre un site avant et après la refonte.', [
-      ligne('titre', 'Titre de la section', 'Le petit titre en capitales (ex. : « Avant / après »).'),
-      ligne('sousTitre', 'Phrase sous le titre', 'La phrase en gros sous le petit titre.'),
+      ligne('titre', 'Ancien petit titre en capitales (retiré)', 'Retiré du site le 2026-11-16 (règle d’agence 1 : pas de petit titre au-dessus d’un titre). Caché ici en attendant d’être vidé.', { hidden: true, requis: false }),
+      ligne('sousTitre', 'Titre de la section', 'La phrase en gros au-dessus de la bascule (ex. : « Ce qu’une refonte change. »).'),
       ligne('texte', 'Texte', 'Une phrase qui présente le client montré.'),
       defineField({
         name: 'realisation',
