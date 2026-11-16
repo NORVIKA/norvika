@@ -1,11 +1,27 @@
 import type { Metadata } from "next";
 import { SiteShell } from "@/components/site/SiteShell";
+import { obtenirContenu } from "@/lib/contenu";
+import { imagePartage, partage } from "@/lib/meta";
 
-export const metadata: Metadata = {
-  title: "Politique de confidentialité",
-  description: "Politique de confidentialité de Norvika, conforme à la Loi 25 du Québec.",
-  robots: { index: false, follow: false },
-};
+// Texte légal, laissé dans le code (exception de la phase 4). Son propre aperçu de partage : sans
+// lui, la page héritait du titre et de la description de l'accueil (openGraph du layout).
+const TITRE = "Politique de confidentialité";
+const DESCRIPTION = "Politique de confidentialité de Norvika, conforme à la Loi 25 du Québec.";
+
+export async function generateMetadata(): Promise<Metadata> {
+  const { parametres } = await obtenirContenu();
+  return {
+    title: TITRE,
+    description: DESCRIPTION,
+    robots: { index: false, follow: false },
+    ...partage(parametres, {
+      titre: `${TITRE} | ${parametres.nom}`,
+      description: DESCRIPTION,
+      chemin: "/politique-de-confidentialite",
+      image: imagePartage(parametres.imagePartage),
+    }),
+  };
+}
 
 export default function PolitiquePage() {
   return (

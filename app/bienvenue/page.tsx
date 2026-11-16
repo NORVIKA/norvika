@@ -1,18 +1,27 @@
 import type { Metadata } from "next";
 import { SiteShell } from "@/components/site/SiteShell";
 import { obtenirContenu } from "@/lib/contenu";
+import { imagePartage, partage } from "@/lib/meta";
 import { lienTelephone } from "@/lib/telephone";
 import { visible } from "@/lib/types-contenu";
 import { LeadForm } from "./LeadForm";
 
 // Page cachée de Google (lien envoyé aux nouveaux clients). Ses textes : page « Bienvenue » du
 // Studio ; le courriel et le téléphone : « Infos de l'entreprise ».
+// Son propre aperçu de partage : c'est le lien qu'on envoie aux nouveaux clients. Sans lui, la page
+// héritait du titre et de la description de l'accueil (openGraph du layout).
 export async function generateMetadata(): Promise<Metadata> {
-  const { bienvenue } = await obtenirContenu();
+  const { bienvenue, parametres } = await obtenirContenu();
   return {
     title: { absolute: bienvenue.seoTitre },
     description: bienvenue.seoDescription,
     robots: { index: false, follow: false },
+    ...partage(parametres, {
+      titre: bienvenue.partageTitre || bienvenue.seoTitre,
+      description: bienvenue.partageDescription || bienvenue.seoDescription,
+      chemin: "/bienvenue",
+      image: imagePartage(bienvenue.partageImage ?? parametres.imagePartage),
+    }),
   };
 }
 
