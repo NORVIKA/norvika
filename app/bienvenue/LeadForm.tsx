@@ -92,6 +92,7 @@ export function LeadForm({ t }: { t: PageBienvenue }) {
           <span className="text-sm font-medium text-[var(--foreground)]">{t.champPrenom}</span>
           <input
             type="text"
+            autoComplete="given-name"
             required
             maxLength={100}
             value={prenom}
@@ -103,6 +104,7 @@ export function LeadForm({ t }: { t: PageBienvenue }) {
           <span className="text-sm font-medium text-[var(--foreground)]">{t.champCourriel}</span>
           <input
             type="email"
+            autoComplete="email"
             required
             maxLength={255}
             value={courriel}
@@ -114,6 +116,7 @@ export function LeadForm({ t }: { t: PageBienvenue }) {
           <span className="block text-sm font-medium text-[var(--foreground)] md:whitespace-nowrap">{t.champTelephone}</span>
           <input
             type="tel"
+            autoComplete="tel"
             required
             maxLength={50}
             value={telephone}
@@ -123,12 +126,12 @@ export function LeadForm({ t }: { t: PageBienvenue }) {
         </label>
       </div>
       <AntiRobot />
-      {erreur && <p className="mt-4 text-sm text-[var(--destructive)]">{erreur}</p>}
+      {erreur && <p role="alert" className="mt-4 text-sm text-[var(--destructive)]">{erreur}</p>}
       <div className="mt-6 flex flex-col items-start gap-3 sm:flex-row sm:items-center sm:justify-between">
         <button
           type="submit"
           disabled={envoi}
-          className="inline-flex items-center justify-center rounded-full bg-[var(--primary)] px-7 py-3.5 text-sm font-bold text-white transition-colors hover:bg-[var(--primary)]/90 disabled:opacity-60"
+          className="inline-flex items-center justify-center rounded-full nv-btn-primary px-7 py-3.5 text-sm font-bold transition-colors disabled:opacity-60"
         >
           {envoi ? t.boutonEnvoi : t.bouton}
         </button>
