@@ -32,3 +32,6 @@ Claude outputs/
 # Sorties du Studio Sanity (hébergé par Sanity sur norvika.sanity.studio, jamais servi d'ici)
 /studio/dist/
 /studio/.sanity/
+
+# Rapports de sécurité : le dépôt est PUBLIC (bloc F, 2026-11-16)
+securite/
