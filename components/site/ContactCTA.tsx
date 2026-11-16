@@ -32,7 +32,7 @@ const champ: React.CSSProperties = {
   color: "#F5F3EE",
   fontFamily: "var(--font-body)",
   fontSize: 15,
-  outline: "none",
+  // Plus de `outline: "none"` : le contour de selection global (app/globals.css) s'applique.
 };
 const etiquette: React.CSSProperties = {
   display: "block",

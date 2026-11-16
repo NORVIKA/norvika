@@ -87,7 +87,7 @@ export function ContactForm({ email, t }: { email: string; t: PageContact }) {
             maxLength={100}
             value={nom}
             onChange={(e) => setNom(e.target.value)}
-            className="mt-2 block w-full rounded-md border border-[var(--hairline)] bg-[var(--background)] px-3 py-2.5 text-sm text-[var(--foreground)] outline-none focus:border-[var(--primary)]"
+            className="mt-2 block w-full rounded-md border border-[var(--hairline)] bg-[var(--background)] px-3 py-2.5 text-sm text-[var(--foreground)] focus:border-[var(--primary)]"
           />
         </label>
         <label className="block">
@@ -98,7 +98,7 @@ export function ContactForm({ email, t }: { email: string; t: PageContact }) {
             maxLength={255}
             value={courriel}
             onChange={(e) => setCourriel(e.target.value)}
-            className="mt-2 block w-full rounded-md border border-[var(--hairline)] bg-[var(--background)] px-3 py-2.5 text-sm text-[var(--foreground)] outline-none focus:border-[var(--primary)]"
+            className="mt-2 block w-full rounded-md border border-[var(--hairline)] bg-[var(--background)] px-3 py-2.5 text-sm text-[var(--foreground)] focus:border-[var(--primary)]"
           />
         </label>
       </div>
@@ -109,7 +109,7 @@ export function ContactForm({ email, t }: { email: string; t: PageContact }) {
           maxLength={50}
           value={telephone}
           onChange={(e) => setTelephone(e.target.value)}
-          className="mt-2 block w-full rounded-md border border-[var(--hairline)] bg-[var(--background)] px-3 py-2.5 text-sm text-[var(--foreground)] outline-none focus:border-[var(--primary)]"
+          className="mt-2 block w-full rounded-md border border-[var(--hairline)] bg-[var(--background)] px-3 py-2.5 text-sm text-[var(--foreground)] focus:border-[var(--primary)]"
         />
       </label>
       <label className="mt-5 block">
@@ -120,7 +120,7 @@ export function ContactForm({ email, t }: { email: string; t: PageContact }) {
           maxLength={2000}
           value={message}
           onChange={(e) => setMessage(e.target.value)}
-          className="mt-2 block w-full rounded-md border border-[var(--hairline)] bg-[var(--background)] px-3 py-2.5 text-sm text-[var(--foreground)] outline-none focus:border-[var(--primary)]"
+          className="mt-2 block w-full rounded-md border border-[var(--hairline)] bg-[var(--background)] px-3 py-2.5 text-sm text-[var(--foreground)] focus:border-[var(--primary)]"
         />
       </label>
       <AntiRobot />

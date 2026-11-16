@@ -38,6 +38,12 @@
   --muted: #F4F6FA;
   --muted-foreground: rgba(12, 25, 47, .6);
   --destructive: #b3261e;
+
+  /* Contour de selection au clavier : un trait navy entre deux halos creme. Le navy se voit sur
+     fond clair (17,4:1 sur blanc), le creme sur fond fonce (17:1 sur #081120, 15,9:1 sur navy).
+     Declare une seule fois, plus bas (« Contour de selection au clavier »). */
+  --focus-trait: var(--navy);
+  --focus-halo: var(--cream);
 }
 
 @layer base {
@@ -77,9 +83,8 @@
     letter-spacing: -.03em;
   }
 
+  /* Coins du contour sur les liens et les elements sans arrondi propre. */
   :focus-visible {
-    outline: 2px solid var(--navy);
-    outline-offset: 3px;
     border-radius: 4px;
   }
 
@@ -90,6 +95,20 @@
       scroll-behavior: auto !important;
     }
   }
+}
+
+/* ===== Contour de selection au clavier, declare UNE seule fois (regle d'agence 5) =====
+   Avant (bloc F, Pixel constat 4) : un trait navy pose sur les sections foncees (#081120), soit
+   1,08:1, invisible sur 41 pages ; et `outline: none` sans remplacement dans le bandeau du bas.
+   Maintenant, de l'interieur vers l'exterieur : halo creme 2 px, trait navy 2 px, halo creme 2 px.
+   Sur fond clair, c'est le trait navy qui se voit ; sur fond fonce, les halos creme ; sur un
+   bouton navy ou creme, l'un des deux tranche toujours avec lui. Au moins 3:1 partout (WCAG 1.4.11).
+   `!important` : un style en ligne ou une classe (`outline-none` de Tailwind, une ombre de carte)
+   ne doit jamais pouvoir effacer le contour. Seule exception declaree : .nv-row-bouton, plus bas. */
+:focus-visible {
+  outline: 2px solid var(--focus-trait) !important;
+  outline-offset: 2px !important;
+  box-shadow: 0 0 0 6px var(--focus-halo) !important;
 }
 
 /* ===== Animations ===== */
@@ -193,8 +212,15 @@
   transition: text-decoration-color .2s;
 }
 .nv-row-bouton::after { content: ""; position: absolute; inset: 0; transition: background .3s ease; }
-.nv-row-bouton:focus-visible { outline: none; }
-.nv-row-bouton:focus-visible::after { outline: 2px solid var(--navy); outline-offset: -2px; border-radius: 4px; }
+/* La ligne entiere est la cible du bouton (::after) : le contour l'entoure elle, en dedans (la
+   ligne touche ses voisines). Memes jetons que le contour global. */
+.nv-row-bouton:focus-visible { outline: none !important; box-shadow: none !important; }
+.nv-row-bouton:focus-visible::after {
+  outline: 2px solid var(--focus-trait);
+  outline-offset: -2px;
+  border-radius: 4px;
+  box-shadow: inset 0 0 0 4px var(--focus-halo);
+}
 @media (hover: hover) {
   .nv-navlink:hover { color: var(--navy); }
   .nv-btn-primary:hover { background: #16294a; color: #fff; }
@@ -553,10 +579,6 @@
 @media (hover: hover) {
   .nv-bascule-onglet[aria-selected="false"]:hover { color: #0C192F; background: rgba(255,255,255,.7); }
 }
-.nv-bascule-onglet:focus-visible {
-  outline: 2px solid #0C192F;
-  outline-offset: 2px;
-}
 @media (max-width: 620px) {
   .nv-bascule-url { display: none !important; }
 }
@@ -594,7 +616,6 @@
 .nv-fil-sep { padding: 0 8px; color: var(--fil-sep); }
 .nv-fil-sombre { --fil-lien: rgba(245,243,238,.8); --fil-courant: #F5F3EE; --fil-sep: rgba(245,243,238,.34); }
 .nv-fil-clair { --fil-lien: rgba(12,25,47,.66); --fil-courant: var(--navy); --fil-sep: rgba(12,25,47,.3); }
-.nv-fil-sombre a:focus-visible { outline-color: #F5F3EE; }
 /* Au doigt, une cible de 40 px au lieu de 28 (WCAG 2.5.8 demande 24, on vise le confort). */
 @media (pointer: coarse) {
   .nv-fil a { padding: 10px 0; }
