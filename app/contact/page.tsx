@@ -6,8 +6,8 @@ import { lienTelephone } from "@/lib/telephone";
 import { ContactForm } from "./ContactForm";
 
 export async function generateMetadata(): Promise<Metadata> {
-  const { contact } = await obtenirContenu();
-  return metaPage(contact, "/contact");
+  const { contact, parametres } = await obtenirContenu();
+  return metaPage(contact, "/contact", parametres);
 }
 
 // Meme raison que dans app/layout.tsx : la revalidation ne pouvait rien

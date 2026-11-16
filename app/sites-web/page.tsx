@@ -5,8 +5,8 @@ import { obtenirContenu } from "@/lib/contenu";
 import { metaPage } from "@/lib/meta";
 
 export async function generateMetadata(): Promise<Metadata> {
-  const { sitesWeb } = await obtenirContenu();
-  return metaPage(sitesWeb, "/sites-web");
+  const { sitesWeb, parametres } = await obtenirContenu();
+  return metaPage(sitesWeb, "/sites-web", parametres);
 }
 
 export default async function Page() {

@@ -5,6 +5,7 @@ import { Consentement } from "@/components/site/Consentement";
 import { FournisseurContenu } from "@/components/site/ContenuGlobal";
 import { SCRIPT_CONSENTEMENT_DEFAUT, idGaValide } from "@/lib/consentement";
 import { obtenirContenu, obtenirGlobal } from "@/lib/contenu";
+import { imagePartage, partage } from "@/lib/meta";
 
 // Le design n'utilise Sora qu'en 600 (titres) et DM Sans qu'en 400/500/600.
 // Charger les autres graisses, c'est du poids de police pour rien.
@@ -33,20 +34,17 @@ export async function generateMetadata(): Promise<Metadata> {
     },
     description: parametres.seoDescriptionDefaut,
     metadataBase: new URL("https://norvika.ca"),
-    openGraph: {
-      type: "website",
-      locale: "fr_CA",
-      url: "https://norvika.ca",
-      siteName: parametres.nom,
-      images: [
-        {
-          url: parametres.imagePartage.url,
-          alt: parametres.imagePartage.alt ?? "",
-        },
-      ],
-    },
-    twitter: { card: "summary_large_image" },
-    robots: { index: true, follow: true },
+    // Pages sans openGraph propre (politique, /bienvenue, page introuvable). Les autres passent par
+    // lib/meta.ts, avec les mêmes balises : Next remplace l'openGraph du layout, il ne le fusionne pas.
+    ...partage(parametres, {
+      titre: parametres.seoTitreDefaut,
+      description: parametres.seoDescriptionDefaut,
+      chemin: "/",
+      image: imagePartage(parametres.imagePartage),
+    }),
+    // Pas de `robots` ici : indexer est le comportement par defaut, et une balise
+    // « index, follow » posee par le layout s'ajoutait au « noindex » de la page
+    // introuvable (deux consignes contradictoires, constat 16 de Pixel).
     // Icônes : app/favicon.ico, app/icon.png et app/apple-icon.png, lus par Next.
     // Générées sur fond navy plein par scripts/generer-icones.mjs.
   };

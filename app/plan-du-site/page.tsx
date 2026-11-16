@@ -14,8 +14,8 @@ import { apostrophes } from "@/lib/typographie";
  * s'ajoutent toutes seules, en ordre alphabétique (on cherche un nom, on ne lit pas un classement).
  */
 export async function generateMetadata(): Promise<Metadata> {
-  const { planDuSite } = await obtenirContenu();
-  return metaPage(planDuSite, "/plan-du-site");
+  const { planDuSite, parametres } = await obtenirContenu();
+  return metaPage(planDuSite, "/plan-du-site", parametres);
 }
 
 // Même raison que dans app/layout.tsx : page statique, rebâtie à chaque publication du Studio.
