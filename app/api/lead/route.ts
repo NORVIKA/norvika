@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { supabaseService, verifierDebit } from "@/lib/rate-limit";
 import { CHAMP_JETON, verifierAntiRobot } from "@/lib/anti-robot";
+import { envoyerCourrielInterne, esc, gabarit, ligne, lienCourriel } from "@/lib/courriel";
 import { champTexte, ligneSimpleValide, lireCorpsJson } from "@/lib/garde-formulaire";
 
 /**
@@ -13,6 +14,10 @@ import { champTexte, ligneSimpleValide, lireCorpsJson } from "@/lib/garde-formul
  *
  * Maintenant : le navigateur poste ici, le serveur valide, limite le débit,
  * puis insère avec la clé service_role (jamais exposée au navigateur).
+ *
+ * Depuis le 2026-11-16, un courriel part AUSSI vers info@norvika.ca : le /admin du site, seul
+ * endroit où ces prospects se lisaient, a été retiré (audit de sécurité du bloc F). Même modèle
+ * que /api/contact : l'écriture d'abord, le courriel ensuite, aucun accusé au visiteur.
  */
 
 const MAX = { prenom: 100, courriel: 255, telephone: 50 } as const;
@@ -65,6 +70,16 @@ export async function POST(req: Request) {
     console.error("Insertion client_leads:", error.message);
     return NextResponse.json({ error: "Erreur lors de la sauvegarde." }, { status: 500 });
   }
+
+  await envoyerCourrielInterne({
+    objet: `Nouveau client sur /bienvenue : ${prenom}, Norvika`,
+    repondreA: courriel,
+    html: gabarit({
+      titre: "Nouveau client, formulaire Espace client",
+      lignes: [ligne("Prénom", esc(prenom)), ligne("Courriel", lienCourriel(courriel)), ligne("Téléphone", esc(telephone))],
+      note: `Envoyé depuis norvika.ca/bienvenue (page cachée, remise aux nouveaux clients). Aussi enregistré dans Supabase, table client_leads.<br>Répondez directement à ce courriel pour écrire à ${esc(prenom)}.`,
+    }),
+  });
 
   return NextResponse.json({ ok: true });
 }

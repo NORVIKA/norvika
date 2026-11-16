@@ -13,7 +13,6 @@ const nextConfig = {
       // Images du Studio Sanity (projet k99pdqd1), servies par son CDN.
       { protocol: "https", hostname: "cdn.sanity.io" },
       { protocol: "https", hostname: "norvika.ca" },
-      { protocol: "https", hostname: "**.supabase.co" },
       { protocol: "https", hostname: "placehold.co" },
       { protocol: "https", hostname: "image.thum.io" },
       { protocol: "https", hostname: "lepimentszechuan.com" },
@@ -62,8 +61,9 @@ const nextConfig = {
           // frame-ancestors, object-src). Le site n'affiche jamais de HTML
           // fourni par un visiteur, donc la surface XSS reste minime.
           //
-          // connect-src autorise Supabase (connexion /admin depuis le
-          // navigateur). Resend est appele cote serveur uniquement.
+          // Supabase et Resend sont appeles cote serveur uniquement : le
+          // navigateur ne parle plus a Supabase depuis le retrait du /admin
+          // (2026-11-16), d'ou son absence de connect-src et de img-src.
           {
             key: "Content-Security-Policy",
             value: [
@@ -87,9 +87,9 @@ const nextConfig = {
               "style-src 'self' 'unsafe-inline' https://cdn-cookieyes.com",
               // i.ytimg.com : les vignettes des videos, affichees avant que le
               // visiteur clique. Une image seule, sans cookie ni script.
-              "img-src 'self' data: https://*.supabase.co https://cdn.sanity.io https://placehold.co https://image.thum.io https://cdn-cookieyes.com https://*.google-analytics.com https://*.googletagmanager.com https://i.ytimg.com",
+              "img-src 'self' data: https://cdn.sanity.io https://placehold.co https://image.thum.io https://cdn-cookieyes.com https://*.google-analytics.com https://*.googletagmanager.com https://i.ytimg.com",
               "font-src 'self' data: https://cdn-cookieyes.com",
-              "connect-src 'self' https://*.supabase.co https://cdn-cookieyes.com https://log.cookieyes.com https://directives.cookieyes.com https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com https://challenges.cloudflare.com",
+              "connect-src 'self' https://cdn-cookieyes.com https://log.cookieyes.com https://directives.cookieyes.com https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com https://challenges.cloudflare.com",
               // Les lecteurs YouTube des fiches de realisation. Le domaine
               // youtube-nocookie.com ne depose rien avant que le visiteur
               // clique sur lecture, et le lecteur n'est insere qu'a ce

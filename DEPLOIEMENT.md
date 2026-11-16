@@ -28,7 +28,6 @@ via l'adaptateur `@cloudflare/next-on-pages`.
 | Nom | Type | Valeur |
 |---|---|---|
 | `NEXT_PUBLIC_SUPABASE_URL` | Public | `https://uddxvrogkknypneghkkw.supabase.co` |
-| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Public | clé anon Supabase |
 | `SUPABASE_SERVICE_KEY` | Secret | service role Supabase (upload images) |
 | `RESEND_API_KEY` | Secret | clé Resend (formulaire contact) |
 | `CLOUDFLARE_DEPLOY_HOOK_URL` | Secret | URL du Deploy Hook (voir plus bas) |

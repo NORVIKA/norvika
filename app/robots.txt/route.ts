@@ -37,8 +37,6 @@ const ROBOTS_IA = [
 ];
 
 const REGLES = `Allow: /
-Disallow: /admin
-Disallow: /admin/
 Disallow: /api/`;
 
 const BODY = `# Norvika
