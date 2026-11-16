@@ -1,11 +1,14 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useRef, useState, type FormEvent } from "react";
 
+import { AntiRobot, MESSAGE_JETON_ABSENT, lireJetonAntiRobot, reinitialiserAntiRobot } from "@/components/site/AntiRobot";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { useContenuGlobal } from "@/components/site/ContenuGlobal";
+import { MentionCollecte } from "@/components/site/MentionCollecte";
 import { MentionDroits } from "@/components/site/MentionDroits";
+import { CHAMP_JETON } from "@/lib/anti-robot-commun";
 import type { PageDiagnostic, Profil } from "@/lib/types-contenu";
 /** Remplace {cle} dans un gabarit du Studio (ex. : « Merci, {prenom}. »). */
 function remplir(gabarit: string, valeurs: Record<string, string>): string {
@@ -18,7 +21,8 @@ type Phase = "intro" | "quiz" | "result";
 // Le calcul est celui d'avant : les points de chaque réponse sont maintenant écrits dans le
 // Studio (0 à 3) au lieu d'un barème [3, 2, 1, 0] implicite dans le code.
 function Page({ page }: { page: PageDiagnostic }) {
-  const { parametres } = useContenuGlobal();
+  // « Envoi en cours… » : le même libellé que le bandeau de contact (Studio, « Bloc de contact »).
+  const { parametres, blocContact } = useContenuGlobal();
   const logoStack = parametres.logoPied;
   const QS = page.questions.map((q) => ({
     t: q.question,
@@ -37,13 +41,32 @@ function Page({ page }: { page: PageDiagnostic }) {
   const [nom, setNom] = useState("");
   const [courriel, setCourriel] = useState("");
   const [sent, setSent] = useState(false);
+  const [envoi, setEnvoi] = useState(false);
+  const [erreur, setErreur] = useState<string | null>(null);
+
+  // Clavier et lecteurs d'écran : à chaque étape, le focus va au titre qui vient d'apparaître
+  // (la question, le résultat, le remerciement). Sans ça, il retombait sur <body> et il fallait
+  // retraverser tout l'en-tête. Le titre porte tabIndex={-1} : focalisable par le code seulement.
+  const titreEtape = useRef<HTMLHeadingElement>(null);
+  const titreMerci = useRef<HTMLHeadingElement>(null);
+  const aBouge = useRef(false);
+  useEffect(() => {
+    if (!aBouge.current) return; // pas au chargement de la page : seulement après un choix
+    titreEtape.current?.focus();
+  }, [phase, i]);
+  useEffect(() => {
+    if (sent) titreMerci.current?.focus();
+  }, [sent]);
 
   const start = () => {
+    aBouge.current = true;
     setPhase("quiz");
     setI(0);
     setAnswers([]);
   };
   const restart = () => {
+    aBouge.current = false;
+    setErreur(null);
     setPhase("intro");
     setI(0);
     setAnswers([]);
@@ -87,9 +110,55 @@ function Page({ page }: { page: PageDiagnostic }) {
     return oi == null ? "" : (QS[qi]?.m[oi] ?? "");
   };
 
-  const submit = () => {
-    if (nom.trim() && courriel.trim()) setSent(true);
-  };
+  // Le résumé envoyé avec la demande d'analyse : le résultat, les trois barres, et chaque question
+  // avec la réponse choisie, tels que la personne les a vus. Rempli seulement à l'écran du résultat.
+  let resume: { resultat: string; barres: string[]; reponses: { question: string; reponse: string }[] } | null = null;
+
+  // Envoi réel (avant le 2026-11-16, ce bouton affichait « Merci » sans rien envoyer).
+  // Même chemin que les autres formulaires : /api/contact vérifie Turnstile côté serveur AVANT la
+  // limite de débit, l'écriture dans Supabase et le courriel à info@norvika.ca.
+  async function submit(e: FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    if (envoi) return;
+    setErreur(null);
+    const formulaire = e.currentTarget;
+    const jeton = lireJetonAntiRobot(formulaire);
+    if (!nom.trim() || !courriel.trim()) {
+      setErreur("Votre nom et votre courriel suffisent.");
+      return;
+    }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(courriel.trim())) {
+      setErreur("Ce courriel ne semble pas valide.");
+      return;
+    }
+    if (!jeton) {
+      setErreur(MESSAGE_JETON_ABSENT);
+      return;
+    }
+    setEnvoi(true);
+    let messageErreur: string | null = null;
+    try {
+      const res = await fetch("/api/contact", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ nom: nom.trim(), courriel: courriel.trim(), diagnostic: resume, [CHAMP_JETON]: jeton }),
+      });
+      if (!res.ok) {
+        // Le serveur explique lui-même le refus (champ invalide, anti-robot, trop d'envois).
+        const data = (await res.json().catch(() => null)) as { error?: string } | null;
+        messageErreur = data?.error ?? `Une erreur est survenue. Réessayez ou écrivez-nous à ${parametres.courriel}.`;
+      }
+    } catch {
+      messageErreur = `Une erreur est survenue. Réessayez ou écrivez-nous à ${parametres.courriel}.`;
+    }
+    setEnvoi(false);
+    reinitialiserAntiRobot(formulaire);
+    if (messageErreur) {
+      setErreur(messageErreur);
+      return;
+    }
+    setSent(true);
+  }
 
   const q = QS[i];
   const letters = ["A", "B", "C", "D"];
@@ -134,6 +203,11 @@ function Page({ page }: { page: PageDiagnostic }) {
     const prenom = (nom || "").trim().split(/\s+/)[0] || "";
     merci = remplir(page.merciTitre, { prenom });
     merciTexte = remplir(page.merciTexte, { volet });
+    resume = {
+      resultat: resTitle,
+      barres: bars.map((b) => `${b.label} : ${b.pct} (${b.note})`),
+      reponses: QS.map((question, k) => ({ question: question.t, reponse: question.o[answers[k] ?? -1] ?? "" })),
+    };
   }
 
   return (
@@ -191,7 +265,7 @@ function Page({ page }: { page: PageDiagnostic }) {
 
         <div className="nv-shell" style={{ position: "relative", width: "100%", maxWidth: 960, margin: "0 auto", padding: "64px 32px 100px" }}>
           {phase === "intro" && (
-            <div style={{ textAlign: "center", animation: "stepIn .5s cubic-bezier(.2,0,0,1) both" }}>
+            <div style={{ textAlign: "center", animation: "nvHero .5s cubic-bezier(.2,0,0,1) both" }}>
               <div style={{ margin: "0 auto 34px", display: "flex", alignItems: "center", justifyContent: "center", gap: 14 }}>
                 <span
                   style={{
@@ -263,6 +337,7 @@ function Page({ page }: { page: PageDiagnostic }) {
                 {QS.map((_, k) => (
                   <span
                     key={k}
+                    aria-hidden="true"
                     style={{
                       flex: 1,
                       height: 5,
@@ -272,7 +347,9 @@ function Page({ page }: { page: PageDiagnostic }) {
                     }}
                   />
                 ))}
+                {/* Région « status » (aria-live polite) : la progression est annoncée à chaque question. */}
                 <span
+                  role="status"
                   style={{
                     marginLeft: 10,
                     fontFamily: "var(--font-display)",
@@ -327,6 +404,8 @@ function Page({ page }: { page: PageDiagnostic }) {
                   </span>
                   <div>
                     <h2
+                      ref={titreEtape}
+                      tabIndex={-1}
                       style={{
                         margin: 0,
                         fontFamily: "var(--font-display)",
@@ -394,6 +473,8 @@ function Page({ page }: { page: PageDiagnostic }) {
                 {/* Plus de sur-titre « Votre résultat » (règle d'agence 1) : arrivé au bout des sept
                     questions, le titre du profil se lit comme le résultat. */}
                 <h2
+                  ref={titreEtape}
+                  tabIndex={-1}
                   style={{
                     margin: 0,
                     maxWidth: "20ch",
@@ -468,7 +549,11 @@ function Page({ page }: { page: PageDiagnostic }) {
               </div>
 
               {!sent && (
-                <div style={{ margin: "16px 0 0", padding: "38px 40px", borderRadius: 24, border: "1px solid rgba(12,25,47,.1)", background: "#EEF2FA" }}>
+                <form
+                  onSubmit={submit}
+                  noValidate
+                  style={{ margin: "16px 0 0", padding: "38px 40px", borderRadius: 24, border: "1px solid rgba(12,25,47,.1)", background: "#EEF2FA" }}
+                >
                   <h3
                     style={{
                       margin: 0,
@@ -486,28 +571,61 @@ function Page({ page }: { page: PageDiagnostic }) {
                     {page.formTexte}
                   </p>
                   <div className="nv-grid" style={{ margin: "26px 0 0", display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
-                    <input
-                      value={nom}
-                      onChange={(e) => setNom(e.target.value)}
-                      placeholder={page.formNom}
-                      style={inputStyle}
-                    />
-                    <input
-                      value={courriel}
-                      onChange={(e) => setCourriel(e.target.value)}
-                      placeholder={page.formCourriel}
-                      style={inputStyle}
-                    />
+                    <label style={{ display: "block" }}>
+                      <span style={etiquetteStyle}>{page.formNom}</span>
+                      <input
+                        type="text"
+                        name="name"
+                        autoComplete="name"
+                        required
+                        maxLength={100}
+                        value={nom}
+                        onChange={(e) => setNom(e.target.value)}
+                        aria-invalid={erreur !== null && !nom.trim() ? true : undefined}
+                        style={inputStyle}
+                      />
+                    </label>
+                    <label style={{ display: "block" }}>
+                      <span style={etiquetteStyle}>{page.formCourriel}</span>
+                      <input
+                        type="email"
+                        name="email"
+                        autoComplete="email"
+                        inputMode="email"
+                        required
+                        maxLength={255}
+                        value={courriel}
+                        onChange={(e) => setCourriel(e.target.value)}
+                        aria-invalid={erreur !== null && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(courriel.trim()) ? true : undefined}
+                        style={inputStyle}
+                      />
+                    </label>
                   </div>
+                  <AntiRobot />
+                  {erreur && (
+                    <p role="alert" style={{ margin: "16px 0 0", fontSize: 14.5, lineHeight: 1.5, fontWeight: 500, color: "var(--destructive)" }}>
+                      {erreur}
+                    </p>
+                  )}
                   <div style={{ margin: "18px 0 0", display: "flex", flexWrap: "wrap", alignItems: "center", gap: 18 }}>
-                    <button onClick={submit} className="nv-btn-primary-round" style={{ padding: "16px 32px", fontSize: 15 }}>
-                      {page.formBouton}
+                    {/* aria-disabled plutôt que disabled : un bouton désactivé perd le focus, qui retombait sur
+                        <body> après une erreur. Le double envoi est bloqué dans submit(). */}
+                    <button
+                      type="submit"
+                      aria-disabled={envoi || undefined}
+                      className="nv-btn-primary-round"
+                      style={{ padding: "16px 32px", fontSize: 15, opacity: envoi ? 0.7 : 1 }}
+                    >
+                      {envoi ? blocContact.boutonEnvoi : page.formBouton}
                     </button>
                     <p style={{ margin: 0, maxWidth: "42ch", fontSize: 13.5, lineHeight: 1.55, color: "rgba(12,25,47,.5)" }}>
                       {page.formNote}
                     </p>
                   </div>
-                </div>
+                  <div style={{ margin: "20px 0 0", color: "rgba(12,25,47,.68)" }}>
+                    <MentionCollecte id="mention-collecte-diagnostic" />
+                  </div>
+                </form>
               )}
 
               {sent && (
@@ -533,6 +651,8 @@ function Page({ page }: { page: PageDiagnostic }) {
                     }}
                   />
                   <h3
+                    ref={titreMerci}
+                    tabIndex={-1}
                     style={{
                       margin: "30px 0 0",
                       fontFamily: "var(--font-display)",
@@ -645,7 +765,17 @@ const cardTextStyle: React.CSSProperties = {
   color: "rgba(12,25,47,.78)",
 };
 
+const etiquetteStyle: React.CSSProperties = {
+  display: "block",
+  marginBottom: 8,
+  fontSize: 14,
+  fontWeight: 600,
+  color: "#0C192F",
+};
+
 const inputStyle: React.CSSProperties = {
+  width: "100%",
+  boxSizing: "border-box",
   padding: "16px 18px",
   borderRadius: 12,
   border: "1px solid rgba(12,25,47,.14)",

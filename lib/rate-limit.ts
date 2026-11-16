@@ -71,7 +71,8 @@ export type ResultatDebit = { permis: boolean; raison?: string };
 
 /**
  * Verifie et enregistre une tentative. `formulaire` separe les compteurs
- * (« contact » et « lead » ont chacun leur quota).
+ * (« contact », « lead » et « diagnostic » ont chacun leur quota ; la colonne
+ * `formulaire` de form_rate_limit est un texte libre, sans contrainte).
  *
  * En cas de panne du compteur, on laisse passer (fail-open) : un incident
  * Supabase ne doit pas fermer le formulaire de contact du site. La
@@ -80,7 +81,7 @@ export type ResultatDebit = { permis: boolean; raison?: string };
  */
 export async function verifierDebit(
   req: Request,
-  formulaire: "contact" | "lead"
+  formulaire: "contact" | "lead" | "diagnostic"
 ): Promise<ResultatDebit> {
   try {
     const ipHash = await hashIp(clientIp(req));
