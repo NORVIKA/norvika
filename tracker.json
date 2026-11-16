@@ -17,7 +17,7 @@
   "liens": {
     "maquette_lovable": "https://norvika.lovable.app",
     "url_prod": "https://norvika.ca",
-    "url_studio": "https://norvika.sanity.studio (pas encore déployé)",
+    "url_studio": "https://norvika.sanity.studio",
     "github": "https://github.com/NORVIKA/norvika (branche next16-migration)"
   },
   "dates": {
@@ -168,13 +168,13 @@
         "performance-optimization",
         "SKILL_AUDIT"
       ],
-      "statut": "fait",
+      "statut": "en_cours",
       "gate": null,
       "gate_statut": null,
       "debut": "",
       "fin": "",
-      "rapport": "Lighthouse prod : mobile 94 / ordinateur 100, a11y 100, 0 lien mort sur 48",
-      "date": "2026-08-21"
+      "rapport": "Lighthouse prod : mobile 94 / ordinateur 100, a11y 100, 0 lien mort sur 48 | 2026-11-16, bloc F (Pixel + Sentinel) : correctifs codés sur mise-a-niveau-2026-11, 10 commits, RIEN de poussé. Quiz /diagnostic qui envoie pour vrai (via /api/contact, Turnstile avant tout), /admin retiré et /api/lead qui envoie un courriel, premier écran sans JavaScript sur tous les gabarits, GA4 seulement après « Accepter », image de partage 1200x630 partout, contour de sélection unique, puis main, lien d'évitement, menu clavier, texte complet dans le HTML. Vérifié en local (types, lint, OpenNext, verifier-contenu 42 pages, 0 débordement 375/1280). Reste : push autorisé par William, puis test réel des 3 formulaires et des 3 cas Loi 25 en production (Jarvis), et la migration SQL des politiques Supabase (William).",
+      "date": "2026-11-16"
     },
     {
       "id": "6",
@@ -306,10 +306,10 @@
       "prio": "haute"
     },
     {
-      "titre": "Le /admin ne pilote plus le contenu des pages",
+      "titre": "Le /admin ne pilote plus le contenu des pages (réglé : /admin retiré le 2026-11-16, bloc F)",
       "detail": "Les editeurs /admin/textes, /admin/couleurs et /admin/images alimentaient l'ancien design. Le nouveau site vient de la maquette et a son contenu dans le code. /admin/leads, /admin/messages et les routes API restent fonctionnels. A trancher : retirer les trois editeurs, ou rebrancher les nouvelles pages sur Supabase.",
       "qui": "will",
-      "prio": "moyenne"
+      "prio": "fait"
     },
     {
       "titre": "Donner a Lau ses acces, et un poste qui marche",
