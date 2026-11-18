@@ -13,14 +13,21 @@ import { positionFocale, type FondVideo as Donnees, type Image } from "@/lib/typ
  * pause vient APRÈS lui dans le HTML, sinon le bloc de texte, qui couvre le bas de la section sur
  * téléphone, recevrait ses clics.
  *
- * ⚠️ CE QUI PROTÈGE LA VITESSE (accueil mobile à 98, 2026-11-17) :
+ * ⚠️ CE QUI PROTÈGE LA VITESSE (accueil mobile à 98 avant la vidéo) :
  *  - le HTML livré ne contient QUE l'image d'attente, recadrée et réduite par le CDN de Sanity
- *    (portrait sur téléphone) puis copiée au build sur le domaine du site (lib/fond-video.ts).
- *    C'est elle, légère et prioritaire, qui devient l'élément LCP ;
- *  - la balise <video> n'est créée qu'APRÈS le chargement de la page, quand le navigateur est
- *    libre : ses 1,6 à 3,7 Mo ne disputent jamais la bande passante au premier écran ;
- *  - elle a exactement la taille de l'image : un candidat LCP de même taille ne remplace pas le
- *    précédent, donc la vidéo qui arrive plus tard ne repousse pas le LCP.
+ *    puis copiée au build sur le domaine du site (lib/fond-video.ts). Sur ordinateur, nette, elle
+ *    est l'élément LCP. Sur téléphone, c'est une image floue de 350 octets que Chrome refuse comme
+ *    élément LCP (faible entropie) : le paragraphe le reste, comme avant la vidéo ;
+ *  - ORDINATEUR : la balise <video> n'est créée qu'après le chargement de la page, quand le
+ *    navigateur est libre. Elle fait 1 px de moins que l'affiche nette (globals.css) : un candidat
+ *    LCP plus petit ne remplace pas le précédent, donc la vidéo ne repousse pas le LCP. À boîte
+ *    égale, Chrome la comptait plus grande de 360 px² (arrondis) et elle prenait la place ;
+ *  - TÉLÉPHONE : la vidéo attend en plus le PREMIER GESTE (toucher, défilement, clavier) et que le
+ *    haut de page soit à l'écran. Mesuré le 2026-11-18 : lancée au chargement, sa première image
+ *    devenait l'élément LCP (l'image floue ne compte pas, donc rien ne la précède de même taille) :
+ *    Lighthouse mobile local à 81, LCP 5 s. Chrome cesse de mesurer le LCP au premier geste : la
+ *    vidéo qui arrive après ne compte plus, et un visiteur qui repart sans toucher à rien ne
+ *    télécharge pas 1,6 Mo. PageSpeed en ligne avec l'affiche nette comme élément LCP : 86.
  *
  * ⚠️ MOUVEMENT (WCAG 2.2.2 et 2.3.3) :
  *  - « moins d'animations » demandé à l'appareil, ou mode « économie de données » : l'image seule,
@@ -77,10 +84,12 @@ function Fond({
   // L'image d'attente, servie par le site (lib/fond-video.ts). Une adresse hors du projet Sanity,
   // improbable, garde son adresse d'origine.
   const tailles = variantesAffiche(affiche);
-  const pleine = tailles.find((t) => !t.portrait && t.largeur === 1440);
+  const pleine = tailles.find((t) => t.role === "paysage" && t.largeur === 1440);
   const repli = pleine ? `${CHEMIN_AFFICHE}/${pleine.fichier}` : affiche?.url;
 
-  // 1. Choisir la vidéo une fois la page chargée et le navigateur libre, ou n'en choisir aucune.
+  // 1. Choisir la vidéo, ou n'en choisir aucune. Trois conditions : la page est chargée (et le
+  //    navigateur libre), le haut de page est à l'écran, et sur téléphone, la personne a fait un
+  //    premier geste (voir l'en-tête : sinon la vidéo devient l'élément LCP).
   useEffect(() => {
     if (!ordinateur && !mobile) return;
     const mouvement = window.matchMedia(MOINS_DE_MOUVEMENT);
@@ -94,17 +103,49 @@ function Fond({
       const choix = large ? (ordinateur ?? mobile) : (mobile ?? ordinateur);
       setLecteur((l) => (l?.source === choix || !choix ? l : { source: choix, etat: "attente", pret: false }));
     };
-    // Safari n'a pas requestIdleCallback : un court délai après le chargement en tient lieu.
+
+    let charge = false;
+    let geste = window.matchMedia(LARGE).matches;
+    let aLEcran = true;
+    // Safari n'a pas requestIdleCallback : un court délai en tient lieu. Le délai sert aussi au
+    // téléphone : le geste est enregistré par Chrome avant que la vidéo ne soit demandée.
     const auRepos = typeof window.requestIdleCallback === "function";
     let attente: number | null = null;
-    const planifier = () => {
+    const essayer = () => {
+      if (!charge || !geste || !aLEcran || attente !== null) return;
       attente = auRepos ? window.requestIdleCallback(choisir, { timeout: 2000 }) : window.setTimeout(choisir, 300);
     };
-    if (document.readyState === "complete") planifier();
-    else window.addEventListener("load", planifier, { once: true });
+
+    const GESTES = ["pointerdown", "keydown", "wheel", "touchmove"] as const;
+    const surGeste = () => {
+      geste = true;
+      GESTES.forEach((g) => window.removeEventListener(g, surGeste));
+      essayer();
+    };
+    if (!geste) GESTES.forEach((g) => window.addEventListener(g, surGeste, { passive: true }));
+
+    const c = cadre.current;
+    const io =
+      c && "IntersectionObserver" in window
+        ? new IntersectionObserver(([e]) => {
+            if (!e) return;
+            aLEcran = e.isIntersecting;
+            essayer();
+          })
+        : null;
+    if (c) io?.observe(c);
+
+    const surChargement = () => {
+      charge = true;
+      essayer();
+    };
+    if (document.readyState === "complete") surChargement();
+    else window.addEventListener("load", surChargement, { once: true });
     mouvement.addEventListener("change", choisir);
     return () => {
-      window.removeEventListener("load", planifier);
+      window.removeEventListener("load", surChargement);
+      GESTES.forEach((g) => window.removeEventListener(g, surGeste));
+      io?.disconnect();
       mouvement.removeEventListener("change", choisir);
       if (attente !== null) {
         if (auRepos) window.cancelIdleCallback(attente);
@@ -156,10 +197,18 @@ function Fond({
       <div ref={cadre} className="nv-fond-video" aria-hidden="true">
         {affiche ? (
           <picture>
-            {tailles.length ? <source media="(max-width: 767px)" srcSet={srcSetAffiche(tailles, true)} sizes="100vw" /> : null}
+            {/* Téléphone : l'image floue de 350 octets, que Chrome n'accepte pas comme élément LCP
+                (lib/fond-video.ts) ; l'affiche nette seulement si l'appareil demande moins d'animations,
+                puisque la vidéo ne viendra jamais. Le premier <source> qui correspond gagne. */}
+            {tailles.length ? (
+              <>
+                <source media="(max-width: 767px) and (prefers-reduced-motion: no-preference)" srcSet={srcSetAffiche(tailles, "flou")} sizes="100vw" />
+                <source media="(max-width: 767px)" srcSet={srcSetAffiche(tailles, "portrait")} sizes="100vw" />
+              </>
+            ) : null}
             <img
               src={repli}
-              srcSet={tailles.length ? srcSetAffiche(tailles, false) : undefined}
+              srcSet={tailles.length ? srcSetAffiche(tailles, "paysage") : undefined}
               sizes="100vw"
               alt=""
               width={affiche.largeur ?? 1920}

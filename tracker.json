@@ -370,16 +370,16 @@
       "detail": "En attendant, le creneau est occupe par cinq photos du portfolio (bande sur ordinateur, mosaique 2x2 sur telephone). Tout est dans components/site/BandeTravail.tsx : remplacer le contenu de ce fichier par le lecteur video, rien d'autre a toucher. Garder les memes proportions (bande large, ~190px de haut sur ordinateur) pour eviter un saut de mise en page. Rappels : pas de lecture automatique avec son, prevoir une affiche (poster) sinon le LCP tombe, et le domaine de la video doit etre ajoute a la CSP dans next.config.mjs sinon elle sera bloquee.",
       "qui": "will",
       "prio": "moyenne",
-      "statut": "fait_en_local",
-      "rapport": "2026-11-18 (Mattew), branche mise-a-niveau-2026-11, PAS en ligne : video de fond du hero de l'accueil, servie par Sanity (champ « Video de fond du haut de page », fichiers 1080p 3,6 Mo et 720p 1,6 Mo, affiche WebP 76 Ko). Voile bleu nuit 66 % (paragraphe 4,7:1 au pire pixel), bouton pause, affiche seule si moins d'animations. CSP media-src ajoutee. Lighthouse mobile local : 95-96 avant, 93 apres (LCP 2,8 s vers 3,1 s, element LCP = l'affiche). Mise en ligne en attente de l'accord de William, Studio a deployer en meme temps."
+      "statut": "fait",
+      "rapport": "2026-11-18 : video de fond du hero en ligne (317f4cf, Studio redeploye). PageSpeed mobile en ligne tombe a 86 (affiche nette = element LCP). Correctif (Mattew, local, pas pousse) : sur telephone, image floue de 348 octets (refusee comme element LCP par Chrome) et video lancee au premier geste ; affiche nette si moins d'animations. Lighthouse mobile local : 93 (LCP 3,1 s, affiche) devient 94-96 (LCP 2,7-3,0 s, paragraphe), comme avant la video (95-96, 2,8 s). Ordinateur : 99, element LCP = affiche, la video 1 px plus petite ne la remplace plus."
     },
     {
       "titre": "Le creneau de la video, maintenant que le hero est sombre",
       "detail": "Le hero n'a plus de bloc sous les boutons : c'est le fond au complet qui porte l'aurore et les lames animees (components/site/CourantNorvika.tsx). Quand la video arrivera, elle se posera PAR-DESSUS ce fond, dans le bloc de texte, sans retirer le courant. Rappels pour ce jour-la : prevoir une image d'affiche sinon la vitesse tombe, et ajouter le domaine de la video a la CSP dans next.config.mjs sinon elle sera bloquee. Les composants des deux propositions refusees (BandeTravail.tsx, VitrineSites.tsx) restent dans le depot mais ne sont plus rendus : a supprimer si on ne revient pas dessus.",
       "qui": "will",
       "prio": "moyenne",
-      "statut": "fait_en_local",
-      "rapport": "2026-11-18 (Mattew), branche mise-a-niveau-2026-11, PAS en ligne : video de fond du hero de l'accueil, servie par Sanity (champ « Video de fond du haut de page », fichiers 1080p 3,6 Mo et 720p 1,6 Mo, affiche WebP 76 Ko). Voile bleu nuit 66 % (paragraphe 4,7:1 au pire pixel), bouton pause, affiche seule si moins d'animations. CSP media-src ajoutee. Lighthouse mobile local : 95-96 avant, 93 apres (LCP 2,8 s vers 3,1 s, element LCP = l'affiche). Mise en ligne en attente de l'accord de William, Studio a deployer en meme temps."
+      "statut": "fait",
+      "rapport": "2026-11-18 : video de fond du hero en ligne (317f4cf, Studio redeploye). PageSpeed mobile en ligne tombe a 86 (affiche nette = element LCP). Correctif (Mattew, local, pas pousse) : sur telephone, image floue de 348 octets (refusee comme element LCP par Chrome) et video lancee au premier geste ; affiche nette si moins d'animations. Lighthouse mobile local : 93 (LCP 3,1 s, affiche) devient 94-96 (LCP 2,7-3,0 s, paragraphe), comme avant la video (95-96, 2,8 s). Ordinateur : 99, element LCP = affiche, la video 1 px plus petite ne la remplace plus."
     }
   ]
 }

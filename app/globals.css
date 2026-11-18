@@ -173,14 +173,34 @@
   to { transform: none; }
 }
 
+/* Hauteur du haut de page de l'accueil (2026-11-18, demande de William : « plus gros »).
+   Ordinateur : presque tout l'ecran, moins l'en-tete (59 px) et assez de place pour voir le
+   titre « Nos clients en parlent » sous le haut de page (Lau voulait les videos juste en
+   dessous : le titre visible dit qu'il y a une suite). Mesure a 1440 x 900 : 190 px laissent
+   55 px du titre visibles ; 140 px ne montraient que le blanc de la section suivante (76 px de
+   marge), donc aucun signal. Plafond 820 px sur les tres grands ecrans.
+   Telephone : inchange. Le haut de page y prend deja les trois quarts de l'ecran ; le grandir
+   ajoute du defilement avant la suite (regle 6 de William : optimiser la largeur, pas empiler).
+   Le texte reste centre verticalement ; le fond video et le bouton pause sont en absolu, donc
+   hors du flux. Hauteur fixee par le CSS au premier rendu : aucun decalage de mise en page. */
+.nv-hero-accueil {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+@media (min-width: 768px) {
+  .nv-hero-accueil { min-height: clamp(560px, calc(100svh - 190px), 820px); }
+}
+
 /* ===== Fond video du haut de l'accueil (components/site/FondVideo.tsx), declare UNE fois =====
    De bas en haut : l'image d'attente, la video (invisible tant qu'elle n'a pas d'image, puis
    fondu), le voile. Le voile est la couleur du fond de la section (#081120) a 66 % : mesure sur
    les 480 images de la video du 2026-11-18, le paragraphe creme a 88 % garde 4,7:1 au PIRE
    pixel, et ce plancher tient meme sur une image toute blanche. Le grand titre blanc : 6,1:1.
    ⛔ Ne pas alleger le voile sans remesurer (scratchpad : contraste.py, ou une capture).
-   L'image et la video ont EXACTEMENT la meme boite : la video, arrivee apres, ne devient pas un
-   nouvel element LCP (un candidat de meme taille ne remplace pas le precedent). */
+   Element LCP : sur ordinateur, l'affiche nette (la video, 1 px plus petite, ne peut pas la
+   remplacer) ; sur telephone, le paragraphe (l'image floue est trop legere pour compter, et la
+   video attend le premier geste). Detail : components/site/FondVideo.tsx, lib/fond-video.ts. */
 .nv-fond-video {
   position: absolute;
   inset: 0;
@@ -196,7 +216,14 @@
   object-fit: cover;
   display: block;
 }
+/* La video fait 1 px de MOINS que l'affiche, en bas. Mesure du 2026-11-18 (PerformanceObserver,
+   1440 x 900) : a boite egale, Chrome comptait la video plus grande de 360 px2 (arrondis) et elle
+   remplacait l'affiche comme element LCP, a l'heure de sa premiere image. Plus petite, elle ne
+   peut plus la remplacer. La rangee de 1 px laissee a l'affiche est couverte par le voile, plein
+   a cet endroit (::after ci-dessous) : sinon un fil plus clair se voyait au bas du haut de page. */
 .nv-fond-video video {
+  bottom: 1px;
+  height: calc(100% - 1px);
   opacity: 0;
   transition: opacity .9s cubic-bezier(.2, 0, 0, 1);
 }
@@ -205,7 +232,7 @@
   content: "";
   position: absolute;
   inset: 0;
-  background: rgba(8, 17, 32, .66);
+  background: linear-gradient(to top, #081120 1px, transparent 1px), rgba(8, 17, 32, .66);
 }
 /* Le bouton pause : couleurs, contour et survol viennent de .nv-cream-hover (le second bouton du
    haut de page), donc le survol n'existe qu'avec un pointeur qui survole. Ici, la forme seulement.

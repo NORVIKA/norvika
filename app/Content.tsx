@@ -58,8 +58,11 @@ function Index({ page, avisListe }: { page: PageAccueil; avisListe: Avis[] }) {
           son contraste : 4,7:1 au pire pour le paragraphe, meme sur une image
           toute blanche (voile a 66 %, globals.css « Fond video »).
           Sans video dans le Studio (« Video de fond du haut de page »), c'est le
-          fond uni d'avant, sans rien changer d'autre. */}
+          fond uni d'avant, sans rien changer d'autre.
+          Hauteur (2026-11-18, demande de William « plus gros ») : classe
+          nv-hero-accueil dans globals.css, ordinateur seulement. */}
       <section
+        className="nv-hero-accueil"
         style={{
           position: "relative",
           overflow: "hidden",
