@@ -173,6 +173,99 @@
   to { transform: none; }
 }
 
+/* ===== Fond video du haut de l'accueil (components/site/FondVideo.tsx), declare UNE fois =====
+   De bas en haut : l'image d'attente, la video (invisible tant qu'elle n'a pas d'image, puis
+   fondu), le voile. Le voile est la couleur du fond de la section (#081120) a 66 % : mesure sur
+   les 480 images de la video du 2026-11-18, le paragraphe creme a 88 % garde 4,7:1 au PIRE
+   pixel, et ce plancher tient meme sur une image toute blanche. Le grand titre blanc : 6,1:1.
+   ⛔ Ne pas alleger le voile sans remesurer (scratchpad : contraste.py, ou une capture).
+   L'image et la video ont EXACTEMENT la meme boite : la video, arrivee apres, ne devient pas un
+   nouvel element LCP (un candidat de meme taille ne remplace pas le precedent). */
+.nv-fond-video {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+}
+.nv-fond-video img,
+.nv-fond-video video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+.nv-fond-video video {
+  opacity: 0;
+  transition: opacity .9s cubic-bezier(.2, 0, 0, 1);
+}
+.nv-fond-video video[data-pret] { opacity: 1; }
+.nv-fond-video::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: rgba(8, 17, 32, .66);
+}
+/* Le bouton pause : couleurs, contour et survol viennent de .nv-cream-hover (le second bouton du
+   haut de page), donc le survol n'existe qu'avec un pointeur qui survole. Ici, la forme seulement.
+   Meme arrondi (10 px) que les deux boutons du haut de page. 44 px de haut : une cible de doigt. */
+.nv-fond-video-bouton {
+  position: absolute;
+  right: 24px;
+  bottom: 16px;
+  z-index: 1;
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  min-height: 44px;
+  margin: 0;
+  padding: 0 16px;
+  border-radius: 10px;
+  background: rgba(8, 17, 32, .55);
+  font-family: var(--font-body);
+  font-size: 13.5px;
+  font-weight: 600;
+  line-height: 1;
+  cursor: pointer;
+  animation: nvApparition .4s cubic-bezier(.2, 0, 0, 1) both;
+}
+/* Le signe dit ce que fait le bouton : deux barres pour arreter, le triangle de lecture pour
+   relancer (le seul « triangle » permis par la regle 9 : il EST la fonction, avec son libelle). */
+.nv-fond-video-signe {
+  flex: none;
+  box-sizing: border-box;
+  width: 10px;
+  height: 12px;
+}
+.nv-fond-video-bouton[data-etat="lecture"] .nv-fond-video-signe {
+  border-left: 3px solid currentColor;
+  border-right: 3px solid currentColor;
+}
+.nv-fond-video-bouton[data-etat="pause"] .nv-fond-video-signe {
+  background: currentColor;
+  clip-path: polygon(0 0, 100% 50%, 0 100%);
+}
+@keyframes nvApparition { from { opacity: 0; } to { opacity: 1; } }
+/* Telephone : les deux boutons du haut de page s'empilent et le second arrive a 10 px du bouton
+   pause (capture 390 px du 2026-11-18). Le bouton devient un carre de 44 px avec le signe seul ;
+   le texte reste dans la page, cache a l'oeil, et demeure le nom lu du bouton. */
+@media (max-width: 680px) {
+  .nv-fond-video-bouton { right: 14px; bottom: 12px; width: 44px; padding: 0; justify-content: center; }
+  .nv-fond-video-libelle {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+}
+/* Ceinture et bretelles : le composant ne cree meme pas la video dans ce cas. */
+@media (prefers-reduced-motion: reduce) {
+  .nv-fond-video video { display: none; }
+}
+
 /* ===== Boutons, liens, cartes =====
    REGLE 10 (2026-09-29), dans les deux sens : une animation au survol veut dire « c'est
    cliquable ». Chaque regle de survol ci-dessous vise un lien ou un bouton, et TOUTES sont sous

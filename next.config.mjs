@@ -89,6 +89,9 @@ const nextConfig = {
               // visiteur clique. Une image seule, sans cookie ni script.
               "img-src 'self' data: https://cdn.sanity.io https://placehold.co https://image.thum.io https://cdn-cookieyes.com https://*.google-analytics.com https://*.googletagmanager.com https://i.ytimg.com",
               "font-src 'self' data: https://cdn-cookieyes.com",
+              // La video de fond du haut de l'accueil, televersee dans le Studio : sans cette
+              // ligne, `default-src 'self'` bloque le fichier et le fond reste sur son image.
+              "media-src 'self' https://cdn.sanity.io",
               "connect-src 'self' https://cdn-cookieyes.com https://log.cookieyes.com https://directives.cookieyes.com https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com https://challenges.cloudflare.com",
               // Les lecteurs YouTube des fiches de realisation. Le domaine
               // youtube-nocookie.com ne depose rien avant que le visiteur

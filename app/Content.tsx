@@ -13,6 +13,7 @@ import { positionFocale, visible, type Avis, type PageAccueil } from "@/lib/type
 import { Aimant } from "@/components/site/Aimant";
 import { VideoYoutube } from "@/components/site/VideoYoutube";
 import { BasculeAvantApres } from "@/components/site/BasculeAvantApres";
+import { FondVideo } from "@/components/site/FondVideo";
 // Tout le texte vient de l'« Accueil » du Studio ; les services, de leurs pages de service ;
 // les avis, des « Avis Google ».
 //
@@ -48,11 +49,16 @@ function Index({ page, avisListe }: { page: PageAccueil; avisListe: Avis[] }) {
       <main id="contenu">
 
       {/* Hero
-          Fond sombre uni, sans decor. Il a porte un temps trois aurores
-          colorees en degrade (bleu, turquoise, magenta) et les lames de la
-          marque qui derivaient derriere le texte. Les deux ont ete retirees a
-          la demande de Lau, qui voulait un fond simple. Le sombre reste : le
-          texte creme et les boutons sont regles pour ce contraste-la. */}
+          Fond sombre. Il a porte un temps trois aurores colorees en degrade
+          (bleu, turquoise, magenta) et les lames de la marque qui derivaient
+          derriere le texte, retirees a la demande de Lau, qui voulait un fond
+          simple. Depuis le 2026-11-18 (demande de William) : une video de nos
+          rencontres avec des clients, sous un voile bleu nuit uni. Le fond reste
+          simple (une seule image qui bouge, aucun decor) et le texte creme garde
+          son contraste : 4,7:1 au pire pour le paragraphe, meme sur une image
+          toute blanche (voile a 66 %, globals.css « Fond video »).
+          Sans video dans le Studio (« Video de fond du haut de page »), c'est le
+          fond uni d'avant, sans rien changer d'autre. */}
       <section
         style={{
           position: "relative",
@@ -62,6 +68,7 @@ function Index({ page, avisListe }: { page: PageAccueil; avisListe: Avis[] }) {
           borderBottom: "1px solid rgba(12,25,47,.1)",
         }}
       >
+        <FondVideo donnees={page.heroVideo}>
         <div className="nv-shell"
           style={{
             position: "relative",
@@ -139,7 +146,7 @@ function Index({ page, avisListe }: { page: PageAccueil; avisListe: Avis[] }) {
             </Link>
           </div>
         </div>
-
+        </FondVideo>
       </section>
 
       {/* Vidéos

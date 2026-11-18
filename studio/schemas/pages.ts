@@ -20,6 +20,7 @@ import {
   sectionCartes,
   sectionEtapes,
   sectionListe,
+  video,
 } from './champs'
 
 /** Une section en objet repliable. */
@@ -56,6 +57,56 @@ export const pageAccueil = defineType({
     grandTitre('h1', 'Grand titre', 'Le titre en gros, en haut de l’accueil (un seul par page).', 'contenu'),
     paragraphe('heroTexte', 'Texte sous le grand titre', 'Deux ou trois phrases qui disent ce que vous faites et pour qui.', { group: 'contenu' }),
     ligne('heroBoutonSecondaire', 'Second bouton', 'Le bouton à côté de « Réserver mes 30 minutes ». Il mène aux réalisations.', { group: 'contenu' }),
+    defineField({
+      name: 'heroVideo',
+      title: 'Vidéo de fond du haut de page',
+      type: 'object',
+      group: 'contenu',
+      description:
+        'La vidéo qui joue en boucle, sans son, derrière le grand titre. Un voile bleu nuit la recouvre pour garder le texte lisible. Sans vidéo ni image, le haut de page garde son fond bleu nuit uni.',
+      options: { collapsible: true, collapsed: false },
+      fields: [
+        afficher('Décochez pour revenir au fond bleu nuit uni sans perdre la vidéo. Recochez pour la remettre.'),
+        video(
+          'ordinateur',
+          'Vidéo pour ordinateur',
+          'Montrée sur ordinateur et tablette. MP4 sans son, 1920 x 1080, 4 Mo au plus (Norvika la prépare au bon poids).',
+          4,
+        ),
+        video(
+          'mobile',
+          'Vidéo pour téléphone',
+          'La même vidéo, plus légère, pour les téléphones : MP4 sans son, 1280 x 720, 2 Mo au plus. Laissez vide pour reprendre celle de l’ordinateur.',
+          2,
+        ),
+        photo(
+          'affiche',
+          'Image d’attente',
+          'Une image tirée de la vidéo, montrée le temps que la vidéo arrive, et à la place de la vidéo pour les visiteurs qui ont demandé moins d’animations à leur appareil. WebP de 80 Ko au plus.',
+          { requis: false, alt: false },
+        ),
+        ...(
+          [
+            ['boutonPause', 'Texte du bouton pause', 'Le petit bouton en bas à droite qui arrête la vidéo (ex. : « Pause »).', 'Pause'],
+            ['boutonLecture', 'Texte du bouton lecture', 'Le même bouton quand la vidéo est arrêtée : il la relance (ex. : « Lecture »).', 'Lecture'],
+          ] as const
+        ).map(([name, title, description, initial]) =>
+          defineField({
+            name,
+            title,
+            type: 'string',
+            description: `${description} Obligatoire dès qu’une vidéo est ajoutée : sans ce bouton, la vidéo ne joue pas.`,
+            initialValue: initial,
+            validation: (r) =>
+              r.custom((v, contexte) => {
+                const parent = contexte.parent as { ordinateur?: { asset?: unknown }; mobile?: { asset?: unknown } } | undefined
+                const aUneVideo = Boolean(parent?.ordinateur?.asset || parent?.mobile?.asset)
+                return aUneVideo && !String(v ?? '').trim() ? 'Écrivez le texte du bouton : sans lui, la vidéo ne joue pas.' : true
+              }),
+          }),
+        ),
+      ],
+    }),
     section('videos', 'Vidéos de clients', 'Les témoignages vidéo, juste sous le haut de la page.', [
       ligne('titre', 'Ancien petit titre en capitales (retiré)', 'Retiré du site le 2026-11-16 (règle d’agence 1 : pas de petit titre au-dessus d’un titre). Caché ici en attendant d’être vidé.', { hidden: true, requis: false }),
       ligne('sousTitre', 'Titre de la section', 'La phrase en gros au-dessus des vidéos (ex. : « Nos clients en parlent mieux que nous. »).'),

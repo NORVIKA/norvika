@@ -64,6 +64,7 @@ const REQUETE = `{
   "services": *[_type in ${JSON.stringify(Object.keys(CHEMINS_SERVICES))} && !(_id in path("drafts.**"))] | order(ordre asc){ _type, nom, accroche, detail },
   "accueil": *[_id == "pageAccueil"][0]{
     ..., ${SEO},
+    heroVideo{ afficher, "ordinateur": ordinateur.${URL}, "mobile": mobile.${URL}, "affiche": affiche${IMAGE}, boutonPause, boutonLecture },
     videos{ ..., liste[]{ youtubeId, titre, "fiche": realisation->slug.current } },
     avantApres{ ..., "realisation": realisation->{ "slug": slug.current, "avantApres": avantApres${AVANT_APRES} } },
     logos{ ..., "liste": realisations[]->{ nom, logoStyle, "logo": logo${IMAGE} } },

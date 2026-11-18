@@ -197,10 +197,22 @@ export type PageFormation = PageService & {
 
 export type Avis = { _updatedAt: string; nom: string; contexte: string; signature: string; accroche: string; suite: string[] | null; extraitGoogle?: string | null };
 
+/** La vidéo de fond du haut de l'accueil. Tout est facultatif : sans vidéo ni image, le fond reste uni. */
+export type FondVideo = {
+  afficher?: boolean | null;
+  /** Adresses des fichiers MP4 (cdn.sanity.io). */
+  ordinateur?: string | null;
+  mobile?: string | null;
+  affiche?: Image | null;
+  boutonPause?: string | null;
+  boutonLecture?: string | null;
+};
+
 export type PageAccueil = DocumentPage & {
   h1: string;
   heroTexte: string;
   heroBoutonSecondaire: string;
+  heroVideo?: FondVideo | null;
   videos: { afficher?: boolean | null; titre: string; sousTitre: string; bouton: string; liste: { youtubeId: string; titre: string; fiche?: string | null }[] };
   avantApres: { afficher?: boolean | null; titre: string; sousTitre: string; texte: string; bouton: string; realisation: { slug: string; avantApres: AvantApres } };
   quiz: { afficher?: boolean | null; titre: string; texte: string };

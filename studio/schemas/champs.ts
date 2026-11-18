@@ -125,6 +125,40 @@ export function photo(name: string, title: string, description: string, o: Optio
   })
 }
 
+/* ---------------------------------------------------------------- vidéos */
+
+/**
+ * Une vidéo MP4 téléversée dans le Studio (fond animé). Le poids s'AVERTIT sans bloquer : une vidéo
+ * trop lourde ralentit le site sur téléphone, mais une publication refusée ne rend service à personne.
+ * Le poids vient de la fiche du fichier (`size`), lue par le Studio au moment de la vérification.
+ */
+export function video(name: string, title: string, description: string, poidsMaxMo: number, o: Options = {}) {
+  return defineField({
+    name,
+    title,
+    type: 'file',
+    description,
+    group: o.group,
+    hidden: o.hidden,
+    options: { accept: 'video/mp4' },
+    validation: (r) =>
+      r
+        .custom(async (valeur, contexte) => {
+          const ref = (valeur as { asset?: { _ref?: string } } | undefined)?.asset?._ref
+          if (!ref) return true
+          const fiche = await contexte
+            .getClient({ apiVersion: '2025-02-19' })
+            .fetch<{ size?: number; mimeType?: string } | null>('*[_id == $id][0]{ size, mimeType }', { id: ref })
+          if (fiche?.mimeType && fiche.mimeType !== 'video/mp4') return 'Format refusé par certains téléphones : exportez la vidéo en MP4 (H.264).'
+          const mo = (fiche?.size ?? 0) / 1_000_000
+          return mo > poidsMaxMo
+            ? `Cette vidéo pèse ${mo.toFixed(1).replace('.', ',')} Mo, pour ${String(poidsMaxMo).replace('.', ',')} Mo conseillés : elle ralentira le site. Demandez à Norvika de la compresser.`
+            : true
+        })
+        .warning(),
+  })
+}
+
 /* ---------------------------------------------------------------- blocs répétés */
 
 /** Une étape du parcours animé (« Comment ça se passe »). */
