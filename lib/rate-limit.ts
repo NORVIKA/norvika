@@ -67,7 +67,14 @@ async function hashIp(ip: string): Promise<string> {
     .join("");
 }
 
-export type ResultatDebit = { permis: boolean; raison?: string };
+export type ResultatDebit = { permis: boolean; raison?: string; panne?: boolean };
+
+/** Le compteur est en panne : refus (seulement avec `fermeSiPanne`). */
+const PANNE: ResultatDebit = {
+  permis: false,
+  panne: true,
+  raison: "Le service est momentanément indisponible. Réessayez dans quelques minutes, ou écrivez-nous à info@norvika.ca.",
+};
 
 /**
  * Verifie et enregistre une tentative. `formulaire` separe les compteurs
@@ -78,11 +85,17 @@ export type ResultatDebit = { permis: boolean; raison?: string };
  * Supabase ne doit pas fermer le formulaire de contact du site. La
  * sauvegarde du message, elle, echouera de toute facon si la base est en
  * panne, donc on ne cree aucun trou reel.
+ *
+ * `fermeSiPanne` (verificateur Loi 25, 2026-11-18) : l'inverse, une panne REFUSE. Le
+ * verificateur n'ecrit rien dans la base (aucune autre etape ne tomberait avec elle) et chaque
+ * analyse ouvre un navigateur Browser Run : sans compteur, seul Turnstile le protegerait.
  */
 export async function verifierDebit(
   req: Request,
-  formulaire: "contact" | "lead" | "diagnostic"
+  formulaire: "contact" | "lead" | "diagnostic" | "verificateur" | "verificateur-courriel",
+  options: { fermeSiPanne?: boolean } = {}
 ): Promise<ResultatDebit> {
+  const siPanne: ResultatDebit = options.fermeSiPanne ? PANNE : { permis: true };
   try {
     const ipHash = await hashIp(clientIp(req));
     const { data, error } = await serviceClient().rpc("verifier_debit_formulaire", {
@@ -94,7 +107,7 @@ export async function verifierDebit(
 
     if (error) {
       console.error("Limitation de debit indisponible:", error.message);
-      return { permis: true };
+      return siPanne;
     }
 
     if (data === false) {
@@ -107,7 +120,7 @@ export async function verifierDebit(
     return { permis: true };
   } catch (e) {
     console.error("Limitation de debit indisponible:", e);
-    return { permis: true };
+    return siPanne;
   }
 }
 

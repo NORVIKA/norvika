@@ -14,6 +14,14 @@
     "enabled": true
   },
 
+  // Navigateur Cloudflare Browser Run, pour le vérificateur Loi 25 (/verificateur-loi-25,
+  // lib/verificateur/moteur.ts). La liaison EST le droit d'accès : aucun jeton de compte à poser
+  // en secret (l'API REST, elle, en exigerait un). Forfait Workers Paid : 10 h de navigateur par
+  // mois incluses, puis 0,09 $ US l'heure. En local, `wrangler dev` lance un Chrome sur le poste.
+  "browser": {
+    "binding": "BROWSER"
+  },
+
   // Domaines servis par ce Worker.
   //
   // ⚠️ DEUX PRÉALABLES, appris à la dure le 2026-08-13 :
