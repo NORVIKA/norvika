@@ -6,7 +6,9 @@ import { imagePartage, partage } from "@/lib/meta";
 // Texte légal, laissé dans le code (exception de la phase 4). Son propre aperçu de partage : sans
 // lui, la page héritait du titre et de la description de l'accueil (openGraph du layout).
 const TITRE = "Politique de confidentialité";
-const DESCRIPTION = "Politique de confidentialité de Norvika, conforme à la Loi 25 du Québec.";
+// Jamais « conforme à la Loi 25 » : c'est l'auto-attestation que le vérificateur Loi 25 refuse de
+// faire, sur le site qui l'offre (Martin, 2026-11-18, point B).
+const DESCRIPTION = "Politique de confidentialité de Norvika : renseignements recueillis, utilisation, fournisseurs, conservation et vos droits.";
 
 export async function generateMetadata(): Promise<Metadata> {
   const { parametres } = await obtenirContenu();
@@ -23,7 +25,9 @@ export async function generateMetadata(): Promise<Metadata> {
   };
 }
 
-export default function PolitiquePage() {
+export default async function PolitiquePage() {
+  // Le nom légal vient de « Infos de l'entreprise » (zéro texte en dur) : il a changé le 2026-11-18.
+  const { parametres } = await obtenirContenu();
   return (
     <SiteShell>
       <div className="mx-auto max-w-3xl px-6 py-20 md:py-28">
@@ -116,7 +120,7 @@ export default function PolitiquePage() {
           </h2>
           <p className="mt-3 text-[var(--muted-foreground)]">
             Conformément à l’article 3.1 de la Loi 25, la personne responsable de la protection
-            des renseignements personnels chez Groupe Norvika S.E.N.C. est :
+            des renseignements personnels chez {parametres.nomLegal} est :
           </p>
           <ul className="mt-3 list-disc pl-5 text-[var(--muted-foreground)]">
             <li>
