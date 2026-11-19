@@ -34,7 +34,9 @@
  */
 import "server-only";
 
-import puppeteer, { type Browser, type HTTPRequest, type Page } from "@cloudflare/puppeteer";
+import puppeteer, { type Browser, type CDPSession, type HTTPRequest, type Page } from "@cloudflare/puppeteer";
+
+type Connection = NonNullable<ReturnType<CDPSession["connection"]>>;
 import { getCloudflareContext } from "@opennextjs/cloudflare";
 
 import { creerGardeReseau, ipReservee } from "./adresse";
@@ -61,7 +63,7 @@ const MAX_TEMOINS = 200;
 const MAX_TEXTE_POLITIQUE = 200_000;
 
 /** Pourquoi une visite n'a pas pu se faire. Le texte affiché vient du Studio, par ce code. */
-export type CodeMoteur = "indisponible" | "capacite" | "inaccessible" | "refusee" | "protege" | "delai";
+export type CodeMoteur = "indisponible" | "capacite" | "inaccessible" | "refusee" | "protege" | "delai" | "incompatible";
 
 export class ErreurMoteur extends Error {
   constructor(
@@ -197,18 +199,45 @@ const SCRIPT_ACCUEIL = `(function (args) {
 const SCRIPT_TEXTE = `(function (max) { return ((document.body && document.body.innerText) || "").slice(0, max); })`;
 
 /**
- * Lancé dans CHAQUE document et chaque cadre, AVANT tout script du site (E2 de Sentinel) : retire
- * ce qui échappe à l'interception de Puppeteer. Validé par le banc d'essai de Sentinel (0
+ * Lancé dans CHAQUE document, chaque cadre et chaque worker, AVANT tout script du site (E2 de
+ * Sentinel ; WebSocketStream ajouté à la passe 2, N1 : Network.setBlockedURLs ne le bloque pas) :
+ * retire ce qui échappe à l'interception de Puppeteer. `globalThis` : le même texte vaut pour une
+ * page et pour un worker (où `window` n'existe pas). Validé par le banc d'essai de Sentinel (0
  * contournement, cadres vides et cadres d'un autre site compris). Effet connu : un site qui déplace
  * Google Analytics dans un Worker (Partytown) est moins bien lu, ce qui reste rare.
  */
 const SCRIPT_BARRIERE = `(function () {
-  try { window.open = function () { return null; }; } catch (e) {}
-  var cles = ["WebSocket", "WebTransport", "SharedWorker", "Worker", "RTCPeerConnection", "webkitRTCPeerConnection", "RTCDataChannel"];
+  var g = typeof globalThis !== "undefined" ? globalThis : self;
+  try { g.open = function () { return null; }; } catch (e) {}
+  var cles = ["WebSocket", "WebSocketStream", "WebTransport", "SharedWorker", "Worker", "RTCPeerConnection", "webkitRTCPeerConnection", "RTCDataChannel"];
   for (var i = 0; i < cles.length; i++) {
-    try { delete window[cles[i]]; Object.defineProperty(window, cles[i], { value: undefined, configurable: false, writable: false }); } catch (e) {}
+    try { delete g[cles[i]]; Object.defineProperty(g, cles[i], { value: undefined, configurable: false, writable: false }); } catch (e) {}
   }
   try { Object.defineProperty(Navigator.prototype, "serviceWorker", { get: function () { return undefined; }, configurable: false }); } catch (e) {}
+  // N2 : une iframe sandbox sans allow-same-origin et sans adresse http(s) (srcdoc, data:, blob:,
+  // about:) part dans un autre processus que Chrome ne met PAS en pause : aucune barrière n'y
+  // entre à temps. Elle est retirée du document dès son insertion, avant que sa navigation aboutisse.
+  // Fonctions natives gardées avant tout script du site (il ne peut plus les remplacer).
+  try {
+    if (typeof document === "undefined" || typeof MutationObserver === "undefined") return;
+    var MO = MutationObserver, E = Element.prototype, retirer = E.remove, attr = E.getAttribute, a = E.hasAttribute, qsa = E.querySelectorAll;
+    var suspecte = function (el) {
+      if (!el || el.nodeType !== 1 || String(el.tagName).toUpperCase() !== "IFRAME" || !a.call(el, "sandbox")) return false;
+      if (/(^|\\s)allow-same-origin(\\s|$)/i.test(attr.call(el, "sandbox") || "")) return false;
+      return a.call(el, "srcdoc") || !/^https?:/i.test(attr.call(el, "src") || "");
+    };
+    var nettoyer = function (n) {
+      if (suspecte(n)) { retirer.call(n); return; }
+      if (n && n.nodeType === 1) { var l = qsa.call(n, "iframe[sandbox]"); for (var j = 0; j < l.length; j++) if (suspecte(l[j])) retirer.call(l[j]); }
+    };
+    new MO(function (liste) {
+      for (var i = 0; i < liste.length; i++) {
+        var m = liste[i];
+        if (m.type === "attributes") nettoyer(m.target);
+        else for (var k = 0; k < m.addedNodes.length; k++) nettoyer(m.addedNodes[k]);
+      }
+    }).observe(document, { childList: true, subtree: true, attributes: true, attributeFilter: ["sandbox", "srcdoc", "src"] });
+  } catch (e) {}
 })();`;
 
 type ResultatAccueil = {
@@ -322,7 +351,11 @@ async function contexte(): Promise<Contexte> {
   return { navigateur, attendre };
 }
 
-/** Au plus MAX_SIMULTANES navigateurs à la fois. Si Browser Run ne répond pas, la base plafonne déjà. */
+/**
+ * Au plus MAX_SIMULTANES navigateurs à la fois, selon Browser Run. Ceinture seulement : la vraie
+ * garde, atomique et fermée en cas de panne, est dans la base (verifier_debit_verificateur refuse
+ * à 5 analyses de moins de 35 s, N3 de Sentinel). Si Browser Run ne répond pas, on s'y fie.
+ */
 async function verifierCapacite(navigateur: LiaisonNavigateur): Promise<void> {
   let actives: number | null = null;
   try {
@@ -342,6 +375,52 @@ async function lancer(navigateur: LiaisonNavigateur): Promise<Browser> {
     if (/429|rate limit|too many|limit|quota/i.test(message)) throw new ErreurMoteur("capacite", "LANCEMENT");
     throw new ErreurMoteur("indisponible", "LANCEMENT");
   }
+}
+
+/** L'erreur rendue pour un arrêt décidé pendant la visite. */
+function arret(motif: string): ErreurMoteur {
+  // Rebinding : une adresse privée a vraiment été jointe. Le reste (cadre ou worker hors de la
+  // barrière) : le site emploie un moyen que l'outil ne sait pas surveiller, donc pas d'analyse.
+  return new ErreurMoteur(motif === "REBINDING" ? "refusee" : "incompatible", motif);
+}
+
+const URL_DE_CHROME = /^(chrome|chrome-extension|devtools):/;
+type CibleAttachee = { sessionId: string; waitingForDebugger: boolean; targetInfo: { type: string; url: string } };
+
+/**
+ * N2 de Sentinel (passe 2) : Puppeteer ne pose ses scripts dans un cadre hors processus que s'il
+ * connaît déjà ce cadre. Une iframe sandbox srcdoc lui échappe, et Chrome l'attache SANS la mettre
+ * en pause (waitingForDebugger = false, mesuré au banc v2) : ses scripts peuvent avoir tourné avant
+ * qu'on puisse y toucher. Deux gestes :
+ *   1. chaque nouvelle session CDP reçoit la barrière et le blocage ws:// AVANT que Puppeteer ne
+ *      relance la cible (l'événement « sessionattached » de la connexion passe avant le sien) ;
+ *   2. FILET FERMÉ : un cadre attaché sans pause, ou tout worker du site, arrête la visite (code
+ *      « incompatible », aucun résultat). Une analyse refusée vaut mieux qu'un trou.
+ * Limite connue : le filet arrête la visite, il n'empêche pas une première connexion déjà partie
+ * d'un tel cadre. Sur Browser Run, le Local Network Access de Chrome 152 bloque en plus les
+ * requêtes d'un site public vers une adresse locale.
+ */
+function surveillerCibles(connexion: Connection | undefined, principale: CDPSession | undefined, arreter: (motif: string) => void) {
+  if (!connexion || !principale) {
+    // Sans ces deux points d'écoute, aucune garantie : la visite ne se fait pas (fermé en cas de doute).
+    throw new ErreurMoteur("indisponible", "SURVEILLANCE");
+  }
+  const surAttache = (e: CibleAttachee) => {
+    const { type, url } = e.targetInfo;
+    if (URL_DE_CHROME.test(url) || type === "page" || type === "tab" || type === "browser") return;
+    if (type === "worker" || type === "shared_worker" || type === "service_worker") return arreter("WORKER");
+    if (!e.waitingForDebugger) return arreter("CIBLE");
+  };
+  const ecouter = (session: CDPSession) => session.on("Target.attachedToTarget", (e: unknown) => surAttache(e as CibleAttachee));
+  ecouter(principale);
+  connexion.on("Target.attachedToTarget", (e: unknown) => surAttache(e as CibleAttachee));
+  connexion.on("sessionattached", (session: CDPSession) => {
+    // Envoyés ici, ces ordres passent AVANT le Runtime.runIfWaitingForDebugger de Puppeteer.
+    void session.send("Page.addScriptToEvaluateOnNewDocument", { source: SCRIPT_BARRIERE, runImmediately: true }).catch(() => undefined);
+    void session.send("Runtime.evaluate", { expression: SCRIPT_BARRIERE }).catch(() => undefined);
+    void session.send("Network.setBlockedURLs", { urls: ["ws://*", "wss://*"] }).catch(() => undefined);
+    ecouter(session);
+  });
 }
 
 /** Un nom d'hôte sans « www. » : la politique de exemple.ca peut rediriger vers www.exemple.ca. */
@@ -385,7 +464,7 @@ export async function observer(url: URL): Promise<Observations> {
 
     // F1 : si le visiteur coupe, la requête est annulée et le `finally` peut ne jamais tourner.
     // waitUntil garde le Worker en vie le temps de fermer le navigateur (sinon facturé 60 s).
-    attendre(Promise.race([terminee, new Promise((r) => setTimeout(r, BUDGET_MS + 2_000))]).then(() => actif.close().catch(() => undefined)));
+    attendre(Promise.race([terminee, new Promise((r) => setTimeout(r, BUDGET_MS))]).then(() => actif.close().catch(() => undefined)));
     // Filet de sécurité : à l'échéance, le navigateur est fermé de force.
     minuterie = setTimeout(() => void actif.close().catch(() => undefined), Math.max(0, restant()));
 
@@ -397,6 +476,8 @@ export async function observer(url: URL): Promise<Observations> {
       if ((type === "service_worker" || type === "shared_worker") && !/^chrome(-extension)?:/.test(cible.url())) {
         return arreter("WORKER");
       }
+      // Les autres cibles (cadres hors processus, workers dédiés) sont surveillées plus bas, à
+      // l'attache CDP, là où Chrome dit si la cible attend avant son premier script.
       // Une fenêtre surgissante aurait ses propres requêtes, hors interception.
       if (type === "page" && cible.opener()) {
         void cible
@@ -415,7 +496,12 @@ export async function observer(url: URL): Promise<Observations> {
     const reseau = await page.target().createCDPSession();
     await reseau.send("Network.enable");
     await reseau.send("Network.setBlockedURLs", { urls: ["ws://*", "wss://*"] });
+    // N4 : aucune page prérendue (Puppeteer n'y pose pas ses scripts).
+    await reseau.send("Page.setPrerenderingAllowed", { isAllowed: false }).catch(() => undefined);
     await page.evaluateOnNewDocument(SCRIPT_BARRIERE);
+    surveillerCibles(reseau.connection(), (page as unknown as { _client?: () => CDPSession })._client?.(), arreter);
+    // R1 : un Worker dédié apparaît comme une cible « other », que le filet du navigateur ne voit pas.
+    page.on("workercreated", () => arreter("WORKER"));
     await page.setRequestInterception(true);
     page.on("request", (requete) => void filtrer(requete));
     // M1 : l'adresse IP réellement jointe par le navigateur. Notre DNS et le sien peuvent différer
@@ -440,7 +526,8 @@ export async function observer(url: URL): Promise<Observations> {
         // M2 : plafond de requêtes, et rien entre l'accueil et la politique ; pendant la politique,
         // seulement son propre domaine (le document et ce qu'il charge de chez lui).
         compte += 1;
-        if (compte > MAX_REQUETES || moment === "entre") return await requete.abort("blockedbyclient");
+        // R2 : dès qu'un arrêt est décidé, plus rien ne part, même avant la fermeture.
+        if (motifArret || compte > MAX_REQUETES || moment === "entre") return await requete.abort("blockedbyclient");
         if (moment === "politique" && sansWww(u.hostname) !== hotePolitique) return await requete.abort("blockedbyclient");
         if (moment === "accueil") requetes.push({ url: u.href.slice(0, 500), hote: u.hostname.toLowerCase(), type: requete.resourceType() });
         if (!(await garde(u.hostname))) return await requete.abort("blockedbyclient");
@@ -458,7 +545,7 @@ export async function observer(url: URL): Promise<Observations> {
     // --- 2. Huit secondes sans aucune interaction --------------------------------------------
     await new Promise((r) => setTimeout(r, Math.max(0, Math.min(OBSERVATION_MS, restant() - 3_000))));
     moment = "entre";
-    if (motifArret) throw new ErreurMoteur("refusee", motifArret);
+    if (motifArret) throw arret(motifArret);
 
     const temoins = await lireTemoins(page);
     const accueil = lireResultatAccueil(
@@ -489,7 +576,7 @@ export async function observer(url: URL): Promise<Observations> {
       politique = await lirePolitique(page, accueil.lien.url, adresseFinale, restant);
       moment = "entre";
     }
-    if (motifArret) throw new ErreurMoteur("refusee", motifArret);
+    if (motifArret) throw arret(motifArret);
 
     return {
       adresse: url.href,
@@ -502,7 +589,7 @@ export async function observer(url: URL): Promise<Observations> {
       https: adresseFinale.startsWith("http://") ? "https-absent" : await sonde,
     };
   } catch (e) {
-    if (motifArret) throw new ErreurMoteur("refusee", motifArret);
+    if (motifArret) throw arret(motifArret);
     if (e instanceof ErreurMoteur) throw e;
     if (restant() <= 0) throw new ErreurMoteur("delai");
     throw new ErreurMoteur("inaccessible", erreurReseau(e));

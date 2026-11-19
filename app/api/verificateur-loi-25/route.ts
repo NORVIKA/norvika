@@ -53,6 +53,7 @@ const MESSAGES_MOTEUR: Record<CodeMoteur, { statut: number; message: string }> =
   refusee: { statut: 400, message: "Votre site redirige vers une adresse qui ne peut pas être vérifiée." },
   protege: { statut: 502, message: "Votre site a demandé une vérification anti-robot à notre navigateur." },
   delai: { statut: 504, message: "Votre site a pris trop de temps à répondre." },
+  incompatible: { statut: 502, message: "Votre site emploie des éléments que notre outil ne peut pas analyser en sécurité." },
 };
 
 /** Le poste de développement (localhost, 127.0.0.1), jamais un domaine public. */
@@ -100,7 +101,7 @@ export async function POST(req: Request) {
     const code: CodeMoteur = e instanceof ErreurMoteur ? e.code : "indisponible";
     // Au journal : le code d'erreur et un code technique court (net::ERR_..., HTTP 404), JAMAIS
     // l'adresse visitée ni un message libre qui pourrait la contenir (EFVP de Martin, 2026-11-18).
-    const detail = e instanceof ErreurMoteur && /^(ERR_[A-Z_]+|HTTP \d{3}|TIMEOUT|AUTRE|WORKER|REBINDING|SIMULTANES|LANCEMENT)$/.test(e.message) ? e.message : undefined;
+    const detail = e instanceof ErreurMoteur && /^(ERR_[A-Z_]+|HTTP \d{3}|TIMEOUT|AUTRE|WORKER|CIBLE|REBINDING|SIMULTANES|LANCEMENT|SURVEILLANCE)$/.test(e.message) ? e.message : undefined;
     console.warn("[verificateur] analyse impossible", JSON.stringify({ code, detail, duree: Date.now() - debut }));
     const { statut, message } = MESSAGES_MOTEUR[code];
     return refus(statut, message, code);
