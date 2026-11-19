@@ -3,6 +3,7 @@
 import { useState } from "react";
 
 import { useContenuGlobal } from "@/components/site/ContenuGlobal";
+import { adresseVignette } from "@/lib/vignettes-youtube";
 
 /**
  * Lecteur YouTube a chargement differe.
@@ -15,12 +16,10 @@ import { useContenuGlobal } from "@/components/site/ContenuGlobal";
  * youtube-nocookie.com : aucun cookie de suivi n'est depose avant la lecture,
  * donc rien a negocier avec la banniere de consentement.
  *
- * ⚠️ LA VIGNETTE VIENT DE YOUTUBE, ET LE NOM DE FICHIER COMPTE.
- * `hqdefault.jpg` et `maxresdefault.jpg` sont toujours en 16/9 : dans un cadre
- * vertical, ils donnent une image recadree ou cernee de bandes noires.
- * `oardefault.jpg` (original aspect ratio) rend la vraie image verticale du
- * Short, en 1080x1920. D'ou le choix selon le format. Ces vignettes obligent
- * `img-src https://i.ytimg.com` dans la CSP ; elles ne deposent pas de cookie.
+ * ⚠️ LA VIGNETTE EST SERVIE PAR NORVIKA.CA (2026-11-18), copiee de YouTube au build :
+ * avant, elle venait de i.ytimg.com des l'arrivee, et l'adresse IP du visiteur partait
+ * chez Google avant tout clic (lib/vignettes-youtube.ts). Le format compte : `oardefault`
+ * (format d'origine) pour un Short vertical, `maxresdefault` (16/9) sinon.
  */
 export function VideoYoutube({
   youtubeId,
@@ -82,9 +81,7 @@ export function VideoYoutube({
           }}
         >
           <img
-            src={`https://i.ytimg.com/vi/${youtubeId}/${
-              vertical ? "oardefault" : "maxresdefault"
-            }.jpg`}
+            src={adresseVignette(youtubeId, format)}
             alt=""
             loading="lazy"
             style={{

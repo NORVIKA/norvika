@@ -85,9 +85,9 @@ const nextConfig = {
               // (script, iframe de la case et verification).
               `script-src 'self' 'unsafe-inline'${process.env.NODE_ENV === "development" ? " 'unsafe-eval'" : ""} https://cdn-cookieyes.com https://www.googletagmanager.com https://challenges.cloudflare.com`,
               "style-src 'self' 'unsafe-inline' https://cdn-cookieyes.com",
-              // i.ytimg.com : les vignettes des videos, affichees avant que le
-              // visiteur clique. Une image seule, sans cookie ni script.
-              "img-src 'self' data: https://cdn.sanity.io https://placehold.co https://image.thum.io https://cdn-cookieyes.com https://*.google-analytics.com https://*.googletagmanager.com https://i.ytimg.com",
+              // Plus de i.ytimg.com (2026-11-18) : les vignettes des videos sont servies par le
+              // site lui-meme (lib/vignettes-youtube.ts), rien ne part chez Google avant le clic.
+              "img-src 'self' data: https://cdn.sanity.io https://placehold.co https://image.thum.io https://cdn-cookieyes.com https://*.google-analytics.com https://*.googletagmanager.com",
               "font-src 'self' data: https://cdn-cookieyes.com",
               // La video de fond du haut de l'accueil, televersee dans le Studio : sans cette
               // ligne, `default-src 'self'` bloque le fichier et le fond reste sur son image.
