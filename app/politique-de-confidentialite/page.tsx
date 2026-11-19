@@ -6,6 +6,10 @@ import { imagePartage, partage } from "@/lib/meta";
 // Texte légal, laissé dans le code (exception de la phase 4). Son propre aperçu de partage : sans
 // lui, la page héritait du titre et de la description de l'accueil (openGraph du layout).
 const TITRE = "Politique de confidentialité";
+// ⚠️ À METTRE AU JOUR LE JOUR DE LA MISE EN LIGNE du vérificateur Loi 25 (préparé le 2026-11-18,
+// textes de Martin, contenu/verificateur-loi25-textes.md sections 4 et 5) : les ajouts sur l'outil
+// seraient faux tant qu'il n'est pas en ligne.
+const MISE_A_JOUR = "18 novembre 2026";
 // Jamais « conforme à la Loi 25 » : c'est l'auto-attestation que le vérificateur Loi 25 refuse de
 // faire, sur le site qui l'offre (Martin, 2026-11-18, point B).
 const DESCRIPTION = "Politique de confidentialité de Norvika : renseignements recueillis, utilisation, fournisseurs, conservation et vos droits.";
@@ -34,7 +38,9 @@ export default async function PolitiquePage() {
         <h1 className="text-3xl font-semibold leading-tight tracking-tight text-[var(--foreground)] md:text-4xl">
           Politique de confidentialité
         </h1>
-        <p className="mt-4 text-sm text-[var(--muted-foreground)]">Dernière mise à jour : 14 novembre 2026</p>
+        <p className="mt-4 text-sm text-[var(--muted-foreground)]">
+          Dernière mise à jour et entrée en vigueur : {MISE_A_JOUR}
+        </p>
 
         <div className="prose prose-sm mt-10 max-w-none text-[var(--foreground)]">
           <h2 className="mt-8 text-xl font-semibold">1. Qui sommes-nous</h2>
@@ -50,6 +56,11 @@ export default async function PolitiquePage() {
           </p>
           <ul className="mt-3 list-disc pl-5 text-[var(--muted-foreground)]">
             <li>Prénom, courriel et numéro de téléphone (via le formulaire Espace client)</li>
+            <li>
+              Votre adresse IP, gardée sous une forme brouillée au plus 24 heures, quand vous envoyez un
+              formulaire ou lancez le vérificateur Loi 25, pour limiter le nombre d’envois et bloquer les abus
+            </li>
+            <li>L’adresse d’un site web, quand vous utilisez le vérificateur Loi 25</li>
           </ul>
 
           <h2 className="mt-8 text-xl font-semibold">3. Utilisation des données</h2>
@@ -65,7 +76,44 @@ export default async function PolitiquePage() {
             commerciales.
           </p>
 
-          <h2 className="mt-8 text-xl font-semibold">4. Témoins (cookies) et mesure d’audience</h2>
+          <h2 className="mt-8 text-xl font-semibold">4. Vérificateur Loi 25</h2>
+          <p className="mt-3 text-[var(--muted-foreground)]">
+            Notre vérificateur Loi 25 (norvika.ca/verificateur-loi-25) visite automatiquement le site dont
+            vous entrez l’adresse et relève des signaux visibles de l’extérieur. Voici ce qu’il recueille
+            et ce que nous en faisons.
+          </p>
+          <ul className="mt-3 list-disc pl-5 text-[var(--muted-foreground)]">
+            <li>
+              <strong className="text-[var(--foreground)]">Adresse du site analysé.</strong> Elle sert
+              uniquement à faire l’analyse et à afficher le résultat. Elle n’est enregistrée dans aucune de
+              nos bases de données. Elle peut rester au plus 7 jours dans les journaux techniques de notre
+              hébergeur, Cloudflare.
+            </li>
+            <li>
+              <strong className="text-[var(--foreground)]">Adresse IP.</strong> Nous la gardons sous une
+              forme brouillée (un condensé qui ne permet pas de la relire), au plus 24 heures, pour limiter
+              le nombre d’analyses par appareil et bloquer les abus. Elle ne sert à rien d’autre.
+            </li>
+            <li>
+              <strong className="text-[var(--foreground)]">Vérification anti-robot.</strong> Comme sur nos
+              autres formulaires, Cloudflare Turnstile reçoit des signaux techniques de votre navigateur pour
+              distinguer une personne d’un robot.
+            </li>
+            <li>
+              <strong className="text-[var(--foreground)]">Où se fait l’analyse.</strong> La visite du site
+              analysé est faite par un navigateur automatique de Cloudflare (Browser Run), depuis le réseau
+              mondial de Cloudflare, qui peut se trouver à l’extérieur du Québec. Le contenu des pages
+              visitées sert seulement à produire le résultat : ni nous ni Cloudflare ne le conservons après
+              l’analyse. Si la politique analysée nomme une personne, ce nom sert seulement à constater
+              qu’un responsable est désigné ; il n’est ni affiché ni conservé.
+            </li>
+            <li>
+              <strong className="text-[var(--foreground)]">Ce que vaut le résultat.</strong> C’est un test
+              automatique, pas un avis juridique.
+            </li>
+          </ul>
+
+          <h2 className="mt-8 text-xl font-semibold">5. Témoins (cookies) et mesure d’audience</h2>
           <p className="mt-3 text-[var(--muted-foreground)]">
             Ce site utilise deux catégories de témoins. Les témoins <strong>nécessaires</strong> font
             fonctionner le site et mémorisent votre choix de consentement : ils sont déposés sans votre
@@ -90,13 +138,13 @@ export default async function PolitiquePage() {
             fournie par Google Analytics 4, avec l’anonymisation des adresses IP activée.
           </p>
 
-          <h2 className="mt-8 text-xl font-semibold">5. Conservation des données</h2>
+          <h2 className="mt-8 text-xl font-semibold">6. Conservation des données</h2>
           <p className="mt-3 text-[var(--muted-foreground)]">
             Vos données sont conservées aussi longtemps que nécessaire pour la gestion de votre projet,
             puis supprimées dans un délai raisonnable.
           </p>
 
-          <h2 className="mt-8 text-xl font-semibold">6. Vos droits (Loi 25 Québec)</h2>
+          <h2 className="mt-8 text-xl font-semibold">7. Vos droits (Loi 25 Québec)</h2>
           <p className="mt-3 text-[var(--muted-foreground)]">
             Conformément à la Loi modernisant des dispositions législatives en matière de protection des
             renseignements personnels (Loi 25), vous avez le droit de :
@@ -106,6 +154,10 @@ export default async function PolitiquePage() {
             <li>Demander la correction de données inexactes</li>
             <li>Demander la suppression de vos données</li>
             <li>Retirer votre consentement à tout moment</li>
+            <li>
+              Recevoir les renseignements que vous nous avez fournis dans un format numérique structuré et
+              couramment utilisé (portabilité)
+            </li>
           </ul>
           <p className="mt-3 text-[var(--muted-foreground)]">
             Pour exercer ces droits, contactez-nous à{" "}
@@ -114,9 +166,14 @@ export default async function PolitiquePage() {
             </a>
             .
           </p>
+          <p className="mt-3 text-[var(--muted-foreground)]">
+            Nous répondons par écrit à une demande d’accès ou de rectification dans les 30 jours suivant sa
+            réception. Si notre réponse ne vous satisfait pas, vous pouvez vous adresser à la Commission
+            d’accès à l’information du Québec : www.cai.gouv.qc.ca.
+          </p>
 
           <h2 className="mt-8 text-xl font-semibold">
-            7. Responsable de la protection des renseignements personnels
+            8. Responsable de la protection des renseignements personnels
           </h2>
           <p className="mt-3 text-[var(--muted-foreground)]">
             Conformément à l’article 3.1 de la Loi 25, la personne responsable de la protection
@@ -139,7 +196,7 @@ export default async function PolitiquePage() {
           </p>
 
           <h2 className="mt-8 text-xl font-semibold">
-            8. Hébergement et communication hors du Québec
+            9. Hébergement et communication hors du Québec
           </h2>
           <p className="mt-3 text-[var(--muted-foreground)]">
             Conformément à l’article 17 de la Loi 25, nous vous informons que vos renseignements
@@ -158,6 +215,23 @@ export default async function PolitiquePage() {
             <li>
               <strong className="text-[var(--foreground)]">Cloudflare</strong> : hébergement et
               diffusion du site
+            </li>
+            <li>
+              <strong className="text-[var(--foreground)]">Cloudflare Browser Run</strong> : visite
+              automatique des sites soumis au vérificateur Loi 25
+            </li>
+            <li>
+              <strong className="text-[var(--foreground)]">Sanity</strong> : gestion du contenu du site. Les
+              images et les vidéos du site sont servies depuis ses serveurs, qui reçoivent l’adresse IP des
+              visiteurs.
+            </li>
+            <li>
+              <strong className="text-[var(--foreground)]">YouTube (Google)</strong> : lecture d’une vidéo
+              quand vous cliquez dessus (domaine youtube-nocookie.com, sans témoin de suivi avant la lecture).
+            </li>
+            <li>
+              <strong className="text-[var(--foreground)]">Google Workspace</strong> : notre messagerie, qui
+              reçoit les courriels de notification de vos messages.
             </li>
             <li>
               <strong className="text-[var(--foreground)]">Cloudflare Turnstile</strong> : vérification
@@ -183,14 +257,14 @@ export default async function PolitiquePage() {
             sensible à ces fournisseurs.
           </p>
 
-          <h2 className="mt-8 text-xl font-semibold">9. Sécurité</h2>
+          <h2 className="mt-8 text-xl font-semibold">10. Sécurité</h2>
           <p className="mt-3 text-[var(--muted-foreground)]">
             Vos données sont stockées de manière sécurisée via Supabase et protégées par des mesures
             de sécurité conformes aux standards de l’industrie (chiffrement, authentification, contrôle
             d’accès).
           </p>
 
-          <h2 className="mt-8 text-xl font-semibold">10. Contact</h2>
+          <h2 className="mt-8 text-xl font-semibold">11. Contact</h2>
           <p className="mt-3 text-[var(--muted-foreground)]">
             Pour toute question relative à cette politique :{" "}
             <a href="mailto:info@norvika.ca" className="underline">
