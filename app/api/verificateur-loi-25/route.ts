@@ -20,8 +20,10 @@ import { CHAMP_ADRESSE, type ReponseVerificateur } from "@/lib/verificateur/type
  *
  * Réponses d'erreur : { error, code }. `error` est un repli lisible ; la page affiche le texte du
  * Studio correspondant à `code` (zéro texte en dur à l'écran).
- * Aucun renseignement n'est conservé : ni l'adresse soumise, ni le rapport. Le journal du Worker
- * ne note que le résultat chiffré et la durée, jamais l'adresse.
+ * Rien n'est écrit dans nos bases (ni l'adresse soumise, ni le rapport) et le journal du Worker ne
+ * note que le résultat chiffré, la durée et un code d'erreur, jamais l'adresse. ⚠️ Cloudflare, lui,
+ * affiche les adresses visitées dans l'onglet « Runs » de Browser Run, pour une durée non
+ * documentée (constat de Sentinel, 2026-11-19) : la mention de collecte et la politique le disent.
  */
 
 /** Le widget Turnstile du vérificateur (components/verificateur/Verificateur.tsx) et ses hôtes. */

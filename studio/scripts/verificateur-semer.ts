@@ -41,8 +41,9 @@ const doc = {
   champLibelle: 'Adresse de votre site',
   champExemple: 'exemple.ca',
   bouton: 'Lancer la vérification',
+  // Corrigée le 2026-11-19 (Martin, correction n° 1) : voir scripts/verificateur-corrections-2026-11-19.ts.
   mentionCollecte:
-    "Quand vous lancez une vérification, Norvika reçoit l'adresse entrée et l'adresse IP de votre appareil. L'adresse sert seulement à faire l'analyse et n'est enregistrée dans aucune de nos bases de données. Votre adresse IP sert à limiter le nombre d'analyses : nous en gardons une forme brouillée au plus 24 heures, chez Supabase. Comme pour toute visite du site, les deux peuvent rester jusqu'à 7 jours dans les journaux techniques de Cloudflare, qui fait aussi l'analyse et la vérification anti-robot. Ces fournisseurs peuvent traiter ces renseignements hors du Québec. Pour consulter ou faire corriger vos renseignements, ou retirer votre consentement : info@norvika.ca. Détails dans notre politique de confidentialité.",
+    "Quand vous lancez une vérification, Norvika reçoit l'adresse entrée et l'adresse IP de votre appareil. L'adresse sert seulement à faire l'analyse et n'est enregistrée dans aucune de nos bases de données. Cloudflare, qui fait l'analyse, garde toutefois la liste des adresses visitées dans notre tableau de bord, pour une durée qu'il ne précise pas. Votre adresse IP sert à limiter le nombre d'analyses : nous en gardons une forme brouillée au plus 24 heures, chez Supabase. Comme pour toute visite du site, elle reste aussi jusqu'à 7 jours dans les journaux techniques de Cloudflare, qui fait la vérification anti-robot. Ces fournisseurs peuvent traiter ces renseignements hors du Québec. Pour consulter ou faire corriger vos renseignements, ou retirer votre consentement : info@norvika.ca. Détails dans notre politique de confidentialité.",
   mentionLien: 'politique de confidentialité',
   listeTitre: 'Les 8 points vérifiés', // Mattew
   invisibleTitre: 'Ce que ce test ne peut pas voir',

@@ -79,15 +79,18 @@ export default async function PolitiquePage() {
           <h2 className="mt-8 text-xl font-semibold">4. Vérificateur Loi 25</h2>
           <p className="mt-3 text-[var(--muted-foreground)]">
             Notre vérificateur Loi 25 (norvika.ca/verificateur-loi-25) visite automatiquement le site dont
-            vous entrez l’adresse et relève des signaux visibles de l’extérieur. Voici ce qu’il recueille
-            et ce que nous en faisons.
+            vous entrez l’adresse, puis la page de politique de confidentialité vers laquelle ce site
+            renvoie, même si elle est hébergée sur un autre domaine. Il relève des signaux visibles de
+            l’extérieur. Il ne vous demande pas de courriel. Voici ce qu’il recueille et ce que nous en
+            faisons.
           </p>
           <ul className="mt-3 list-disc pl-5 text-[var(--muted-foreground)]">
             <li>
               <strong className="text-[var(--foreground)]">Adresse du site analysé.</strong> Elle sert
               uniquement à faire l’analyse et à afficher le résultat. Elle n’est enregistrée dans aucune de
-              nos bases de données. Elle peut rester au plus 7 jours dans les journaux techniques de notre
-              hébergeur, Cloudflare.
+              nos bases de données. Cloudflare, qui fait l’analyse, garde toutefois la liste des adresses
+              visitées (le site analysé et sa page de politique) dans notre tableau de bord, pour une durée
+              qu’il ne précise pas. Nous ne nous servons pas de cette liste.
             </li>
             <li>
               <strong className="text-[var(--foreground)]">Adresse IP.</strong> Nous la gardons sous une
@@ -103,8 +106,8 @@ export default async function PolitiquePage() {
               <strong className="text-[var(--foreground)]">Où se fait l’analyse.</strong> La visite du site
               analysé est faite par un navigateur automatique de Cloudflare (Browser Run), depuis le réseau
               mondial de Cloudflare, qui peut se trouver à l’extérieur du Québec. Le contenu des pages
-              visitées sert seulement à produire le résultat : ni nous ni Cloudflare ne le conservons après
-              l’analyse. Si la politique analysée nomme une personne, ce nom sert seulement à constater
+              visitées sert seulement à produire le résultat : ni nous ni Cloudflare ne conservons ce
+              contenu après l’analyse. Si la politique analysée nomme une personne, ce nom sert seulement à constater
               qu’un responsable est désigné ; il n’est ni affiché ni conservé.
             </li>
             <li>
@@ -206,7 +209,8 @@ export default async function PolitiquePage() {
           <ul className="mt-3 list-disc pl-5 text-[var(--muted-foreground)]">
             <li>
               <strong className="text-[var(--foreground)]">Supabase</strong> : conservation des
-              messages envoyés par les formulaires du site
+              messages envoyés par les formulaires du site, et de l’adresse IP brouillée qui sert à limiter
+              le nombre d’envois et d’analyses (24 heures au plus)
             </li>
             <li>
               <strong className="text-[var(--foreground)]">Resend</strong> : acheminement des
@@ -218,7 +222,8 @@ export default async function PolitiquePage() {
             </li>
             <li>
               <strong className="text-[var(--foreground)]">Cloudflare Browser Run</strong> : visite
-              automatique des sites soumis au vérificateur Loi 25
+              automatique des sites soumis au vérificateur Loi 25. La liste des adresses visitées reste
+              affichée dans notre tableau de bord Cloudflare, pour une durée que Cloudflare ne précise pas.
             </li>
             <li>
               <strong className="text-[var(--foreground)]">Sanity</strong> : gestion du contenu du site. Les
