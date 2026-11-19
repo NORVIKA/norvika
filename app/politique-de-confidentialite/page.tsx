@@ -9,7 +9,9 @@ const TITRE = "Politique de confidentialité";
 // ⚠️ À METTRE AU JOUR LE JOUR DE LA MISE EN LIGNE du vérificateur Loi 25 (préparé le 2026-11-18,
 // textes de Martin, contenu/verificateur-loi25-textes.md sections 4 et 5) : les ajouts sur l'outil
 // seraient faux tant qu'il n'est pas en ligne.
-const MISE_A_JOUR = "18 novembre 2026";
+// Date de la version EN LIGNE aujourd'hui. Elle se fixe le jour de la mise en ligne (Pixel,
+// 2026-11-19), pas avant : c'est cette ligne qui change à ce moment-là.
+const MISE_A_JOUR = "14 novembre 2026";
 // Jamais « conforme à la Loi 25 » : c'est l'auto-attestation que le vérificateur Loi 25 refuse de
 // faire, sur le site qui l'offre (Martin, 2026-11-18, point B).
 const DESCRIPTION = "Politique de confidentialité de Norvika : renseignements recueillis, utilisation, fournisseurs, conservation et vos droits.";
@@ -265,7 +267,7 @@ export default async function PolitiquePage() {
           <h2 className="mt-8 text-xl font-semibold">10. Sécurité</h2>
           <p className="mt-3 text-[var(--muted-foreground)]">
             Vos données sont stockées de manière sécurisée via Supabase et protégées par des mesures
-            de sécurité conformes aux standards de l’industrie (chiffrement, authentification, contrôle
+            de sécurité reconnues dans l’industrie (chiffrement, authentification, contrôle
             d’accès).
           </p>
 

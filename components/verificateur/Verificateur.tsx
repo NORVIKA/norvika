@@ -42,7 +42,7 @@ const DELAI_NAVIGATEUR_MS = 45_000;
 
 /** Code d'erreur de la route → texte du Studio. Un code inconnu donne « indisponible ». */
 const ERREURS: Record<string, keyof PageVerificateur> = {
-  vide: "erreurAdresse",
+  vide: "erreurVide",
   "trop-longue": "erreurAdresse",
   forme: "erreurAdresse",
   protocole: "erreurAdresse",
@@ -50,6 +50,8 @@ const ERREURS: Record<string, keyof PageVerificateur> = {
   identifiants: "erreurAdresse",
   ip: "erreurAdresse",
   corps: "erreurAdresse",
+  // Le site emploie des moyens que l'outil ne peut pas surveiller : arrêt sans résultat, pas une panne.
+  incompatible: "erreurIncompatible",
   "nom-local": "erreurPrivee",
   privee: "erreurPrivee",
   refusee: "erreurPrivee",
@@ -168,7 +170,8 @@ export function Verificateur({ t, lienRendezVous }: { t: PageVerificateur; lienR
     if (phase.nom === "analyse") return;
     const formulaire = e.currentTarget;
     const saisie = adresse.trim();
-    if (!saisie || saisie.length > LONGUEUR_MAX_ADRESSE) return montrerErreur(t.erreurAdresse);
+    if (!saisie) return montrerErreur(apostrophes(t.erreurVide));
+    if (saisie.length > LONGUEUR_MAX_ADRESSE) return montrerErreur(t.erreurAdresse);
     const jeton = lireJetonAntiRobot(formulaire);
     if (!jeton) return montrerErreur(t.erreurAntiRobot);
 

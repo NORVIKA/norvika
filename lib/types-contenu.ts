@@ -382,6 +382,7 @@ export type PageVerificateur = DocumentPage & {
   analyseTexte: string;
   analyseEtapes: string[];
   analyseAnnonce: string;
+  erreurVide: string;
   erreurAdresse: string;
   erreurPrivee: string;
   erreurInjoignable: string;
@@ -390,6 +391,7 @@ export type PageVerificateur = DocumentPage & {
   erreurLimite: string;
   erreurAntiRobot: string;
   erreurIndisponible: string;
+  erreurIncompatible: string;
   etatACorriger: string;
   etatAVerifier: string;
   etatEnPlace: string;

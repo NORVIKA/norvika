@@ -77,6 +77,7 @@ const doc = {
     'Préparation du résultat',
   ],
   analyseAnnonce: 'Analyse en cours, comptez de 10 à 20 secondes.',
+  erreurVide: "Inscrivez l'adresse de votre site, par exemple votreentreprise.ca.", // Pixel et Mattew, 2026-11-19
   erreurAdresse: 'Cette adresse ne ressemble pas à une adresse de site web. Entrez-la sous la forme exemple.ca ou https://www.exemple.ca.',
   erreurPrivee: 'Nous analysons seulement les sites publics. Cette adresse mène à un réseau privé ou local.',
   erreurInjoignable: "Nous n'avons pas pu joindre {domaine}. Vérifiez l'adresse (avec ou sans www) et que le site est en ligne, puis réessayez.",
@@ -86,6 +87,7 @@ const doc = {
   erreurLimite: 'Vous avez lancé 3 vérifications dans la dernière heure. Réessayez un peu plus tard.',
   erreurAntiRobot: "La vérification anti-robot n'a pas abouti. Rechargez la page et réessayez.",
   erreurIndisponible: 'Le vérificateur est indisponible pour le moment. Réessayez plus tard, ou écrivez-nous à info@norvika.ca.',
+  erreurIncompatible: 'Notre outil ne peut pas analyser ce site automatiquement en toute sécurité. Plutôt que de vous donner un résultat incomplet, nous préférons ne rien conclure. Écrivez-nous à info@norvika.ca : nous le vérifierons nous-mêmes.', // Mattew, 2026-11-19, à faire relire par Martin
 
   /* Le résultat (Martin, section 3 ; libellés d'état et de preuve : Mattew) */
   etatACorriger: 'À corriger',

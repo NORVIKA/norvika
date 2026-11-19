@@ -118,6 +118,7 @@ export const pageVerificateurLoi25 = defineType({
     }),
     ...(
       [
+        ['erreurVide', 'Champ vide', 'La personne a lancé la vérification sans inscrire d’adresse.'],
         ['erreurAdresse', 'Adresse invalide', 'L’adresse ne ressemble pas à celle d’un site web.'],
         ['erreurPrivee', 'Adresse privée ou locale', 'L’adresse mène à un réseau privé ou local.'],
         ['erreurInjoignable', 'Site injoignable', 'Le site ne répond pas, ou le nom de domaine n’existe pas. {domaine} est remplacé par le nom du site.'],
@@ -126,6 +127,11 @@ export const pageVerificateurLoi25 = defineType({
         ['erreurLimite', 'Limite atteinte', 'Trois analyses dans la dernière heure depuis le même appareil.'],
         ['erreurAntiRobot', 'Vérification anti-robot échouée', 'La vérification anti-robot n’a pas abouti.'],
         ['erreurIndisponible', 'Vérificateur indisponible', 'Panne, quota de Cloudflare atteint, trop d’analyses en même temps.'],
+        [
+          'erreurIncompatible',
+          'Analyse impossible pour ce site',
+          'Le site emploie des moyens que l’outil ne peut pas surveiller en sécurité : l’analyse est arrêtée, sans résultat. Ce n’est pas une panne, réessayer ne changera rien.',
+        ],
       ] as const
     ).map(([name, title, quand]) => paragraphe(name, title, `Message affiché quand : ${quand.charAt(0).toLowerCase()}${quand.slice(1)}`, { group: 'analyse', rows: 2 })),
 
