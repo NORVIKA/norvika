@@ -217,26 +217,56 @@ const SCRIPT_BARRIERE = `(function () {
   // N2 : une iframe sandbox sans allow-same-origin et sans adresse http(s) (srcdoc, data:, blob:,
   // about:) part dans un autre processus que Chrome ne met PAS en pause : aucune barrière n'y
   // entre à temps. Elle est retirée du document dès son insertion, avant que sa navigation aboutisse.
-  // Fonctions natives gardées avant tout script du site (il ne peut plus les remplacer).
+  // H1 (Sentinel, passe 3) : l'observateur n'emploie QUE des fonctions natives prises ici, avant
+  // tout script du site : getters lus par descripteur, appels par Reflect.apply (jamais .call),
+  // RegExp.prototype.exec, aucune méthode de chaîne. Le site ne peut plus les remplacer.
+  // H2 : attachShadow est enveloppé, pour observer aussi chaque shadow root créé par script
+  // (ouvert ou fermé). Le shadow root déclaratif et une boucle qui retarde l'observateur restent
+  // au filet du moteur (cadre attaché sans pause = visite arrêtée) : c'est accepté.
   try {
     if (typeof document === "undefined" || typeof MutationObserver === "undefined") return;
-    var MO = MutationObserver, E = Element.prototype, retirer = E.remove, attr = E.getAttribute, a = E.hasAttribute, qsa = E.querySelectorAll;
+    var appel = Reflect.apply, desc = Object.getOwnPropertyDescriptor, definir = Object.defineProperty;
+    var lire = function (proto, nom) { var d = desc(proto, nom); return d && d.get; };
+    var E = Element.prototype, N = Node.prototype, F = DocumentFragment.prototype, MR = MutationRecord.prototype;
+    var gNodeType = lire(N, "nodeType"), gLocalName = lire(E, "localName"), gAjoutes = lire(MR, "addedNodes");
+    var gType = lire(MR, "type"), gCible = lire(MR, "target"), gLongueur = lire(NodeList.prototype, "length");
+    var retirer = E.remove, attr = E.getAttribute, a = E.hasAttribute, qsaE = E.querySelectorAll, qsaF = F.querySelectorAll;
+    var exec = RegExp.prototype.exec, MO = MutationObserver, observer = MutationObserver.prototype.observe, attache = E.attachShadow;
+    var MEME_ORIGINE = /(^|[^a-z-])allow-same-origin([^a-z-]|$)/i, HTTP = /^https?:/i;
+    var OPTIONS = { childList: true, subtree: true, attributes: true, attributeFilter: ["sandbox", "srcdoc", "src"] };
     var suspecte = function (el) {
-      if (!el || el.nodeType !== 1 || String(el.tagName).toUpperCase() !== "IFRAME" || !a.call(el, "sandbox")) return false;
-      if (/(^|\\s)allow-same-origin(\\s|$)/i.test(attr.call(el, "sandbox") || "")) return false;
-      return a.call(el, "srcdoc") || !/^https?:/i.test(attr.call(el, "src") || "");
+      if (!el || appel(gNodeType, el, []) !== 1 || appel(gLocalName, el, []) !== "iframe" || !appel(a, el, ["sandbox"])) return false;
+      if (appel(exec, MEME_ORIGINE, [appel(attr, el, ["sandbox"]) || ""]) !== null) return false;
+      return appel(a, el, ["srcdoc"]) || appel(exec, HTTP, [appel(attr, el, ["src"]) || ""]) === null;
     };
     var nettoyer = function (n) {
-      if (suspecte(n)) { retirer.call(n); return; }
-      if (n && n.nodeType === 1) { var l = qsa.call(n, "iframe[sandbox]"); for (var j = 0; j < l.length; j++) if (suspecte(l[j])) retirer.call(l[j]); }
+      if (!n) return;
+      if (suspecte(n)) { appel(retirer, n, []); return; }
+      var t = appel(gNodeType, n, []);
+      if (t !== 1 && t !== 11) return;
+      var l = appel(t === 1 ? qsaE : qsaF, n, ["iframe[sandbox]"]), nb = appel(gLongueur, l, []);
+      for (var j = 0; j < nb; j++) if (suspecte(l[j])) appel(retirer, l[j], []);
     };
-    new MO(function (liste) {
+    var mo = new MO(function (liste) {
       for (var i = 0; i < liste.length; i++) {
         var m = liste[i];
-        if (m.type === "attributes") nettoyer(m.target);
-        else for (var k = 0; k < m.addedNodes.length; k++) nettoyer(m.addedNodes[k]);
+        if (appel(gType, m, []) === "attributes") { nettoyer(appel(gCible, m, [])); continue; }
+        var ajoutes = appel(gAjoutes, m, []), nb = appel(gLongueur, ajoutes, []);
+        for (var k = 0; k < nb; k++) nettoyer(ajoutes[k]);
       }
-    }).observe(document, { childList: true, subtree: true, attributes: true, attributeFilter: ["sandbox", "srcdoc", "src"] });
+    });
+    appel(observer, mo, [document, OPTIONS]);
+    if (attache) {
+      definir(E, "attachShadow", {
+        configurable: false,
+        writable: false,
+        value: function attachShadow() {
+          var racine = appel(attache, this, arguments);
+          try { appel(observer, mo, [racine, OPTIONS]); } catch (e) {}
+          return racine;
+        },
+      });
+    }
   } catch (e) {}
 })();`;
 
