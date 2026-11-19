@@ -152,7 +152,8 @@ export async function verifierDebit(
  * Workers Paid. Le tout dans UNE fonction Postgres, sous verrou : aucune course.
  *   - « ok » : l'analyse est comptee et permise ;
  *   - « ip » : trop d'analyses depuis cette adresse (ou ce /64) dans l'heure ;
- *   - « quota » : le plafond du jour ou du mois est atteint, pour tout le monde ;
+ *   - « quota » : le plafond du jour ou du mois est atteint, ou 5 analyses sont deja en cours
+ *     (verrou global, donc atomique : N3 de Sentinel), pour tout le monde ;
  *   - « panne » : compteur injoignable, OU fonction pas encore creee (SQL a passer par William,
  *     supabase/migration-2026-11-19-verificateur-plafonds.sql). FERME dans les deux cas : sans
  *     plafond, chaque analyse ouvre un navigateur Browser Run facture a notre compte, celui qui
@@ -177,7 +178,9 @@ export async function verifierDebitVerificateur(req: Request): Promise<DebitVeri
     }
     if (data === "ok") return "ok";
     if (data === "ip") return "ip";
-    if (data === "jour" || data === "mois") return "quota";
+    // « simultanes » : 5 analyses en cours ou plus (N3 de Sentinel, fichier SQL du 2026-11-19 b).
+    if (data === "jour" || data === "mois" || data === "simultanes") return "quota";
+    // Toute autre valeur : refus (fermé en cas de doute).
     return "panne";
   } catch (e) {
     console.error("[verificateur] compteur indisponible :", e instanceof Error ? e.message.slice(0, 120) : "erreur");
