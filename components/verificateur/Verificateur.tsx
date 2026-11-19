@@ -264,7 +264,7 @@ export function Verificateur({ t, lienRendezVous }: { t: PageVerificateur; lienR
                 {erreur.texte}
               </p>
             ) : null}
-            <AntiRobot />
+            <AntiRobot action="verificateur" />
             <div className="nv-verif-mention">
               <MentionVerificateur id="verif-mention" texte={t.mentionCollecte} lien={t.mentionLien} />
             </div>

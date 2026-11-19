@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 
 import { CHAMP_JETON, verifierAntiRobot } from "@/lib/anti-robot";
 import { champTexte, lireCorpsJson } from "@/lib/garde-formulaire";
-import { verifierDebit } from "@/lib/rate-limit";
+import { verifierDebitVerificateur } from "@/lib/rate-limit";
 import { normaliserAdresse, resoudrePublic } from "@/lib/verificateur/adresse";
 import { analyser } from "@/lib/verificateur/analyse";
 import { ErreurMoteur, observer, type CodeMoteur } from "@/lib/verificateur/moteur";
@@ -24,6 +24,9 @@ import { CHAMP_ADRESSE, type ReponseVerificateur } from "@/lib/verificateur/type
  * ne note que le résultat chiffré et la durée, jamais l'adresse.
  */
 
+/** Le widget Turnstile du vérificateur (components/verificateur/Verificateur.tsx) et ses hôtes. */
+const JETON_ATTENDU = { action: "verificateur", hotes: ["norvika.ca", "www.norvika.ca"] } as const;
+
 // Analyse à la demande : jamais mise en cache, jamais prérendue.
 export const dynamic = "force-dynamic";
 
@@ -43,7 +46,7 @@ const MESSAGES_ADRESSE: Record<string, string> = {
 
 const MESSAGES_MOTEUR: Record<CodeMoteur, { statut: number; message: string }> = {
   indisponible: { statut: 503, message: "Le vérificateur est momentanément indisponible. Réessayez plus tard." },
-  capacite: { statut: 503, message: "Trop de vérifications sont en cours. Réessayez dans une minute." },
+  capacite: { statut: 503, message: "Le vérificateur a atteint sa limite pour le moment. Réessayez plus tard." },
   inaccessible: { statut: 502, message: "Votre site n'a pas répondu à notre navigateur." },
   refusee: { statut: 400, message: "Votre site redirige vers une adresse qui ne peut pas être vérifiée." },
   protege: { statut: 502, message: "Votre site a demandé une vérification anti-robot à notre navigateur." },
@@ -68,19 +71,20 @@ export async function POST(req: Request) {
   const adresse = normaliserAdresse(champTexte(corps.donnees, CHAMP_ADRESSE));
   if (!adresse.ok) return refus(400, MESSAGES_ADRESSE[adresse.code], adresse.code);
 
-  // Anti-robot AVANT la limite de débit et avant tout accès réseau (patron de /api/contact).
-  const antiRobot = await verifierAntiRobot(req, champTexte(corps.donnees, CHAMP_JETON));
+  // Anti-robot AVANT la limite de débit et avant tout accès réseau (patron de /api/contact). Le jeton
+  // doit venir du widget du vérificateur, sur norvika.ca (F5 de Sentinel).
+  const antiRobot = await verifierAntiRobot(req, champTexte(corps.donnees, CHAMP_JETON), JETON_ATTENDU);
   if (!antiRobot.ok) return refus(antiRobot.statut, antiRobot.erreur, `anti-robot-${antiRobot.statut}`);
 
-  // 3 analyses par IP par heure. Compteur fermé en cas de panne : un navigateur coûte du temps de
-  // Browser Run, et Turnstile seul ne suffit pas à le protéger (voir lib/rate-limit.ts).
+  // 3 analyses par IP (ou /64) par heure, et plafond GLOBAL de 200 par jour et 1 500 par mois
+  // (Sentinel, E1). Fermé en cas de panne, et tant que la fonction SQL n'est pas créée.
   // Seule exception : le poste local (next dev, aperçu wrangler), qui n'a pas la clé Supabase. Le
   // nom d'hôte ne peut pas être forgé en production : Cloudflare n'achemine vers ce Worker que les
   // requêtes adressées à norvika.ca (même raisonnement que les clés de test Turnstile).
-  const debit = await verifierDebit(req, "verificateur", { fermeSiPanne: !hoteLocal(req) });
-  if (!debit.permis) {
-    return refus(debit.panne ? 503 : 429, debit.raison ?? "Réessayez dans une heure.", debit.panne ? "debit-panne" : "debit");
-  }
+  const debit = hoteLocal(req) ? "ok" : await verifierDebitVerificateur(req);
+  if (debit === "ip") return refus(429, "Vous avez lancé 3 vérifications dans la dernière heure.", "debit");
+  if (debit === "quota") return refus(503, MESSAGES_MOTEUR.capacite.message, "capacite");
+  if (debit === "panne") return refus(503, MESSAGES_MOTEUR.indisponible.message, "debit-panne");
 
   const resolution = await resoudrePublic(adresse.url.hostname);
   if (!resolution.ok) return refus(400, MESSAGES_ADRESSE[resolution.code], resolution.code);
@@ -94,7 +98,7 @@ export async function POST(req: Request) {
     const code: CodeMoteur = e instanceof ErreurMoteur ? e.code : "indisponible";
     // Au journal : le code d'erreur et un code technique court (net::ERR_..., HTTP 404), JAMAIS
     // l'adresse visitée ni un message libre qui pourrait la contenir (EFVP de Martin, 2026-11-18).
-    const detail = e instanceof ErreurMoteur && /^(ERR_[A-Z_]+|HTTP \d{3}|TIMEOUT|AUTRE)$/.test(e.message) ? e.message : undefined;
+    const detail = e instanceof ErreurMoteur && /^(ERR_[A-Z_]+|HTTP \d{3}|TIMEOUT|AUTRE|WORKER|REBINDING|SIMULTANES|LANCEMENT)$/.test(e.message) ? e.message : undefined;
     console.warn("[verificateur] analyse impossible", JSON.stringify({ code, detail, duree: Date.now() - debut }));
     const { statut, message } = MESSAGES_MOTEUR[code];
     return refus(statut, message, code);

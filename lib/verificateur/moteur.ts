@@ -10,14 +10,23 @@
  * en secret sur le Worker ; la liaison n'en demande aucun (elle est le droit d'accès). Forfait
  * Workers Paid : 10 h de navigateur par mois incluses (environ 1 800 visites de 20 s).
  *
- * SÉCURITÉ (revue Sentinel) : chaque requête du navigateur, redirections comprises, passe par
- * l'interception et par la garde de lib/verificateur/adresse.ts (forme, puis DNS) AVANT de partir.
- * Refusé : tout ce qui n'est pas http(s), tout port autre que 80 et 443, toute adresse privée ou
- * réservée, tout nom local. Les fenêtres surgissantes sont neutralisées (window.open) et fermées,
- * les service workers contournés (sinon leurs requêtes échapperaient à l'interception).
- * Limites connues, notées pour Sentinel : les WebSockets ne passent pas par l'interception de
- * Puppeteer ; le rebinding DNS (voir resoudrePublic). Aucune réponse brute n'est rendue au
- * visiteur : seulement des signaux (noms de témoins, domaines, oui ou non).
+ * SÉCURITÉ (revue de Sentinel du 2026-11-19, constats E2, M1, M2, F1, F2 corrigés ici) :
+ *   - chaque requête du navigateur, redirections comprises, passe par l'interception et par la garde
+ *     de lib/verificateur/adresse.ts (forme, puis DNS) AVANT de partir : http(s) seulement, ports
+ *     80 et 443, aucune adresse privée ou réservée, aucun nom local ;
+ *   - ce que l'interception de Puppeteer NE voit PAS est retiré avant tout script du site, dans
+ *     chaque cadre : WebSocket (aussi bloqué au niveau réseau, ws:// et wss://), WebTransport,
+ *     SharedWorker, Worker, WebRTC, service workers, window.open. Une cible worker ou service worker
+ *     qui apparaît quand même arrête la visite (E2) ;
+ *   - chaque réponse est contrôlée sur son adresse IP réelle : une adresse privée (rebinding DNS)
+ *     arrête la visite (M1) ;
+ *   - 400 requêtes au plus par visite ; après les 8 s, seule la page de politique et ce qui vient de
+ *     son propre domaine passent (M2) ;
+ *   - le navigateur est fermé même si le visiteur coupe la connexion, par waitUntil (F1) ;
+ *   - les scripts de lecture tournent dans un monde ISOLÉ (le site ne peut pas falsifier leurs
+ *     fonctions), et leur résultat est revérifié ici, type et longueur (F2).
+ * Aucune réponse brute n'est rendue au visiteur : seulement des signaux (noms de témoins,
+ * domaines, oui ou non).
  *
  * ⚠️ Le code exécuté DANS la page est une CHAÎNE (SCRIPT_ACCUEIL, SCRIPT_TEXTE), pas une fonction :
  * la construction (Next, puis esbuild d'OpenNext) réécrit les fonctions et peut y glisser des
@@ -28,7 +37,7 @@ import "server-only";
 import puppeteer, { type Browser, type HTTPRequest, type Page } from "@cloudflare/puppeteer";
 import { getCloudflareContext } from "@opennextjs/cloudflare";
 
-import { creerGardeReseau } from "./adresse";
+import { creerGardeReseau, ipReservee } from "./adresse";
 import type { Observations, Requete, Temoin } from "./analyse";
 import {
   ADRESSE_POLITIQUE,
@@ -44,7 +53,10 @@ const BUDGET_MS = 30_000;
 const OBSERVATION_MS = 8_000;
 const DELAI_ACCUEIL_MS = 12_000;
 const DELAI_POLITIQUE_MS = 7_000;
+/** Requêtes au plus par visite (M2) : au-delà, tout est refusé, pas seulement non noté. */
 const MAX_REQUETES = 400;
+/** Navigateurs en même temps pour tout le compte (souhait de Sentinel, E1) : au-delà, « capacite ». */
+const MAX_SIMULTANES = 5;
 const MAX_TEMOINS = 200;
 const MAX_TEXTE_POLITIQUE = 200_000;
 
@@ -181,8 +193,23 @@ const SCRIPT_ACCUEIL = `(function (args) {
   return { outils: outils, maison: maison, refus: texteRefus, lien: lien, defi: defi };
 })`;
 
-/** Texte lisible d'une page (la politique), plafonné. */
+/** Texte lisible d'une page (la politique), plafonné dans la page. */
 const SCRIPT_TEXTE = `(function (max) { return ((document.body && document.body.innerText) || "").slice(0, max); })`;
+
+/**
+ * Lancé dans CHAQUE document et chaque cadre, AVANT tout script du site (E2 de Sentinel) : retire
+ * ce qui échappe à l'interception de Puppeteer. Validé par le banc d'essai de Sentinel (0
+ * contournement, cadres vides et cadres d'un autre site compris). Effet connu : un site qui déplace
+ * Google Analytics dans un Worker (Partytown) est moins bien lu, ce qui reste rare.
+ */
+const SCRIPT_BARRIERE = `(function () {
+  try { window.open = function () { return null; }; } catch (e) {}
+  var cles = ["WebSocket", "WebTransport", "SharedWorker", "Worker", "RTCPeerConnection", "webkitRTCPeerConnection", "RTCDataChannel"];
+  for (var i = 0; i < cles.length; i++) {
+    try { delete window[cles[i]]; Object.defineProperty(window, cles[i], { value: undefined, configurable: false, writable: false }); } catch (e) {}
+  }
+  try { Object.defineProperty(Navigator.prototype, "serviceWorker", { get: function () { return undefined; }, configurable: false }); } catch (e) {}
+})();`;
 
 type ResultatAccueil = {
   outils: string[];
@@ -191,6 +218,59 @@ type ResultatAccueil = {
   lien: { texte: string; url: string } | null;
   defi: boolean;
 };
+
+const NOMS_OUTILS = new Set(OUTILS_CONSENTEMENT.map((o) => o.nom));
+
+/**
+ * Revérifie ici ce que le script de lecture a rendu (F2) : types, valeurs permises, longueurs.
+ * Même dans un monde isolé, la page contrôle le DOM lu ; rien de ce qui en sort n'est cru tel quel.
+ */
+function lireResultatAccueil(brut: unknown): ResultatAccueil {
+  const o = brut && typeof brut === "object" ? (brut as Record<string, unknown>) : {};
+  const texte = (v: unknown, max: number) => (typeof v === "string" ? v.slice(0, max) : null);
+  let lien: ResultatAccueil["lien"] = null;
+  if (o.lien && typeof o.lien === "object") {
+    const l = o.lien as Record<string, unknown>;
+    const adresse = texte(l.url, 500);
+    try {
+      if (adresse && /^https?:$/.test(new URL(adresse).protocol)) lien = { texte: texte(l.texte, 120) ?? "", url: adresse };
+    } catch {
+      lien = null;
+    }
+  }
+  return {
+    outils: Array.isArray(o.outils) ? o.outils.filter((x): x is string => typeof x === "string" && NOMS_OUTILS.has(x)).slice(0, 5) : [],
+    maison: o.maison === true,
+    refus: texte(o.refus, 60),
+    lien,
+    defi: o.defi === true,
+  };
+}
+
+/**
+ * Évalue `expression` dans un monde ISOLÉ du cadre principal (F2) : le site partage le DOM avec ce
+ * monde, pas ses objets JavaScript. Il ne peut donc ni redéfinir `String.prototype.slice` ni
+ * `RegExp` pour fausser la lecture. Valeur rendue par copie, délai de 3 s.
+ */
+async function evaluerIsole(page: Page, expression: string): Promise<unknown> {
+  const session = await page.target().createCDPSession();
+  try {
+    const { frameTree } = await session.send("Page.getFrameTree");
+    const { executionContextId } = await session.send("Page.createIsolatedWorld", {
+      frameId: frameTree.frame.id,
+      worldName: "verificateur-norvika",
+    });
+    const reponse = await session.send("Runtime.evaluate", {
+      expression,
+      contextId: executionContextId,
+      returnByValue: true,
+      timeout: 3_000,
+    });
+    return reponse.exceptionDetails ? null : (reponse.result.value ?? null);
+  } finally {
+    await session.detach().catch(() => undefined);
+  }
+}
 
 /** Code d'erreur de Chrome dans un message (net::ERR_NAME_NOT_RESOLVED...). */
 function erreurReseau(e: unknown): string {
@@ -225,16 +305,32 @@ async function sonderHttp(hote: string, garde: (h: string) => Promise<boolean>):
   return "inconnu";
 }
 
-async function liaison(): Promise<LiaisonNavigateur> {
+type Contexte = { navigateur: LiaisonNavigateur; attendre: (promesse: Promise<unknown>) => void };
+
+async function contexte(): Promise<Contexte> {
   let env: Record<string, unknown> = {};
+  let attendre: Contexte["attendre"] = () => undefined;
   try {
-    env = (await getCloudflareContext({ async: true })).env as unknown as Record<string, unknown>;
+    const cf = await getCloudflareContext({ async: true });
+    env = cf.env as unknown as Record<string, unknown>;
+    attendre = (promesse) => cf.ctx.waitUntil(promesse);
   } catch {
     // Hors du Worker (next start sans OpenNext) : aucune liaison.
   }
   const navigateur = env.BROWSER as LiaisonNavigateur | undefined;
   if (!navigateur || typeof navigateur.fetch !== "function") throw new ErreurMoteur("indisponible", "liaison BROWSER absente");
-  return navigateur;
+  return { navigateur, attendre };
+}
+
+/** Au plus MAX_SIMULTANES navigateurs à la fois. Si Browser Run ne répond pas, la base plafonne déjà. */
+async function verifierCapacite(navigateur: LiaisonNavigateur): Promise<void> {
+  let actives: number | null = null;
+  try {
+    actives = (await puppeteer.limits(navigateur)).activeSessions.length;
+  } catch {
+    actives = null;
+  }
+  if (actives !== null && actives >= MAX_SIMULTANES) throw new ErreurMoteur("capacite", "SIMULTANES");
 }
 
 /** Lance le navigateur et traduit un refus de Browser Run (quota, trop de navigateurs à la fois). */
@@ -243,10 +339,16 @@ async function lancer(navigateur: LiaisonNavigateur): Promise<Browser> {
     return await puppeteer.launch(navigateur, { keep_alive: 60_000 });
   } catch (e) {
     const message = e instanceof Error ? e.message : String(e);
-    if (/429|rate limit|too many|limit|quota/i.test(message)) throw new ErreurMoteur("capacite", message.slice(0, 200));
-    throw new ErreurMoteur("indisponible", message.slice(0, 200));
+    if (/429|rate limit|too many|limit|quota/i.test(message)) throw new ErreurMoteur("capacite", "LANCEMENT");
+    throw new ErreurMoteur("indisponible", "LANCEMENT");
   }
 }
+
+/** Un nom d'hôte sans « www. » : la politique de exemple.ca peut rediriger vers www.exemple.ca. */
+const sansWww = (hote: string) => hote.toLowerCase().replace(/^www\./, "");
+
+/** Les moments d'une visite, pour le filtre des requêtes (M2). */
+type Moment = "accueil" | "entre" | "politique";
 
 /**
  * Visite `url` et rend ce que le navigateur a vu. `url` a déjà passé normaliserAdresse ET
@@ -258,27 +360,50 @@ export async function observer(url: URL): Promise<Observations> {
   const restant = () => echeance - Date.now();
   const garde = creerGardeReseau();
   const requetes: Requete[] = [];
-  let enregistrer = true;
+  let moment: Moment = "accueil";
+  let hotePolitique = "";
+  let compte = 0;
+  let motifArret: string | null = null;
   let browser: Browser | null = null;
   let minuterie: ReturnType<typeof setTimeout> | undefined;
+  let terminer: () => void = () => undefined;
+  const terminee = new Promise<void>((r) => (terminer = r));
 
   // La sonde http part en même temps que le navigateur : elle ne lui coûte rien.
   const sonde = sonderHttp(url.hostname, garde);
 
   try {
-    browser = await lancer(await liaison());
+    const { navigateur, attendre } = await contexte();
+    await verifierCapacite(navigateur);
+    browser = await lancer(navigateur);
     const actif = browser;
-    // Filet de sécurité : à l'échéance, le navigateur est fermé de force, ce qui fait échouer
-    // l'étape en cours. Le `finally` ferme aussi, dans tous les autres cas.
+    const arreter = (motif: string) => {
+      if (motifArret) return;
+      motifArret = motif;
+      void actif.close().catch(() => undefined);
+    };
+
+    // F1 : si le visiteur coupe, la requête est annulée et le `finally` peut ne jamais tourner.
+    // waitUntil garde le Worker en vie le temps de fermer le navigateur (sinon facturé 60 s).
+    attendre(Promise.race([terminee, new Promise((r) => setTimeout(r, BUDGET_MS + 2_000))]).then(() => actif.close().catch(() => undefined)));
+    // Filet de sécurité : à l'échéance, le navigateur est fermé de force.
     minuterie = setTimeout(() => void actif.close().catch(() => undefined), Math.max(0, restant()));
 
-    // Une fenêtre surgissante ouverte par le site aurait ses propres requêtes, hors interception.
     actif.on("targetcreated", (cible) => {
-      if (cible.type() !== "page" || !cible.opener()) return;
-      void cible
-        .page()
-        .then((p) => p?.close())
-        .catch(() => undefined);
+      const type = cible.type();
+      // E2 : un worker partagé ou un service worker DU SITE ferait ses requêtes hors interception.
+      // Ceux de Chrome lui-même (extensions intégrées, chrome-extension://) apparaissent à chaque
+      // lancement, vu au banc d'essai : ils ne viennent pas du site et sont ignorés.
+      if ((type === "service_worker" || type === "shared_worker") && !/^chrome(-extension)?:/.test(cible.url())) {
+        return arreter("WORKER");
+      }
+      // Une fenêtre surgissante aurait ses propres requêtes, hors interception.
+      if (type === "page" && cible.opener()) {
+        void cible
+          .page()
+          .then((p) => p?.close())
+          .catch(() => undefined);
+      }
     });
 
     const page = await actif.newPage();
@@ -286,9 +411,19 @@ export async function observer(url: URL): Promise<Observations> {
     await page.setUserAgent((await actif.userAgent()).replace(/HeadlessChrome/g, "Chrome"));
     await page.setExtraHTTPHeaders({ "Accept-Language": "fr-CA,fr;q=0.9,en;q=0.6" });
     await page.setBypassServiceWorker(true);
-    await page.evaluateOnNewDocument("window.open = function () { return null; };");
+    // E2 : WebSocket bloqué au niveau réseau, puis retiré de la page avec les autres canaux.
+    const reseau = await page.target().createCDPSession();
+    await reseau.send("Network.enable");
+    await reseau.send("Network.setBlockedURLs", { urls: ["ws://*", "wss://*"] });
+    await page.evaluateOnNewDocument(SCRIPT_BARRIERE);
     await page.setRequestInterception(true);
     page.on("request", (requete) => void filtrer(requete));
+    // M1 : l'adresse IP réellement jointe par le navigateur. Notre DNS et le sien peuvent différer
+    // (rebinding) : une réponse venue d'une adresse privée arrête tout, aussitôt.
+    page.on("response", (reponse) => {
+      const ip = reponse.remoteAddress()?.ip;
+      if (ip && ipReservee(ip)) arreter("REBINDING");
+    });
 
     async function filtrer(requete: HTTPRequest) {
       try {
@@ -302,15 +437,18 @@ export async function observer(url: URL): Promise<Observations> {
         if (u.protocol === "data:" || u.protocol === "blob:" || u.href === "about:blank") return await requete.continue();
         if (u.protocol !== "http:" && u.protocol !== "https:") return await requete.abort("blockedbyclient");
         if ((u.port && u.port !== "80" && u.port !== "443") || u.username || u.password) return await requete.abort("blockedbyclient");
-        if (enregistrer && requetes.length < MAX_REQUETES) {
-          requetes.push({ url: u.href.slice(0, 500), hote: u.hostname.toLowerCase(), type: requete.resourceType() });
-        }
+        // M2 : plafond de requêtes, et rien entre l'accueil et la politique ; pendant la politique,
+        // seulement son propre domaine (le document et ce qu'il charge de chez lui).
+        compte += 1;
+        if (compte > MAX_REQUETES || moment === "entre") return await requete.abort("blockedbyclient");
+        if (moment === "politique" && sansWww(u.hostname) !== hotePolitique) return await requete.abort("blockedbyclient");
+        if (moment === "accueil") requetes.push({ url: u.href.slice(0, 500), hote: u.hostname.toLowerCase(), type: requete.resourceType() });
         if (!(await garde(u.hostname))) return await requete.abort("blockedbyclient");
         // Les vidéos sont lourdes et ne disent rien de la Loi 25 : notées, puis coupées.
         if (requete.resourceType() === "media") return await requete.abort("blockedbyclient");
         return await requete.continue();
       } catch {
-        // Page fermée pendant la décision (échéance) : rien à faire.
+        // Page fermée pendant la décision (échéance, arrêt) : rien à faire.
       }
     }
 
@@ -319,19 +457,23 @@ export async function observer(url: URL): Promise<Observations> {
 
     // --- 2. Huit secondes sans aucune interaction --------------------------------------------
     await new Promise((r) => setTimeout(r, Math.max(0, Math.min(OBSERVATION_MS, restant() - 3_000))));
-    enregistrer = false;
+    moment = "entre";
+    if (motifArret) throw new ErreurMoteur("refusee", motifArret);
 
     const temoins = await lireTemoins(page);
-    const accueil = (await page.evaluate(
-      `${SCRIPT_ACCUEIL}(${JSON.stringify({
-        refus: TEXTE_REFUS.source,
-        banniere: TEXTE_BANNIERE.source,
-        politique: TEXTE_POLITIQUE.source,
-        adressePolitique: ADRESSE_POLITIQUE.source,
-        outils: OUTILS_CONSENTEMENT.map((o) => ({ nom: o.nom, selecteurs: o.selecteurs })),
-        fournisseurs: POLITIQUES_DE_FOURNISSEURS,
-      })})`,
-    )) as ResultatAccueil;
+    const accueil = lireResultatAccueil(
+      await evaluerIsole(
+        page,
+        `${SCRIPT_ACCUEIL}(${JSON.stringify({
+          refus: TEXTE_REFUS.source,
+          banniere: TEXTE_BANNIERE.source,
+          politique: TEXTE_POLITIQUE.source,
+          adressePolitique: ADRESSE_POLITIQUE.source,
+          outils: OUTILS_CONSENTEMENT.map((o) => ({ nom: o.nom, selecteurs: o.selecteurs })),
+          fournisseurs: POLITIQUES_DE_FOURNISSEURS,
+        })})`,
+      ),
+    );
     if (accueil.defi) throw new ErreurMoteur("protege");
 
     // Un outil reconnu par le domaine de son script compte autant qu'un sélecteur dans la page.
@@ -340,7 +482,14 @@ export async function observer(url: URL): Promise<Observations> {
     )?.nom;
 
     // --- 3. La politique ----------------------------------------------------------------------
-    const politique = accueil.lien ? await lirePolitique(page, accueil.lien.url, adresseFinale, restant) : null;
+    let politique: Observations["politique"] = null;
+    if (accueil.lien) {
+      hotePolitique = sansWww(new URL(accueil.lien.url).hostname);
+      moment = "politique";
+      politique = await lirePolitique(page, accueil.lien.url, adresseFinale, restant);
+      moment = "entre";
+    }
+    if (motifArret) throw new ErreurMoteur("refusee", motifArret);
 
     return {
       adresse: url.href,
@@ -353,10 +502,12 @@ export async function observer(url: URL): Promise<Observations> {
       https: adresseFinale.startsWith("http://") ? "https-absent" : await sonde,
     };
   } catch (e) {
+    if (motifArret) throw new ErreurMoteur("refusee", motifArret);
     if (e instanceof ErreurMoteur) throw e;
     if (restant() <= 0) throw new ErreurMoteur("delai");
     throw new ErreurMoteur("inaccessible", erreurReseau(e));
   } finally {
+    terminer();
     clearTimeout(minuterie);
     await browser?.close().catch(() => undefined);
   }
@@ -407,14 +558,18 @@ async function ouvrirAccueil(page: Page, url: URL, restant: () => number): Promi
 
 /** Tous les témoins du navigateur, témoins tiers compris (le navigateur est neuf à chaque visite). */
 async function lireTemoins(page: Page): Promise<Temoin[]> {
+  const propres = (liste: { name?: unknown; domain?: unknown }[]) =>
+    liste
+      .filter((c) => typeof c.name === "string" && typeof c.domain === "string")
+      .slice(0, MAX_TEMOINS)
+      .map((c) => ({ nom: String(c.name).slice(0, 80), domaine: String(c.domain).slice(0, 120) }));
   try {
     const session = await page.target().createCDPSession();
-    const { cookies } = (await session.send("Network.getAllCookies")) as { cookies: { name: string; domain: string }[] };
+    const { cookies } = await session.send("Network.getAllCookies");
     await session.detach().catch(() => undefined);
-    return cookies.slice(0, MAX_TEMOINS).map((c) => ({ nom: c.name.slice(0, 80), domaine: c.domain.slice(0, 120) }));
+    return propres(cookies);
   } catch {
-    const cookies = await page.cookies().catch(() => []);
-    return cookies.slice(0, MAX_TEMOINS).map((c) => ({ nom: c.name.slice(0, 80), domaine: c.domain.slice(0, 120) }));
+    return propres(await page.cookies().catch(() => []));
   }
 }
 
@@ -437,6 +592,11 @@ async function lirePolitique(
   }
   if (cible.protocol !== "https:" && cible.protocol !== "http:") return { url: lien, statut: null, texte: null };
   const sansAncre = (a: string) => a.replace(/#.*$/, "");
+  // F2 : le texte est relu dans un monde isolé, puis revérifié ici (type et longueur).
+  const lireTexte = async () => {
+    const brut = await evaluerIsole(page, `${SCRIPT_TEXTE}(${MAX_TEXTE_POLITIQUE})`);
+    return typeof brut === "string" ? brut.slice(0, MAX_TEXTE_POLITIQUE) : "";
+  };
   let statut: number | null = 200;
   try {
     // Une politique sur la même page (ancre, fenêtre) : aucune deuxième visite.
@@ -450,11 +610,11 @@ async function lirePolitique(
       const type = reponse?.headers()["content-type"] ?? "text/html";
       if (statut === null || statut >= 400 || !/html/i.test(type)) return { url: page.url() || cible.href, statut, texte: null };
     }
-    let texte = (await page.evaluate(`${SCRIPT_TEXTE}(${MAX_TEXTE_POLITIQUE})`)) as string;
+    let texte = await lireTexte();
     // Une page bâtie en JavaScript peut être encore vide à « DOMContentLoaded » : une seconde de plus.
     if (texte.length < 500 && restant() > 1_500) {
       await new Promise((r) => setTimeout(r, 1_000));
-      texte = (await page.evaluate(`${SCRIPT_TEXTE}(${MAX_TEXTE_POLITIQUE})`)) as string;
+      texte = await lireTexte();
     }
     return { url: page.url(), statut, texte };
   } catch {
