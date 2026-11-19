@@ -126,6 +126,8 @@ export type ContenuGlobal = {
   services: ServiceResume[];
   /** L'année du © au pied de page, calculée au moment de la construction (heure du Québec). */
   annee: number;
+  /** Le lien du pied de page vers le vérificateur Loi 25 (son texte vit dans la page du vérificateur). */
+  lienVerificateur: string;
 };
 
 /* ---------------------------------------------------------------- réalisations */
@@ -351,3 +353,77 @@ export function categories(page: PageRealisations): { id: CategorieId; label: st
     { id: "formation", label: page.categories.formation },
   ];
 }
+
+/* ---------------------------------------------------------------- vérificateur Loi 25 */
+
+/** Les textes d'une vérification : nom, pourquoi, article, puis un texte par cas (voir lib/verificateur/types.ts). */
+export type TextesVerification = { nom: string; pourquoi: string; article: string } & Record<string, string | undefined>;
+
+export type PageVerificateur = DocumentPage & {
+  nom: string;
+  h1: string;
+  intro: string;
+  introRisque?: string | null;
+  champLibelle: string;
+  champExemple: string;
+  bouton: string;
+  mentionCollecte: string;
+  mentionLien: string;
+  listeTitre: string;
+  invisibleTitre: string;
+  invisibleTexte: string;
+  invisibleListe: string[];
+  avertissement: string[];
+  appelTitre: string;
+  appelTexte: string;
+  appelTexteSansCorrection: string;
+  appelBouton: string;
+  analyseTitre: string;
+  analyseTexte: string;
+  analyseEtapes: string[];
+  analyseAnnonce: string;
+  erreurAdresse: string;
+  erreurPrivee: string;
+  erreurInjoignable: string;
+  erreurRefusee: string;
+  erreurDelai: string;
+  erreurLimite: string;
+  erreurAntiRobot: string;
+  erreurIndisponible: string;
+  etatACorriger: string;
+  etatAVerifier: string;
+  etatEnPlace: string;
+  synthese: string;
+  corrigerAucun: string;
+  corrigerUn: string;
+  corrigerPlusieurs: string;
+  verifierAucun: string;
+  verifierPlusieurs: string;
+  enPlaceAucun: string;
+  enPlacePlusieurs: string;
+  avertissementCourt: string;
+  phraseCorriger: string;
+  phraseVerifier: string;
+  phraseTout: string;
+  phrasePartielle: string;
+  phraseRedirection: string;
+  politiqueIllisible: string;
+  libellePourquoi: string;
+  libelleTemoins: string;
+  libelleDomaines: string;
+  droitAcces: string;
+  droitRectification: string;
+  droitRetrait: string;
+  piedResultat: string;
+  boutonRefaire: string;
+  temoins: TextesVerification;
+  banniere: TextesVerification;
+  politique: TextesVerification;
+  responsable: TextesVerification;
+  transfert: TextesVerification;
+  droits: TextesVerification;
+  tiers: TextesVerification;
+  https: TextesVerification;
+  blocSitesWeb: { afficher?: boolean | null; titre: string; texte: string; bouton: string };
+  lienPied: string;
+};

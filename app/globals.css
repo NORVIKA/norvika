@@ -44,6 +44,19 @@
      Declare une seule fois, plus bas (« Contour de selection au clavier »). */
   --focus-trait: var(--navy);
   --focus-halo: var(--cream);
+
+  /* Les trois etats du verificateur Loi 25 (app/verificateur-loi-25), declares UNE fois.
+     Rouge et ambre sont des couleurs d'ETAT, pas des accents : l'accent du site reste le navy, et
+     « en place » le porte (pas de vert de feu de circulation). L'etat est TOUJOURS ecrit en mots :
+     la couleur ne porte jamais seule le sens. Contrastes mesures (texte sur son fond) :
+     corriger 5,7:1, verifier 6,7:1, en place 8,1:1 ; sur blanc 6,5 / 7,5 / 9,1. */
+  --etat-corriger: #b3261e;
+  --etat-corriger-fond: #FCEDEB;
+  --etat-verifier: #7A4A00;
+  --etat-verifier-fond: #FBF1DE;
+  --etat-place: var(--navy-500);
+  --etat-place-fond: var(--brand-soft);
+  --police-mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
 }
 
 @layer base {
@@ -916,4 +929,266 @@
   .nv-filtre[aria-pressed="false"]:hover { border-color: rgba(12,25,47,.3); color: #0C192F; }
   .nv-video-jouer:hover .nv-video-rond { transform: scale(1.08); }
   .nv-etape-point:hover [data-point] { transform: scale(1.3); }
+}
+
+/* ===== Verificateur Loi 25 (app/verificateur-loi-25, components/verificateur), declare UNE fois =====
+   Haut de page : le titre et le formulaire cote a cote sur ordinateur, empiles sur telephone (le
+   formulaire suit le texte, sans marge perdue : regle 6). Puis le resultat en deux colonnes : la
+   synthese collee a gauche, les huit lignes a droite. Sans JavaScript, la liste des huit points et
+   leur « pourquoi » sont deja dans le HTML (lus par Google et les assistants). */
+.nv-verif-cadre { max-width: 1240px; margin: 0 auto; padding-left: 32px; padding-right: 32px; }
+.nv-verif-entete { background: var(--brand-soft); border-bottom: 1px solid rgba(12,25,47,.1); }
+.nv-verif-entete .nv-verif-cadre {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.05fr);
+  gap: 56px;
+  align-items: start;
+  padding-top: 64px;
+  padding-bottom: 64px;
+}
+.nv-verif-entete h1 {
+  margin: 0;
+  font-size: clamp(32px, 4vw, 52px);
+  line-height: 1.04;
+  letter-spacing: -.035em;
+  text-wrap: balance;
+}
+.nv-verif-intro { margin: 20px 0 0; max-width: 56ch; font-size: 17px; line-height: 1.62; color: rgba(12,25,47,.72); text-wrap: pretty; }
+.nv-verif-intro + .nv-verif-intro { margin-top: 12px; }
+
+/* Le formulaire : carte blanche, etiquette au-dessus du champ, erreur sous le champ. */
+.nv-verif-formulaire {
+  padding: 28px;
+  border-radius: 20px;
+  border: 1px solid rgba(12,25,47,.1);
+  background: #fff;
+  box-shadow: 0 30px 70px -50px rgba(12,25,47,.55);
+}
+.nv-verif-etiquette { display: block; font-size: 14px; font-weight: 600; color: var(--navy); }
+.nv-verif-rangee { display: flex; gap: 10px; margin-top: 8px; }
+.nv-champ {
+  flex: 1 1 auto;
+  min-width: 0;
+  height: 52px;
+  padding: 0 16px;
+  border-radius: 12px;
+  border: 1px solid rgba(12,25,47,.24);
+  background: #fff;
+  color: var(--navy);
+  font-family: var(--font-body);
+  font-size: 16px; /* 16 px : iOS ne zoome pas au focus */
+  transition: border-color .2s;
+}
+.nv-champ::placeholder { color: rgba(12,25,47,.5); }
+.nv-champ[aria-invalid="true"] { border-color: var(--etat-corriger); }
+.nv-verif-bouton {
+  flex: none;
+  height: 52px;
+  padding: 0 24px;
+  border: 0;
+  border-radius: 12px;
+  font-family: var(--font-body);
+  font-size: 15px;
+  font-weight: 600;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background .2s, transform .15s;
+}
+.nv-verif-bouton:disabled { cursor: progress; opacity: .7; }
+.nv-verif-erreur { margin: 12px 0 0; font-size: 14.5px; line-height: 1.5; color: var(--etat-corriger); }
+.nv-verif-mention { margin-top: 18px; color: rgba(12,25,47,.72); }
+
+/* Le resultat. */
+.nv-verif-resultat .nv-verif-cadre {
+  display: grid;
+  grid-template-columns: minmax(0, .9fr) minmax(0, 1.6fr);
+  gap: 56px;
+  align-items: start;
+  padding-top: 64px;
+  padding-bottom: 72px;
+}
+.nv-verif-synthese { position: sticky; top: 88px; }
+.nv-verif-synthese h2 {
+  margin: 0;
+  font-size: clamp(24px, 2.6vw, 32px);
+  line-height: 1.15;
+  letter-spacing: -.03em;
+  text-wrap: balance;
+  overflow-wrap: anywhere;
+}
+/* Le titre du resultat recoit le focus par programme (tabindex -1, jamais atteint au clavier) : pas
+   de contour, il n'est pas une commande. Marge pour passer sous l'en-tete colle a l'arrivee. */
+.nv-verif-synthese h2 { scroll-margin-top: 96px; }
+.nv-verif-synthese h2:focus,
+.nv-verif-synthese h2:focus-visible { outline: none !important; box-shadow: none !important; }
+.nv-verif-avertissement-court { margin: 14px 0 0; font-size: 14px; font-weight: 600; color: rgba(12,25,47,.7); }
+.nv-verif-synthese p.nv-verif-phrase { margin: 14px 0 0; font-size: 16px; line-height: 1.6; color: rgba(12,25,47,.74); }
+.nv-verif-comptes { display: flex; flex-wrap: wrap; gap: 8px; margin: 22px 0 0; padding: 0; list-style: none; }
+.nv-verif-pied { margin: 22px 0 0; font-size: 13.5px; line-height: 1.55; color: rgba(12,25,47,.66); }
+.nv-verif-refaire {
+  min-height: 44px;
+  margin-top: 10px;
+  padding: 10px 0;
+  border: 0;
+  background: none;
+  color: var(--navy);
+  font-family: var(--font-body);
+  font-size: 15px;
+  font-weight: 600;
+  text-decoration-line: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 4px;
+  cursor: pointer;
+  transition: text-decoration-thickness .15s;
+}
+
+/* Pendant l'analyse : une barre qui avance sans pretendre mesurer (elle ne coche aucune etape). */
+.nv-verif-etapes { margin: 18px 0 0; padding: 0 0 0 20px; font-size: 15px; line-height: 1.9; color: rgba(12,25,47,.72); }
+.nv-verif-barre { position: relative; height: 3px; margin-top: 22px; overflow: hidden; border-radius: 3px; background: rgba(51,73,108,.16); }
+.nv-verif-barre::after {
+  content: "";
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 35%;
+  border-radius: inherit;
+  background: var(--navy-500);
+  animation: nvVerifBarre 1.6s cubic-bezier(.4, 0, .2, 1) infinite;
+}
+@keyframes nvVerifBarre { from { transform: translateX(-100%); } to { transform: translateX(290%); } }
+
+/* Les huit lignes. L'etat est l'etiquette, ecrite en toutes lettres (pas de trait de couleur sur le
+   cote : un « side-stripe » est un tic de gabarit, refuse par la passe impeccable du 2026-11-18).
+   A l'arrivee du resultat, les lignes apparaissent l'une apres l'autre (--rang) : c'est le passage
+   de « ce qu'on verifie » a « ce qu'on a vu ». */
+.nv-verif-liste { margin: 0; padding: 0; list-style: none; border-top: 1px solid rgba(12,25,47,.1); }
+.nv-verif-ligne { padding: 24px 0; border-bottom: 1px solid rgba(12,25,47,.1); }
+@media (prefers-reduced-motion: no-preference) {
+  .nv-verif-ligne[data-etat] { animation: nvVerifLigne .45s cubic-bezier(.22, 1, .36, 1) both; animation-delay: calc(var(--rang, 0) * 45ms); }
+}
+@keyframes nvVerifLigne { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+/* Pendant l'analyse : la place de l'etiquette respire (rien n'est encore tranche). */
+.nv-etat-attente { display: inline-block; width: 84px; height: 24px; border-radius: 999px; background: rgba(51,73,108,.12); animation: breathe 1.4s ease-in-out infinite; }
+.nv-verif-tete { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 6px 16px; }
+.nv-verif-ligne h3 { margin: 0; font-size: 18px; line-height: 1.3; letter-spacing: -.02em; }
+.nv-verif-article { font-size: 13px; color: rgba(12,25,47,.62); }
+.nv-verif-texte { margin: 10px 0 0; max-width: 68ch; font-size: 15.5px; line-height: 1.62; color: rgba(12,25,47,.8); text-wrap: pretty; }
+.nv-etat {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-size: 12.5px;
+  font-weight: 600;
+  line-height: 1.5;
+  white-space: nowrap;
+}
+.nv-etat[data-etat="a-corriger"] { color: var(--etat-corriger); background: var(--etat-corriger-fond); }
+.nv-etat[data-etat="a-verifier"] { color: var(--etat-verifier); background: var(--etat-verifier-fond); }
+.nv-etat[data-etat="en-place"] { color: var(--etat-place); background: var(--etat-place-fond); }
+
+/* Les preuves : ce que le navigateur a vu, en caracteres de machine (noms de temoins, domaines). */
+.nv-verif-preuve { margin: 14px 0 0; }
+.nv-verif-preuve p { margin: 0 0 6px; font-size: 13px; font-weight: 600; color: rgba(12,25,47,.66); }
+.nv-verif-preuve ul { display: flex; flex-wrap: wrap; gap: 6px; margin: 0; padding: 0; list-style: none; }
+.nv-verif-preuve li {
+  max-width: 100%;
+  padding: 3px 8px;
+  border-radius: 6px;
+  background: var(--muted);
+  font-family: var(--police-mono);
+  font-size: 12.5px;
+  line-height: 1.5;
+  color: var(--navy);
+  overflow-wrap: anywhere;
+}
+
+/* « Pourquoi ca compte » : le texte est dans la page (cache a l'oeil), jamais ajoute au clic. */
+.nv-verif-pourquoi { margin-top: 12px; }
+.nv-verif-pourquoi summary {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 44px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--navy-500);
+  cursor: pointer;
+  list-style: none;
+}
+.nv-verif-pourquoi summary::-webkit-details-marker { display: none; }
+/* Le « + » qui devient « - » : il EST la fonction (ouvrir, fermer), comme le chevron d'un menu. */
+.nv-verif-pourquoi summary::before { content: "+"; width: 14px; font-size: 18px; line-height: 1; text-align: center; transition: transform .2s; }
+.nv-verif-pourquoi[open] summary::before { content: "\2212"; }
+.nv-verif-pourquoi p { margin: 4px 0 0; max-width: 68ch; font-size: 14.5px; line-height: 1.62; color: rgba(12,25,47,.72); }
+
+/* Sous le resultat : ce que le test ne voit pas, puis l'avertissement complet. */
+.nv-verif-limites { background: var(--muted); border-top: 1px solid rgba(12,25,47,.08); }
+.nv-verif-limites .nv-verif-cadre {
+  display: grid;
+  grid-template-columns: minmax(0, .9fr) minmax(0, 1.6fr);
+  gap: 56px;
+  padding-top: 64px;
+  padding-bottom: 64px;
+}
+.nv-verif-limites h2 { margin: 0; font-size: clamp(24px, 2.6vw, 32px); line-height: 1.15; }
+.nv-verif-limites ul { margin: 14px 0 0; padding-left: 20px; font-size: 15.5px; line-height: 1.62; color: rgba(12,25,47,.8); }
+.nv-verif-limites li + li { margin-top: 8px; }
+.nv-verif-limites .nv-verif-avertissement { margin-top: 32px; padding-top: 24px; border-top: 1px solid rgba(12,25,47,.12); }
+.nv-verif-avertissement p { margin: 0 0 10px; max-width: 72ch; font-size: 14px; line-height: 1.6; color: rgba(12,25,47,.7); }
+
+/* L'invitation, apres un resultat seulement : le bloc fonce du site. */
+.nv-verif-appel { margin-top: 32px; padding: 28px; border-radius: 20px; background: var(--navy); color: var(--cream); }
+.nv-verif-appel h3 { margin: 0; font-size: 22px; line-height: 1.2; color: #fff; }
+.nv-verif-appel p { margin: 10px 0 0; font-size: 15.5px; line-height: 1.6; color: rgba(245,243,238,.82); }
+.nv-verif-appel a { display: inline-flex; align-items: center; min-height: 48px; margin-top: 18px; padding: 0 22px; border-radius: 12px; font-size: 15px; font-weight: 600; }
+
+/* Le bloc qui annonce l'outil dans /sites-web. */
+.nv-verif-annonce {
+  display: grid;
+  grid-template-columns: minmax(0, 1.4fr) auto;
+  gap: 24px 48px;
+  align-items: center;
+  padding: 36px 40px;
+  border-radius: 20px;
+  background: var(--navy);
+  color: var(--cream);
+}
+.nv-verif-annonce h2 { margin: 0; font-size: clamp(24px, 2.8vw, 34px); line-height: 1.12; color: #fff; }
+.nv-verif-annonce p { margin: 12px 0 0; max-width: 62ch; font-size: 16px; line-height: 1.6; color: rgba(245,243,238,.82); }
+.nv-verif-annonce a { display: inline-flex; align-items: center; min-height: 52px; padding: 0 24px; border-radius: 12px; font-size: 15px; font-weight: 600; white-space: nowrap; }
+
+@media (hover: hover) {
+  .nv-verif-bouton:not(:disabled):hover { background: var(--navy-600); }
+  .nv-verif-refaire:hover { text-decoration-thickness: 2px; }
+  .nv-verif-pourquoi summary:hover { color: var(--navy); }
+  .nv-verif-pourquoi summary:hover::before { transform: scale(1.2); }
+  .nv-verif-appel a:hover, .nv-verif-annonce a:hover { background: #fff; color: var(--navy); }
+}
+.nv-verif-bouton:not(:disabled):active { transform: translateY(1px); }
+.nv-champ:hover { border-color: rgba(12,25,47,.42); }
+
+@media (max-width: 1024px) {
+  .nv-verif-entete .nv-verif-cadre,
+  .nv-verif-resultat .nv-verif-cadre,
+  .nv-verif-limites .nv-verif-cadre { grid-template-columns: minmax(0, 1fr); gap: 28px; }
+  .nv-verif-synthese { position: static; }
+}
+@media (max-width: 680px) {
+  .nv-verif-cadre { padding-left: 16px; padding-right: 16px; }
+  .nv-verif-entete .nv-verif-cadre { padding-top: 32px; padding-bottom: 32px; gap: 22px; }
+  .nv-verif-intro { font-size: 16px; margin-top: 14px; }
+  .nv-verif-formulaire { padding: 18px; border-radius: 16px; }
+  .nv-verif-resultat .nv-verif-cadre, .nv-verif-limites .nv-verif-cadre { padding-top: 36px; padding-bottom: 40px; }
+  .nv-verif-ligne { padding: 18px 0; }
+  .nv-verif-annonce { grid-template-columns: minmax(0, 1fr); padding: 26px 20px; }
+  .nv-verif-appel { padding: 22px 18px; }
+}
+/* Sous 400 px, le bouton passe sous le champ, pleine largeur : le libelle reste sur une ligne. */
+@media (max-width: 400px) {
+  .nv-verif-rangee { flex-direction: column; }
+  .nv-verif-bouton { width: 100%; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .nv-verif-barre::after { animation: none; width: 100%; opacity: .5; }
+  .nv-etat-attente { animation: none; }
 }

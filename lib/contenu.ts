@@ -20,6 +20,7 @@ import type {
   PagePhotoVideo,
   PagePlanDuSite,
   PageRealisations,
+  PageVerificateur,
   PageSitesWeb,
   Parametres,
   Realisation,
@@ -76,6 +77,7 @@ const REQUETE = `{
   "photoVideo": *[_id == "pagePhotoVideo"][0]{ ..., ${SEO}, tournage{ ..., "photo": photo${IMAGE} } },
   "formation": *[_id == "pageFormation"][0]{ ..., ${SEO} },
   "diagnostic": *[_id == "pageDiagnostic"][0]{ ..., ${SEO} },
+  "verificateur": *[_id == "pageVerificateurLoi25"][0]{ ..., ${SEO} },
   "equipe": *[_id == "pageEquipe"][0]{ ..., ${SEO}, ensemble{ ..., "photo": photo${IMAGE} } },
   "membres": *[_type == "membre" && afficher != false && !(_id in path("drafts.**"))] | order(ordre asc){ _updatedAt, nom, role, texte, "photo": photo${IMAGE} },
   "realisationsPage": *[_id == "pageRealisations"][0]{ ..., ${SEO} },
@@ -98,6 +100,7 @@ type Brut = {
   photoVideo: PagePhotoVideo;
   formation: PageFormation;
   diagnostic: PageDiagnostic;
+  verificateur: PageVerificateur;
   equipe: PageEquipe;
   membres: Membre[];
   realisationsPage: PageRealisations;
@@ -156,5 +159,6 @@ export async function obtenirGlobal(): Promise<ContenuGlobal> {
     page404: c.page404,
     services: c.services,
     annee: anneeAuQuebec(),
+    lienVerificateur: c.verificateur.lienPied,
   };
 }

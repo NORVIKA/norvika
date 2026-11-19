@@ -7,11 +7,13 @@ import { SiteFooter } from "@/components/site/SiteFooter";
 import { Roadmap, versRoadSteps } from "@/components/site/Roadmap";
 import { AutresPages } from "@/components/site/AutresPages";
 import { HeroService } from "@/components/site/HeroService";
-import { visible, type PageSitesWeb } from "@/lib/types-contenu";
+import { visible, type PageSitesWeb, type PageVerificateur } from "@/lib/types-contenu";
+import { CHEMIN_VERIFICATEUR } from "@/lib/verificateur/types";
 import { useReveal } from "@/lib/useReveal";
 
-// Tout le texte vient de la page « Sites web » du Studio.
-function Page({ page }: { page: PageSitesWeb }) {
+// Tout le texte vient de la page « Sites web » du Studio ; le bloc du vérificateur Loi 25, de la page
+// « Vérificateur Loi 25 » (il y vit tant que l'outil n'est pas en ligne : voir studio/schemas/verificateur.ts).
+function Page({ page, annonceVerificateur }: { page: PageSitesWeb; annonceVerificateur: PageVerificateur["blocSitesWeb"] }) {
   useReveal();
   const ROAD_STEPS = versRoadSteps(page.parcours.etapes);
 
@@ -179,6 +181,22 @@ function Page({ page }: { page: PageSitesWeb }) {
           </div>
         </div>
       </section>
+      ) : null}
+
+      {visible(annonceVerificateur) ? (
+        <section style={{ borderBottom: "1px solid rgba(12,25,47,.1)", background: "#ffffff" }}>
+          <div className="nv-verif-cadre" style={{ paddingTop: 72, paddingBottom: 72 }}>
+            <div className="nv-verif-annonce">
+              <div>
+                <h2>{annonceVerificateur.titre}</h2>
+                <p>{annonceVerificateur.texte}</p>
+              </div>
+              <Link href={CHEMIN_VERIFICATEUR} className="nv-btn-cream">
+                {annonceVerificateur.bouton}
+              </Link>
+            </div>
+          </div>
+        </section>
       ) : null}
 
       <AutresPages courante="/sites-web" />

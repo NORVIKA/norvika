@@ -10,7 +10,7 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function Page() {
-  const { sitesWeb, parametres } = await obtenirContenu();
+  const { sitesWeb, parametres, verificateur } = await obtenirContenu();
   return (
     <>
       <SchemaService
@@ -20,7 +20,7 @@ export default async function Page() {
         chemin="/sites-web"
         parametres={parametres}
       />
-      <Content page={sitesWeb} />
+      <Content page={sitesWeb} annonceVerificateur={verificateur.blocSitesWeb} />
     </>
   );
 }

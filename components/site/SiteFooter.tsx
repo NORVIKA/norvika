@@ -4,11 +4,12 @@ import Link from "next/link";
 import { ContactCTA } from "@/components/site/ContactCTA";
 import { useContenuGlobal } from "@/components/site/ContenuGlobal";
 import { MentionDroits } from "@/components/site/MentionDroits";
+import { CHEMIN_VERIFICATEUR } from "@/lib/verificateur/types";
 
 // Tout le texte vient du Studio : « Infos de l'entreprise » (logo, phrase, courriel, nom légal)
 // et « Menu et pied de page » (colonnes, liens, ligne du bas). L'annee du © est calculee au build.
 export function SiteFooter() {
-  const { parametres, navigation } = useContenuGlobal();
+  const { parametres, navigation, lienVerificateur } = useContenuGlobal();
   const logoStack = parametres.logoPied;
   return (
     <>
@@ -127,6 +128,9 @@ export function SiteFooter() {
             <div style={{ display: "flex", flexWrap: "wrap", gap: 18 }}>
               <Link href="/politique-de-confidentialite" className="nv-pied-lien">
                 {navigation.piedPolitique}
+              </Link>
+              <Link href={CHEMIN_VERIFICATEUR} className="nv-pied-lien">
+                {lienVerificateur}
               </Link>
               <Link href="/plan-du-site" className="nv-pied-lien">
                 {navigation.piedPlanDuSite}
