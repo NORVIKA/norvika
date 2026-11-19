@@ -4,6 +4,7 @@ import { SiteShell } from "@/components/site/SiteShell";
 import { Verificateur } from "@/components/verificateur/Verificateur";
 import { obtenirContenu } from "@/lib/contenu";
 import { metaPage } from "@/lib/meta";
+import { insecablesPartout } from "@/lib/typographie";
 import { CHEMIN_VERIFICATEUR } from "@/lib/verificateur/types";
 
 /**
@@ -23,7 +24,7 @@ export default async function PageVerificateur() {
   const { verificateur, parametres } = await obtenirContenu();
   return (
     <SiteShell>
-      <Verificateur t={verificateur} lienRendezVous={parametres.lienRendezVous} />
+      <Verificateur t={insecablesPartout(verificateur)} lienRendezVous={parametres.lienRendezVous} />
     </SiteShell>
   );
 }

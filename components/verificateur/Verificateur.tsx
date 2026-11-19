@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState, type CSSProperties, type FormEvent } from "react";
+import { useEffect, useRef, useState, type CSSProperties, type FormEvent } from "react";
 
 import { AntiRobot, lireJetonAntiRobot, reinitialiserAntiRobot } from "@/components/site/AntiRobot";
 import { MentionVerificateur } from "@/components/verificateur/MentionVerificateur";
@@ -30,6 +30,9 @@ import {
  * Accessibilité : une seule annonce au début (« Analyse en cours... »), une à la fin (la phrase de
  * synthèse) dans une zone aria-live ; le focus passe au titre du résultat, ou revient au champ
  * quand une erreur s'affiche (message lié au champ par aria-describedby).
+ * Pendant l'analyse, le champ passe en lecture seule et le bouton en aria-disabled, JAMAIS en
+ * `disabled` : un élément désactivé perd le focus, qui tombait sur <body> pendant 10 s, et le
+ * champ désactivé refusait ensuite le focus de l'erreur (QA Pixel, 2026-11-19).
  */
 
 type Phase = { nom: "repos" } | { nom: "analyse" } | { nom: "resultat"; rapport: Rapport; saisie: string };
@@ -63,6 +66,8 @@ const ERREURS: Record<string, keyof PageVerificateur> = {
 function remplir(gabarit: string, variables: Record<string, string>): string {
   const texte = gabarit
     .replace(/\{(\w+)\}/g, (tout, cle: string) => (cle in variables ? variables[cle] : tout))
+    // Une variable vide ne laisse ni parenthèses vides (« dépose _ga () dès »), ni espaces doubles.
+    .replace(/\s*\(\s*\)/g, "")
     .replace(/\s{2,}/g, " ")
     .replace(/\s+([.,])/g, "$1")
     .trim();
@@ -123,21 +128,23 @@ function phraseAccompagnement(rapport: Rapport, t: PageVerificateur): string {
   return t.phraseTout;
 }
 
-/** « Analyse de exemple.ca le 18 novembre 2026 à 14 h 05 », à l'heure du Québec. */
+/** « Analyse de exemple.ca le 18 novembre 2026 à 14 h 05 », à l'heure du Québec (« 9 h 05 », jamais « 09 h 05 »). */
 function pied(rapport: Rapport, t: PageVerificateur): string {
   const date = new Date(rapport.date);
   const fuseau = { timeZone: "America/Toronto" } as const;
   return remplir(t.piedResultat, {
     domaine: hote(rapport.adresseFinale),
     date: new Intl.DateTimeFormat("fr-CA", { ...fuseau, day: "numeric", month: "long", year: "numeric" }).format(date),
-    heure: new Intl.DateTimeFormat("fr-CA", { ...fuseau, hour: "2-digit", minute: "2-digit" }).format(date),
+    heure: new Intl.DateTimeFormat("fr-CA", { ...fuseau, hour: "numeric", minute: "2-digit" }).format(date),
   });
 }
 
 export function Verificateur({ t, lienRendezVous }: { t: PageVerificateur; lienRendezVous: string }) {
   const [adresse, setAdresse] = useState("");
   const [phase, setPhase] = useState<Phase>({ nom: "repos" });
-  const [erreur, setErreur] = useState<string | null>(null);
+  // `n` change à chaque erreur, même identique : le message est recréé (role="alert" le relit) et
+  // le focus revient au champ.
+  const [erreur, setErreur] = useState<{ texte: string; n: number } | null>(null);
   const [annonce, setAnnonce] = useState("");
   const champ = useRef<HTMLInputElement>(null);
   const titreResultat = useRef<HTMLHeadingElement>(null);
@@ -146,11 +153,15 @@ export function Verificateur({ t, lienRendezVous }: { t: PageVerificateur; lienR
   const rapport = phase.nom === "resultat" ? phase.rapport : null;
 
   function montrerErreur(message: string) {
-    setErreur(message);
+    setErreur((avant) => ({ texte: message, n: (avant?.n ?? 0) + 1 }));
     setAnnonce("");
-    // Le message est lié au champ (aria-describedby) et annoncé (role="alert") : le focus y revient.
-    requestAnimationFrame(() => champ.current?.focus());
   }
+
+  // Le message est lié au champ (aria-describedby) et annoncé (role="alert") : le focus y revient,
+  // APRÈS le rendu (avant, un requestAnimationFrame passait parfois avant React et ratait le champ).
+  useEffect(() => {
+    if (erreur) champ.current?.focus();
+  }, [erreur]);
 
   async function lancer(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -242,15 +253,15 @@ export function Verificateur({ t, lienRendezVous }: { t: PageVerificateur; lienR
                 onChange={(e) => setAdresse(e.target.value)}
                 aria-invalid={erreur ? true : undefined}
                 aria-describedby={`${erreur ? "verif-erreur " : ""}verif-mention`}
-                disabled={phase.nom === "analyse"}
+                readOnly={phase.nom === "analyse"}
               />
-              <button type="submit" className="nv-verif-bouton nv-btn-primary" disabled={phase.nom === "analyse"}>
+              <button type="submit" className="nv-verif-bouton nv-btn-primary" aria-disabled={phase.nom === "analyse" || undefined}>
                 {phase.nom === "analyse" ? t.analyseTitre : t.bouton}
               </button>
             </div>
             {erreur ? (
-              <p id="verif-erreur" role="alert" className="nv-verif-erreur">
-                {erreur}
+              <p key={erreur.n} id="verif-erreur" role="alert" className="nv-verif-erreur">
+                {erreur.texte}
               </p>
             ) : null}
             <AntiRobot />
@@ -311,7 +322,7 @@ export function Verificateur({ t, lienRendezVous }: { t: PageVerificateur; lienR
               return (
                 <li key={id} className="nv-verif-ligne" data-etat={r?.etat} style={{ "--rang": rang } as CSSProperties}>
                   <div className="nv-verif-tete">
-                    <h3>{textes.nom}</h3>
+                    <h3 id={`verif-nom-${id}`}>{textes.nom}</h3>
                     {r ? (
                       <span className="nv-etat" data-etat={r.etat}>
                         {ETATS[r.etat]}
@@ -340,7 +351,8 @@ export function Verificateur({ t, lienRendezVous }: { t: PageVerificateur; lienR
                     </>
                   ) : null}
                   <details className="nv-verif-pourquoi">
-                    <summary>{t.libellePourquoi}</summary>
+                    {/* Huit « Pourquoi ça compte » : le nom du point les distingue au lecteur d'écran. */}
+                    <summary aria-describedby={`verif-nom-${id}`}>{t.libellePourquoi}</summary>
                     <p>{textes.pourquoi}</p>
                     {r ? <p>{textes.article}</p> : null}
                   </details>
