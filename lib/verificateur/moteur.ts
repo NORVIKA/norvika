@@ -18,8 +18,8 @@
  *     chaque cadre : WebSocket (aussi bloqué au niveau réseau, ws:// et wss://), WebTransport,
  *     SharedWorker, Worker, WebRTC, service workers, window.open. Une cible worker ou service worker
  *     qui apparaît quand même arrête la visite (E2) ;
- *   - chaque réponse est contrôlée sur son adresse IP réelle : une adresse privée (rebinding DNS)
- *     arrête la visite (M1) ;
+ *   - chaque réponse est contrôlée sur l'adresse IP jointe par le navigateur : une adresse privée
+ *     (rebinding DNS) arrête la visite (M1), sauf la paire exacte du mandataire de Browser Run ;
  *   - 400 requêtes au plus par visite ; après les 8 s, seule la page de politique et ce qui vient de
  *     son propre domaine passent (M2) ;
  *   - le navigateur est fermé même si le visiteur coupe la connexion, par waitUntil (F1) ;
@@ -414,6 +414,21 @@ function arret(motif: string): ErreurMoteur {
   return new ErreurMoteur(motif === "REBINDING" ? "refusee" : "incompatible", motif);
 }
 
+/**
+ * M1 et le mandataire de Browser Run (essai du 2026-11-19, Chrome 152) : le navigateur distant
+ * sort par un mandataire local, et CHAQUE réponse porte l'adresse de ce mandataire, jamais celle
+ * du site. Cette paire exacte (bouclage IPv6, port 9001) n'arrête donc pas la visite ; toute autre
+ * adresse réservée l'arrête, comme avant. Derrière ce mandataire, le contrôle de l'adresse réelle
+ * revient à la garde DNS (chaque nom, avant chaque requête) et au réseau de Browser Run.
+ * ⛔ Si Browser Run change d'adresse ou de port, chaque visite est refusée (REBINDING) : ajuster la
+ *    paire ici, jamais élargir la règle (tout le bouclage, tout port, « la première adresse vue »).
+ */
+const MANDATAIRE_BROWSER_RUN = { ip: "::1", port: 9001 } as const;
+
+function viaMandataire(adresse: { ip?: string; port?: number } | undefined): boolean {
+  return adresse?.ip?.replace(/^\[|\]$/g, "") === MANDATAIRE_BROWSER_RUN.ip && adresse.port === MANDATAIRE_BROWSER_RUN.port;
+}
+
 const URL_DE_CHROME = /^(chrome|chrome-extension|devtools):/;
 type CibleAttachee = { sessionId: string; waitingForDebugger: boolean; targetInfo: { type: string; url: string } };
 
@@ -535,10 +550,12 @@ export async function observer(url: URL): Promise<Observations> {
     await page.setRequestInterception(true);
     page.on("request", (requete) => void filtrer(requete));
     // M1 : l'adresse IP réellement jointe par le navigateur. Notre DNS et le sien peuvent différer
-    // (rebinding) : une réponse venue d'une adresse privée arrête tout, aussitôt.
+    // (rebinding) : une réponse venue d'une adresse privée arrête tout, aussitôt. Seule exception :
+    // le mandataire de Browser Run, à sa paire exacte (voir viaMandataire).
     page.on("response", (reponse) => {
-      const ip = reponse.remoteAddress()?.ip;
-      if (ip && ipReservee(ip)) arreter("REBINDING");
+      const adresse = reponse.remoteAddress();
+      const ip = adresse?.ip;
+      if (ip && !viaMandataire(adresse) && ipReservee(ip)) arreter("REBINDING");
     });
 
     async function filtrer(requete: HTTPRequest) {
