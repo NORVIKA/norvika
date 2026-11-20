@@ -52,6 +52,8 @@ const ERREURS: Record<string, keyof PageVerificateur> = {
   corps: "erreurAdresse",
   // Le site emploie des moyens que l'outil ne peut pas surveiller : arrêt sans résultat, pas une panne.
   incompatible: "erreurIncompatible",
+  // Chrome bloque le site derrière son avertissement « site non sécurisé » : rien à analyser.
+  "sans-https": "erreurSansHttps",
   "nom-local": "erreurPrivee",
   privee: "erreurPrivee",
   refusee: "erreurPrivee",
@@ -210,7 +212,9 @@ export function Verificateur({ t, lienRendezVous }: { t: PageVerificateur; lienR
     }
     if (donnees && !donnees.ok && donnees.code) code = donnees.code;
     setPhase({ nom: "repos" });
-    montrerErreur(remplir(String(t[ERREURS[code] ?? "erreurIndisponible"]), { domaine: hote(saisie) }));
+    // Un texte absent du Studio (champ ajouté, contenu pas encore semé) ne doit jamais s'afficher « undefined ».
+    const gabarit = t[ERREURS[code] ?? "erreurIndisponible"];
+    montrerErreur(remplir(typeof gabarit === "string" && gabarit ? gabarit : t.erreurIndisponible, { domaine: hote(saisie) }));
   }
 
   function recommencer() {

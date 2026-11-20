@@ -63,7 +63,7 @@ const MAX_TEMOINS = 200;
 const MAX_TEXTE_POLITIQUE = 200_000;
 
 /** Pourquoi une visite n'a pas pu se faire. Le texte affiché vient du Studio, par ce code. */
-export type CodeMoteur = "indisponible" | "capacite" | "inaccessible" | "refusee" | "protege" | "delai" | "incompatible";
+export type CodeMoteur = "indisponible" | "capacite" | "inaccessible" | "refusee" | "protege" | "delai" | "incompatible" | "sans-https";
 
 export class ErreurMoteur extends Error {
   constructor(
@@ -488,7 +488,14 @@ export async function observer(url: URL): Promise<Observations> {
   let hotePolitique = "";
   let compte = 0;
   let motifArret: string | null = null;
+  /** Vrai dès que `filtrer` a refusé le document principal (voir ouvrirAccueil). */
+  let documentRefuse = false;
   let browser: Browser | null = null;
+  // Une seule fermeture par visite, quel que soit le nombre d'appelants (arrêt, échéance, waitUntil,
+  // finally). Deux Browser.close en vol faisaient journaliser par la bibliothèque le rejet du second
+  // (TargetCloseError) à chaque visite. Une vraie erreur de fermeture reste journalisée, une fois.
+  let fermeture: Promise<unknown> | null = null;
+  const fermer = () => (browser ? (fermeture ??= browser.close().catch(() => undefined)) : Promise.resolve());
   let minuterie: ReturnType<typeof setTimeout> | undefined;
   let terminer: () => void = () => undefined;
   const terminee = new Promise<void>((r) => (terminer = r));
@@ -504,14 +511,14 @@ export async function observer(url: URL): Promise<Observations> {
     const arreter = (motif: string) => {
       if (motifArret) return;
       motifArret = motif;
-      void actif.close().catch(() => undefined);
+      void fermer();
     };
 
     // F1 : si le visiteur coupe, la requête est annulée et le `finally` peut ne jamais tourner.
     // waitUntil garde le Worker en vie le temps de fermer le navigateur (sinon facturé 60 s).
-    attendre(Promise.race([terminee, new Promise((r) => setTimeout(r, BUDGET_MS))]).then(() => actif.close().catch(() => undefined)));
+    attendre(Promise.race([terminee, new Promise((r) => setTimeout(r, BUDGET_MS))]).then(() => fermer()));
     // Filet de sécurité : à l'échéance, le navigateur est fermé de force.
-    minuterie = setTimeout(() => void actif.close().catch(() => undefined), Math.max(0, restant()));
+    minuterie = setTimeout(() => void fermer(), Math.max(0, restant()));
 
     actif.on("targetcreated", (cible) => {
       const type = cible.type();
@@ -558,6 +565,20 @@ export async function observer(url: URL): Promise<Observations> {
       if (ip && !viaMandataire(adresse) && ipReservee(ip)) arreter("REBINDING");
     });
 
+    /**
+     * Tout refus passe ici. Chrome emploie le même code que nos refus (ERR_BLOCKED_BY_CLIENT) quand il
+     * bloque lui-même un site non sécurisé (voir ouvrirAccueil) : un refus du document principal est
+     * donc noté AVANT de partir. En cas de doute sur le cadre, il est noté.
+     */
+    function refuser(requete: HTTPRequest) {
+      try {
+        if (requete.isNavigationRequest() && (requete.frame() ?? page.mainFrame()) === page.mainFrame()) documentRefuse = true;
+      } catch {
+        documentRefuse = true;
+      }
+      return requete.abort("blockedbyclient");
+    }
+
     async function filtrer(requete: HTTPRequest) {
       try {
         if (requete.isInterceptResolutionHandled()) return;
@@ -565,21 +586,21 @@ export async function observer(url: URL): Promise<Observations> {
         try {
           u = new URL(requete.url());
         } catch {
-          return await requete.abort("blockedbyclient");
+          return await refuser(requete);
         }
         if (u.protocol === "data:" || u.protocol === "blob:" || u.href === "about:blank") return await requete.continue();
-        if (u.protocol !== "http:" && u.protocol !== "https:") return await requete.abort("blockedbyclient");
-        if ((u.port && u.port !== "80" && u.port !== "443") || u.username || u.password) return await requete.abort("blockedbyclient");
+        if (u.protocol !== "http:" && u.protocol !== "https:") return await refuser(requete);
+        if ((u.port && u.port !== "80" && u.port !== "443") || u.username || u.password) return await refuser(requete);
         // M2 : plafond de requêtes, et rien entre l'accueil et la politique ; pendant la politique,
         // seulement son propre domaine (le document et ce qu'il charge de chez lui).
         compte += 1;
         // R2 : dès qu'un arrêt est décidé, plus rien ne part, même avant la fermeture.
-        if (motifArret || compte > MAX_REQUETES || moment === "entre") return await requete.abort("blockedbyclient");
-        if (moment === "politique" && sansWww(u.hostname) !== hotePolitique) return await requete.abort("blockedbyclient");
+        if (motifArret || compte > MAX_REQUETES || moment === "entre") return await refuser(requete);
+        if (moment === "politique" && sansWww(u.hostname) !== hotePolitique) return await refuser(requete);
         if (moment === "accueil") requetes.push({ url: u.href.slice(0, 500), hote: u.hostname.toLowerCase(), type: requete.resourceType() });
-        if (!(await garde(u.hostname))) return await requete.abort("blockedbyclient");
+        if (!(await garde(u.hostname))) return await refuser(requete);
         // Les vidéos sont lourdes et ne disent rien de la Loi 25 : notées, puis coupées.
-        if (requete.resourceType() === "media") return await requete.abort("blockedbyclient");
+        if (requete.resourceType() === "media") return await refuser(requete);
         return await requete.continue();
       } catch {
         // Page fermée pendant la décision (échéance, arrêt) : rien à faire.
@@ -587,7 +608,7 @@ export async function observer(url: URL): Promise<Observations> {
     }
 
     // --- 1. L'accueil -----------------------------------------------------------------------
-    const adresseFinale = await ouvrirAccueil(page, url, restant);
+    const adresseFinale = await ouvrirAccueil(page, url, restant, () => documentRefuse, sonde);
 
     // --- 2. Huit secondes sans aucune interaction --------------------------------------------
     await new Promise((r) => setTimeout(r, Math.max(0, Math.min(OBSERVATION_MS, restant() - 3_000))));
@@ -643,7 +664,17 @@ export async function observer(url: URL): Promise<Observations> {
   } finally {
     terminer();
     clearTimeout(minuterie);
-    await browser?.close().catch(() => undefined);
+    await fermer();
+  }
+}
+
+/** `promesse`, ou `defaut` si elle n'a pas abouti dans `ms` (minuterie toujours libérée). */
+async function auPlus<T>(promesse: Promise<T>, ms: number, defaut: T): Promise<T> {
+  let minuterie: ReturnType<typeof setTimeout> | undefined;
+  try {
+    return await Promise.race([promesse, new Promise<T>((r) => (minuterie = setTimeout(() => r(defaut), Math.max(0, ms))))]);
+  } finally {
+    clearTimeout(minuterie);
   }
 }
 
@@ -651,26 +682,48 @@ export async function observer(url: URL): Promise<Observations> {
  * Ouvre l'accueil et rend l'adresse atteinte. Sans protocole écrit, l'adresse est en https ; si
  * https ne répond pas du tout (certificat, connexion refusée), un seul essai en http, pour pouvoir
  * dire « votre site n'est pas en https » plutôt que « inaccessible ».
+ *
+ * Chrome tente d'abord en https toute navigation http://. Si ce https échoue, deux issues mesurées :
+ *   - il charge lui-même le http (au poste, neverssl.com) : voir le repli plus bas, analyse complète ;
+ *   - il bloque la page derrière son avertissement « site non sécurisé », sans jamais charger le http
+ *     (Browser Run, Chrome 152, neverssl.com ; banc, Chrome 157). Aucune relance, rien du site chargé.
+ * ERR_BLOCKED_BY_CLIENT a donc deux sources. (1) `filtrer` a refusé le document principal :
+ * « refusee ». (2) L'avertissement de Chrome : la sonde http du Worker départage. Le site répond en
+ * http sans renvoyer vers https, c'est « sans-https » ; sinon, il est « inaccessible ».
  */
-async function ouvrirAccueil(page: Page, url: URL, restant: () => number): Promise<string> {
+async function ouvrirAccueil(
+  page: Page,
+  url: URL,
+  restant: () => number,
+  documentRefuse: () => boolean,
+  sonde: Promise<Observations["https"]>,
+): Promise<string> {
   const essayer = async (adresse: string) =>
     page.goto(adresse, {
       waitUntil: "domcontentloaded",
       timeout: Math.max(1_000, Math.min(DELAI_ACCUEIL_MS, restant() - OBSERVATION_MS - 4_000)),
     });
+  const bloquee = async (code: string) => {
+    if (documentRefuse()) return new ErreurMoteur("refusee", code);
+    const http = await auPlus(sonde, Math.min(5_000, restant() - 1_000), "inconnu");
+    return new ErreurMoteur(http === "sans-redirection" ? "sans-https" : "inaccessible", code);
+  };
 
   let reponse;
   try {
     reponse = await essayer(url.href);
   } catch (e) {
     const code = erreurReseau(e);
-    if (code === "ERR_BLOCKED_BY_CLIENT") throw new ErreurMoteur("refusee", code);
-    const httpsEnPanne = /^ERR_(CERT_|SSL_|CONNECTION_REFUSED|CONNECTION_RESET|CONNECTION_CLOSED)/.test(code);
+    if (code === "ERR_BLOCKED_BY_CLIENT") throw await bloquee(code);
+    // EMPTY_RESPONSE : neverssl.com depuis un poste. TUNNEL_CONNECTION_FAILED : le mandataire de
+    // Browser Run n'a pas pu joindre le port 443. Dans les deux cas, https ne répond pas.
+    const httpsEnPanne = /^ERR_(CERT_|SSL_|CONNECTION_REFUSED|CONNECTION_RESET|CONNECTION_CLOSED|EMPTY_RESPONSE|TUNNEL_CONNECTION_FAILED)/.test(code);
     if (url.protocol === "https:" && httpsEnPanne) {
       try {
         reponse = await essayer(url.href.replace(/^https:/, "http:"));
       } catch (e2) {
-        throw new ErreurMoteur(erreurReseau(e2) === "ERR_BLOCKED_BY_CLIENT" ? "refusee" : "inaccessible", erreurReseau(e2));
+        const code2 = erreurReseau(e2);
+        throw code2 === "ERR_BLOCKED_BY_CLIENT" ? await bloquee(code2) : new ErreurMoteur("inaccessible", code2);
       }
     } else if (code === "TIMEOUT" && page.url() !== "about:blank") {
       // Le document est arrivé mais un script retarde « DOMContentLoaded » : on observe quand même.
@@ -680,6 +733,15 @@ async function ouvrirAccueil(page: Page, url: URL, restant: () => number): Promi
     }
   }
 
+  // Repli automatique de Chrome (vu au poste sur neverssl.com) : le https promu échoue, Chrome charge
+  // lui-même le http, mais `goto` rend la main sur la page d'erreur intermédiaire, quelques
+  // millisecondes avant que le document http soit posé. On attend ce document (il est passé par
+  // `filtrer` et la garde comme toute requête) : le site s'analyse alors au complet, en http.
+  if (reponse && !/^https?:/.test(page.url())) {
+    const delai = Math.max(1_000, Math.min(3_000, restant() - OBSERVATION_MS - 2_000));
+    reponse = (await page.waitForNavigation({ waitUntil: "domcontentloaded", timeout: delai }).catch(() => null)) ?? reponse;
+  }
+
   // Texte de Martin : « Visite refusée par le site (403, défi anti-robot) ». Un 401 ou un 403 sur
   // l'accueil d'un site public, c'est presque toujours une protection contre les robots.
   const statut = reponse?.status() ?? 200;
@@ -687,6 +749,8 @@ async function ouvrirAccueil(page: Page, url: URL, restant: () => number): Promi
     throw new ErreurMoteur("protege", `HTTP ${statut}`);
   }
   if (statut >= 400) throw new ErreurMoteur("inaccessible", `HTTP ${statut}`);
+  // Jamais une page d'erreur de Chrome analysée comme si c'était le site.
+  if (!/^https?:/.test(page.url())) throw new ErreurMoteur("inaccessible", "AUTRE");
   return page.url();
 }
 

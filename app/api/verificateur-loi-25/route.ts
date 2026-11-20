@@ -54,6 +54,7 @@ const MESSAGES_MOTEUR: Record<CodeMoteur, { statut: number; message: string }> =
   protege: { statut: 502, message: "Votre site a demandé une vérification anti-robot à notre navigateur." },
   delai: { statut: 504, message: "Votre site a pris trop de temps à répondre." },
   incompatible: { statut: 502, message: "Votre site emploie des éléments que notre outil ne peut pas analyser en sécurité." },
+  "sans-https": { statut: 502, message: "Votre site n'est pas en https : notre navigateur, comme celui de vos visiteurs, s'arrête à un avertissement." },
 };
 
 /** Le poste de développement (localhost, 127.0.0.1), jamais un domaine public. */

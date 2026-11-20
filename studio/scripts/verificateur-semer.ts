@@ -87,6 +87,8 @@ const doc = {
   erreurLimite: 'Vous avez lancé 3 vérifications dans la dernière heure. Réessayez un peu plus tard.',
   erreurAntiRobot: "La vérification anti-robot n'a pas abouti. Rechargez la page et réessayez.",
   erreurIndisponible: 'Le vérificateur est indisponible pour le moment. Réessayez plus tard, ou écrivez-nous à info@norvika.ca.',
+  erreurSansHttps:
+    "Votre site {domaine} n'est pas en https. Chrome affiche maintenant un avertissement avant d'ouvrir un site comme le vôtre, et notre navigateur s'arrête au même endroit que vos visiteurs : nous ne pouvons rien analyser d'autre. Passez votre site en https, puis relancez la vérification.", // Mattew, 2026-11-19, à faire relire par Martin
   erreurIncompatible: 'Notre outil ne peut pas analyser ce site automatiquement en toute sécurité. Plutôt que de vous donner un résultat incomplet, nous préférons ne rien conclure. Écrivez-nous à info@norvika.ca : nous le vérifierons nous-mêmes.', // Mattew, 2026-11-19, à faire relire par Martin
 
   /* Le résultat (Martin, section 3 ; libellés d'état et de preuve : Mattew) */

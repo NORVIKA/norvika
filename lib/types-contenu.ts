@@ -392,6 +392,7 @@ export type PageVerificateur = DocumentPage & {
   erreurAntiRobot: string;
   erreurIndisponible: string;
   erreurIncompatible: string;
+  erreurSansHttps: string;
   etatACorriger: string;
   etatAVerifier: string;
   etatEnPlace: string;
