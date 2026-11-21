@@ -5,6 +5,10 @@
  *     avertissement « site non sécurisé » et ne charge jamais le http : rien à analyser. Avant, le
  *     visiteur lisait « Votre site redirige vers une adresse qui ne peut pas être vérifiée », qui
  *     est faux. Texte de Mattew, à faire relire par Martin.
+ *   2026-11-21 : relu par Martin. « au même endroit que vos visiteurs » retiré (seul Chrome avertit
+ *     par défaut, à la première visite, et le visiteur peut continuer) ; « maintenant » daté (défaut
+ *     pour tous annoncé par Google le 2026-10-21, Chrome 154) ; cas du certificat invalide ajouté
+ *     (il mène au même avertissement) ; HTTPS en capitales et action alignées sur le point « https ».
  * Un champ déjà rempli n'est jamais écrasé (correction faite dans le Studio).
  *
  *   cd studio && npx sanity exec scripts/verificateur-textes-2026-11-19c.ts --with-user-token -- --essai
@@ -23,7 +27,7 @@ const essai = process.argv.includes('--essai')
 
 const TEXTES = {
   erreurSansHttps:
-    "Votre site {domaine} n'est pas en https. Chrome affiche maintenant un avertissement avant d'ouvrir un site comme le vôtre, et notre navigateur s'arrête au même endroit que vos visiteurs : nous ne pouvons rien analyser d'autre. Passez votre site en https, puis relancez la vérification.",
+    "Votre site {domaine} ne répond pas en HTTPS, ou son certificat est expiré ou invalide. Depuis l'automne 2026, Chrome affiche par défaut un avertissement avant d'ouvrir pour la première fois un site sans HTTPS, et notre outil s'arrête à cet avertissement : nous ne pouvons rien analyser d'autre. Activez un certificat chez votre hébergeur (souvent sans frais), puis relancez la vérification.",
 }
 
 const client = getCliClient({ apiVersion: '2025-02-19' })
