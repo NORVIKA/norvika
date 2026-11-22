@@ -253,13 +253,23 @@ export const pageVerificateurLoi25 = defineType({
     /* ---------------------------------------------------------------- ailleurs sur le site */
     defineField({
       name: 'blocSitesWeb',
-      title: 'Bloc dans la page Sites web',
+      title: 'Bloc d’annonce (Sites web et accueil)',
       type: 'object',
       group: 'ailleurs',
-      description: 'Le bloc qui annonce l’outil dans la page Sites web, avant les autres pages.',
+      description: 'Le bloc qui annonce l’outil. Le même texte paraît dans la page Sites web (avant les autres pages) et sur l’accueil (après les services).',
       options: { collapsible: true, collapsed: false },
       fields: [
-        afficher(),
+        defineField({
+          ...afficher('Décochez pour retirer le bloc de la page Sites web sans perdre son texte.'),
+          title: 'Afficher dans la page Sites web',
+        }),
+        defineField({
+          name: 'afficherAccueil',
+          title: 'Afficher sur l’accueil',
+          type: 'boolean',
+          initialValue: true,
+          description: 'Décochez pour retirer le bloc de l’accueil sans perdre son texte.',
+        }),
         ligne('titre', 'Titre', 'Le titre du bloc.'),
         paragraphe('texte', 'Texte', 'Une ou deux phrases.', { rows: 3 }),
         ligne('bouton', 'Texte du bouton', 'Le bouton qui ouvre le vérificateur (ex. : « Lancer le vérificateur »).'),

@@ -1,14 +1,12 @@
 "use client";
 
-import Link from "next/link";
-
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
 import { Roadmap, versRoadSteps } from "@/components/site/Roadmap";
 import { AutresPages } from "@/components/site/AutresPages";
 import { HeroService } from "@/components/site/HeroService";
 import { visible, type PageSitesWeb, type PageVerificateur } from "@/lib/types-contenu";
-import { CHEMIN_VERIFICATEUR } from "@/lib/verificateur/types";
+import { AnnonceVerificateur } from "@/components/verificateur/AnnonceVerificateur";
 import { useReveal } from "@/lib/useReveal";
 
 // Tout le texte vient de la page « Sites web » du Studio ; le bloc du vérificateur Loi 25, de la page
@@ -183,21 +181,7 @@ function Page({ page, annonceVerificateur }: { page: PageSitesWeb; annonceVerifi
       </section>
       ) : null}
 
-      {visible(annonceVerificateur) ? (
-        <section style={{ borderBottom: "1px solid rgba(12,25,47,.1)", background: "#ffffff" }}>
-          <div className="nv-verif-cadre" style={{ paddingTop: 72, paddingBottom: 72 }}>
-            <div className="nv-verif-annonce">
-              <div>
-                <h2>{annonceVerificateur.titre}</h2>
-                <p>{annonceVerificateur.texte}</p>
-              </div>
-              <Link href={CHEMIN_VERIFICATEUR} className="nv-btn-cream">
-                {annonceVerificateur.bouton}
-              </Link>
-            </div>
-          </div>
-        </section>
-      ) : null}
+      {visible(annonceVerificateur) ? <AnnonceVerificateur annonce={annonceVerificateur} /> : null}
 
       <AutresPages courante="/sites-web" />
       </main>

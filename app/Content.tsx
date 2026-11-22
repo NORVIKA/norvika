@@ -9,7 +9,8 @@ import { useReveal } from "@/lib/useReveal";
 import { Roadmap, versRoadSteps } from "@/components/site/Roadmap";
 import { AutresPages } from "@/components/site/AutresPages";
 import { useContenuGlobal } from "@/components/site/ContenuGlobal";
-import { positionFocale, visible, type Avis, type PageAccueil } from "@/lib/types-contenu";
+import { positionFocale, visible, type Avis, type PageAccueil, type PageVerificateur } from "@/lib/types-contenu";
+import { AnnonceVerificateur } from "@/components/verificateur/AnnonceVerificateur";
 import { Aimant } from "@/components/site/Aimant";
 import { VideoYoutube } from "@/components/site/VideoYoutube";
 import { BasculeAvantApres } from "@/components/site/BasculeAvantApres";
@@ -21,7 +22,15 @@ import { FondVideo } from "@/components/site/FondVideo";
 // logos détourés se posent directement sur la bande ; Desjardins et Anytime Fitness n'ont qu'un
 // logo BLANC sur un bloc de couleur de marque, donc en pastille arrondie (« Sur une tuile de
 // couleur » dans leur fiche). On ne recolore pas le logo d'une institution financière.
-function Index({ page, avisListe }: { page: PageAccueil; avisListe: Avis[] }) {
+function Index({
+  page,
+  avisListe,
+  annonceVerificateur,
+}: {
+  page: PageAccueil;
+  avisListe: Avis[];
+  annonceVerificateur: PageVerificateur["blocSitesWeb"];
+}) {
   useReveal();
   const { parametres, navigation, services } = useContenuGlobal();
   const LIEN_RDV = parametres.lienRendezVous;
@@ -571,6 +580,10 @@ function Index({ page, avisListe }: { page: PageAccueil; avisListe: Avis[] }) {
         </div>
       </section>
       ) : null}
+
+      {/* Vérificateur Loi 25 : après les services, avant le parcours (2026-11-22). Interrupteur
+          « Afficher sur l'accueil » du Studio ; absent = affiché. */}
+      {annonceVerificateur.afficherAccueil !== false ? <AnnonceVerificateur annonce={annonceVerificateur} /> : null}
 
       {/* Comment ça marche */}
       {visible(page.parcours) ? (

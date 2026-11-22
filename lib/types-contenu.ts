@@ -427,6 +427,7 @@ export type PageVerificateur = DocumentPage & {
   droits: TextesVerification;
   tiers: TextesVerification;
   https: TextesVerification;
-  blocSitesWeb: { afficher?: boolean | null; titre: string; texte: string; bouton: string };
+  /** Annonce de l'outil : page Sites web (`afficher`) et accueil (`afficherAccueil`, absent = affiché). */
+  blocSitesWeb: { afficher?: boolean | null; afficherAccueil?: boolean | null; titre: string; texte: string; bouton: string };
   lienPied: string;
 };
