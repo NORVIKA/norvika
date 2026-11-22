@@ -420,13 +420,23 @@
 @media (max-width: 1024px) {
   .nv-shell { padding-left: 24px !important; padding-right: 24px !important; }
   .nv-header-shell { padding-left: 8px !important; padding-right: 8px !important; }
-  .nv-grid { grid-template-columns: minmax(0, 1fr) !important; }
-  .nv-grid-3 { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; }
-  .nv-road-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; }
-  .nv-road { min-width: 1120px; margin-left: 40px !important; margin-right: 40px !important; }
   .nv-desktop-nav, .nv-header-cta { display: none !important; }
   .nv-burger { display: inline-flex !important; }
   section > .nv-shell { padding-top: 64px !important; padding-bottom: 64px !important; }
+}
+
+/* Les grilles a deux colonnes s'empilent a 860 px, plus a 1024 (passe tablette, 2026-11-22).
+   A 1024 px (iPad en paysage, iPad Pro 12,9 po en portrait), le contenu fait 976 px de large :
+   les deux colonnes de l'ordinateur y tiennent. Les empiler laissait des photos de 976 px de
+   large et une page deux fois plus longue (regle 6 : optimiser la largeur, pas empiler).
+   Les tablettes en portrait (744 a 834 px) restent sur une colonne : 350 px par colonne y
+   serraient trop le texte. */
+@media (max-width: 860px) {
+  .nv-grid { grid-template-columns: minmax(0, 1fr) !important; }
+  .nv-grid-3 { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; }
+  /* Le bouton du quiz (accueil) est cale a droite de sa colonne ; empile, il flottait seul
+     au bord droit sous un texte cale a gauche. */
+  .nv-quiz-action { justify-content: flex-start !important; }
 }
 
 @media (max-width: 680px) {
@@ -701,9 +711,9 @@
   border-radius: 8px;
 }
 
-@media (max-width: 1000px) {
-  .nv-logos-bande { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
-}
+/* Plus de passage a trois colonnes sous 1000 px (passe tablette, 2026-11-22) : cinq logos sur
+   trois colonnes laissaient une case vide au bout de la deuxieme rangee, de 641 a 1000 px. Les
+   cinq tiennent sur une rangee jusqu'a 641 px (114 px par logo a 660, 128 a 744). */
 @media (max-width: 640px) {
   .nv-logos-bande { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; padding: 18px; }
   .nv-logos-bande img { max-height: 30px; }

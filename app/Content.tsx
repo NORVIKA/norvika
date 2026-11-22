@@ -353,6 +353,7 @@ function Index({ page, avisListe }: { page: PageAccueil; avisListe: Avis[] }) {
           </div>
           <div
             data-reveal
+            className="nv-quiz-action"
             style={{ display: "flex", justifyContent: "flex-end" }}
           >
             <Link
