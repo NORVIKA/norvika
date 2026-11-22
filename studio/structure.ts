@@ -15,6 +15,7 @@ import { SearchIcon } from '@sanity/icons/Search'
 import { StarIcon } from '@sanity/icons/Star'
 import { UserIcon } from '@sanity/icons/User'
 import { UsersIcon } from '@sanity/icons/Users'
+import { CheckmarkCircleIcon } from '@sanity/icons/CheckmarkCircle'
 import type { ComponentType } from 'react'
 import type { StructureBuilder, StructureResolver } from 'sanity/structure'
 
@@ -69,6 +70,7 @@ export const structure: StructureResolver = (S) =>
             .title('Autres pages')
             .items([
               unique(S, 'pageDiagnostic', 'Diagnostic (quiz)', SearchIcon),
+              unique(S, 'pageVerificateurLoi25', 'Vérificateur Loi 25', CheckmarkCircleIcon),
               unique(S, 'pageContact', 'Contact', EnvelopeIcon),
               unique(S, 'pagePlanDuSite', 'Plan du site', DocumentTextIcon),
               unique(S, 'pageBienvenue', 'Bienvenue (nouveaux clients)', DocumentTextIcon),

@@ -1,6 +1,7 @@
 import type { MetadataRoute } from "next";
 
 import { CHEMINS_SERVICES, type Contenu } from "./contenu";
+import { CHEMIN_VERIFICATEUR } from "./verificateur/types";
 
 /**
  * LA liste des pages publiques, DÉCLARÉE UNE FOIS (règle d'agence 5). Elle nourrit le sitemap,
@@ -81,6 +82,14 @@ export function pagesDuSite(c: Contenu): PageDuSite[] {
       chemin: "/diagnostic",
       description: c.diagnostic.seoDescription,
       modifie: c.diagnostic._updatedAt,
+      frequence: "monthly",
+      priorite: 0.8,
+    },
+    {
+      nom: c.verificateur.nom,
+      chemin: CHEMIN_VERIFICATEUR,
+      description: c.verificateur.seoDescription,
+      modifie: c.verificateur._updatedAt,
       frequence: "monthly",
       priorite: 0.8,
     },

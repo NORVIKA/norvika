@@ -13,6 +13,7 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
+    "@cloudflare/puppeteer": "1.4.0",
     "@sanity/client": "8.14.1",
     "@supabase/supabase-js": "^2.108.2",
     "next": "16.4.6",

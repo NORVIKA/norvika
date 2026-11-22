@@ -14,6 +14,7 @@ import {
   pageSitesWeb,
 } from './pages'
 import { appliquerGardes } from './regles'
+import { pageVerificateurLoi25 } from './verificateur'
 
 /** Tous les types du Studio, avec les gardes de contenu posées sur chaque champ de texte. */
 export const typesDuSchema = appliquerGardes([
@@ -23,6 +24,7 @@ export const typesDuSchema = appliquerGardes([
   pagePhotoVideo,
   pageFormation,
   pageDiagnostic,
+  pageVerificateurLoi25,
   pageEquipe,
   pageRealisations,
   pageContact,
@@ -49,6 +51,7 @@ export const SANS_CREATION = [
   'pagePhotoVideo',
   'pageFormation',
   'pageDiagnostic',
+  'pageVerificateurLoi25',
   'pageEquipe',
   'pageRealisations',
   'pageContact',

@@ -66,7 +66,7 @@ export function reinitialiserAntiRobot(formulaire: HTMLFormElement): void {
  * n'apparaît que si Cloudflare a un doute. Aucune place n'est réservée ; l'attribut `data-visible`
  * suit la hauteur réelle du widget pour ne créer l'écart sous la case que lorsqu'elle s'affiche.
  */
-export function AntiRobot({ theme = "light" }: { theme?: "light" | "dark" }) {
+export function AntiRobot({ theme = "light", action = "formulaire" }: { theme?: "light" | "dark"; action?: string }) {
   const zone = useRef<HTMLDivElement>(null);
   useEffect(() => {
     const conteneur = zone.current;
@@ -87,7 +87,9 @@ export function AntiRobot({ theme = "light" }: { theme?: "light" | "dark" }) {
           if (!actif) return;
           idWidget = api.render(conteneur, {
             sitekey: CLE_SITE_TURNSTILE,
-            action: "formulaire",
+            // Le serveur peut exiger cette action (le vérificateur Loi 25 le fait, F5 de Sentinel) :
+            // un jeton obtenu sur un autre formulaire n'y sert alors à rien.
+            action,
             language: "fr",
             theme,
             appearance: "interaction-only",
@@ -129,7 +131,7 @@ export function AntiRobot({ theme = "light" }: { theme?: "light" | "dark" }) {
       formulaire?.removeEventListener("pointerdown", lancer);
       if (idWidget) window.turnstile?.remove(idWidget);
     };
-  }, [theme]);
+  }, [theme, action]);
   return <div ref={zone} className="zone-turnstile" />;
 }
 

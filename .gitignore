@@ -35,3 +35,5 @@ Claude outputs/
 
 # Rapports de sécurité : le dépôt est PUBLIC (bloc F, 2026-11-16)
 securite/
+# Rapports QA (Pixel) : même raison, ils décrivent des défauts avant correctif (2026-11-20)
+qa/

@@ -11,7 +11,23 @@
   },
 
   "observability": {
-    "enabled": true
+    "enabled": true,
+    // ⛔ GARDER ÉTEINT (Sentinel, vérificateur Loi 25, 2026-11-19). Les traces conservent l'adresse
+    // de chaque sous-requête du Worker : pour le vérificateur, la requête DNS (`?name=<domaine>`) et
+    // la sonde `http://<domaine>/`, donc le domaine soumis par chaque visiteur, ce que la politique
+    // et la mention de collecte disent ne pas conserver. Écrit en clair pour qu'un changement de
+    // `compatibility_date` qui l'activerait par défaut ne passe pas inaperçu.
+    "traces": {
+      "enabled": false
+    }
+  },
+
+  // Navigateur Cloudflare Browser Run, pour le vérificateur Loi 25 (/verificateur-loi-25,
+  // lib/verificateur/moteur.ts). La liaison EST le droit d'accès : aucun jeton de compte à poser
+  // en secret (l'API REST, elle, en exigerait un). Forfait Workers Paid : 10 h de navigateur par
+  // mois incluses, puis 0,09 $ US l'heure. En local, `wrangler dev` lance un Chrome sur le poste.
+  "browser": {
+    "binding": "BROWSER"
   },
 
   // Domaines servis par ce Worker.

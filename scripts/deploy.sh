@@ -79,6 +79,18 @@ if (fuites.size) {
 console.log("  OK : seules les cles NEXT_PUBLIC_* sont embarquees.");
 '
 
+echo "→ garde-fou : aucune clé Turnstile de TEST dans le site construit…"
+# F3 de Sentinel (vérificateur Loi 25, 2026-11-19) : un build local fait avec
+# NEXT_PUBLIC_TURNSTILE_SITE_KEY=1x00000000000000000000AA (essais) laisse cette clé dans les
+# fichiers du navigateur. Envoyée en ligne, elle ferait refuser TOUS les formulaires (403).
+# Les clés de test de Cloudflare commencent par 1x, 2x ou 3x suivis de zéros.
+if grep -rqE '\b[123]x0{20,}[A-Z]{2}\b' .open-next/assets 2>/dev/null; then
+  echo "  ARRET : une clé Turnstile de test est dans .open-next/assets." >&2
+  echo "  Reconstruis sans NEXT_PUBLIC_TURNSTILE_SITE_KEY (la vraie clé est dans lib/anti-robot-commun.ts)." >&2
+  exit 1
+fi
+echo "  OK : aucune clé de test."
+
 echo "→ wrangler deploy…"
 npx wrangler deploy
 echo ""

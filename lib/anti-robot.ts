@@ -53,7 +53,15 @@ function hoteDeTest(hote: string): boolean {
   return /\.workers\.dev$/.test(hote) || hote === "localhost" || hote === "127.0.0.1";
 }
 
-export async function verifierAntiRobot(req: Request, jeton: string): Promise<ResultatAntiRobot> {
+/**
+ * `attendu` (vérificateur Loi 25, F5 de Sentinel, 2026-11-19) : le jeton doit venir du widget de
+ * CE formulaire (`action`) et d'une page de norvika.ca (`hostname`). Sinon, un jeton obtenu sur le
+ * formulaire de contact servirait au vérificateur. Non contrôlé avec une clé de TEST : Cloudflare y
+ * répond toujours « example.com » et n'y met pas d'action.
+ */
+export type JetonAttendu = { action: string; hotes: readonly string[] };
+
+export async function verifierAntiRobot(req: Request, jeton: string, attendu?: JetonAttendu): Promise<ResultatAntiRobot> {
   if (!jeton || jeton.length > 2048) return refus(400);
 
   const cle = await secret();
@@ -81,13 +89,19 @@ export async function verifierAntiRobot(req: Request, jeton: string): Promise<Re
     return refus(503);
   }
 
-  let resultat: { success?: boolean; "error-codes"?: string[] } = {};
+  let resultat: { success?: boolean; "error-codes"?: string[]; action?: string; hostname?: string } = {};
   try {
     resultat = (await reponse.json()) as typeof resultat;
   } catch {
     // Réponse illisible : traitée comme un refus.
   }
-  if (resultat.success === true) return { ok: true };
+  if (resultat.success === true) {
+    if (!attendu || PREFIXE_TEST.test(cle)) return { ok: true };
+    if (resultat.action === attendu.action && attendu.hotes.includes(resultat.hostname ?? "")) return { ok: true };
+    // Le jeton est valide, mais il vient d'un autre widget ou d'un autre site.
+    console.warn("[anti-robot] jeton d'un autre formulaire ou d'un autre site : refusé.");
+    return refus(403);
+  }
   // Seulement les codes d'erreur de Cloudflare : jamais le jeton ni l'IP.
   console.warn("[anti-robot] jeton refusé :", (resultat["error-codes"] ?? []).join(", ") || `HTTP ${reponse.status}`);
   return refus(403);
