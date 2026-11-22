@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useId, useRef, useState, type KeyboardEvent } from "react";
 
 import { useContenuGlobal } from "@/components/site/ContenuGlobal";
 
@@ -21,6 +21,12 @@ import { useContenuGlobal } from "@/components/site/ContenuGlobal";
  * Les deux captures sont des pages completes, donc tres hautes. Le cadre a
  * une hauteur fixe et defile a l'interieur, sinon il faudrait les reduire au
  * point de ne plus rien lire.
+ *
+ * CLAVIER (passe tablette du 2026-11-22, reste de la passe du 2026-11-19) : le cadre est le
+ * panneau des onglets (role tabpanel), atteignable avec Tab, donc les fleches du clavier le font
+ * defiler (Safari ne rend pas focusable un cadre qui defile, contrairement a Chrome). Les deux
+ * onglets suivent le patron ARIA : un seul arret de tabulation, fleches gauche et droite pour
+ * passer de l'un a l'autre.
  */
 export function BasculeAvantApres({
   avant,
@@ -47,6 +53,8 @@ export function BasculeAvantApres({
 }) {
   const [vue, setVue] = useState<"avant" | "apres">("avant");
   const ecran = useRef<HTMLDivElement>(null);
+  const id = useId();
+  const onglets = useRef<Record<"avant" | "apres", HTMLButtonElement | null>>({ avant: null, apres: null });
   // Libellés lus par les lecteurs d'écran : « Menu et pied de page » du Studio (zéro texte en dur).
   const { navigation } = useContenuGlobal();
 
@@ -55,6 +63,20 @@ export function BasculeAvantApres({
     // Remettre en haut : sinon on bascule et on se retrouve au milieu de
     // l'autre page, sans savoir ou on est.
     ecran.current?.scrollTo({ top: 0 });
+  };
+
+  // Fleches, Debut et Fin : passer d'un onglet a l'autre (le focus suit, la vue aussi).
+  const clavier = (e: KeyboardEvent<HTMLButtonElement>) => {
+    const cible =
+      e.key === "ArrowLeft" || e.key === "Home"
+        ? "avant"
+        : e.key === "ArrowRight" || e.key === "End"
+          ? "apres"
+          : null;
+    if (!cible) return;
+    e.preventDefault();
+    changer(cible);
+    onglets.current[cible]?.focus();
   };
 
   return (
@@ -109,10 +131,17 @@ export function BasculeAvantApres({
           {(["avant", "apres"] as const).map((v) => (
             <button
               key={v}
+              ref={(el) => {
+                onglets.current[v] = el;
+              }}
+              id={`${id}-${v}`}
               type="button"
               role="tab"
               aria-selected={vue === v}
+              aria-controls={`${id}-panneau`}
+              tabIndex={vue === v ? 0 : -1}
               onClick={() => changer(v)}
+              onKeyDown={clavier}
               className="nv-bascule-onglet"
               style={{
                 padding: "6px 15px",
@@ -133,6 +162,10 @@ export function BasculeAvantApres({
 
       <div
         ref={ecran}
+        id={`${id}-panneau`}
+        role="tabpanel"
+        aria-labelledby={`${id}-${vue}`}
+        tabIndex={0}
         style={{
           // Grand volontairement : c'est la piece de demonstration de la page.
           // Le plafond a 760 px evite qu'elle depasse un portable de 900 px de

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, type FormEvent } from "react";
+import { useId, useState, type FormEvent } from "react";
 import { AntiRobot, MESSAGE_JETON_ABSENT, lireJetonAntiRobot, reinitialiserAntiRobot } from "@/components/site/AntiRobot";
 import { MentionCollecte } from "@/components/site/MentionCollecte";
 import { useContenuGlobal } from "@/components/site/ContenuGlobal";
@@ -43,6 +43,9 @@ const etiquette: React.CSSProperties = {
 
 export function ContactCTA() {
   const { parametres, blocContact: t } = useContenuGlobal();
+  // Le bandeau vit entre <main> et <footer> : nomme par son titre, la section devient un repère
+  // (région) que les lecteurs d'écran listent. Avant, il était hors de tout repère (Pixel, 2026-11-19).
+  const idTitre = useId();
   const LIEN_RDV = parametres.lienRendezVous;
   const [nom, setNom] = useState("");
   const [courriel, setCourriel] = useState("");
@@ -104,6 +107,7 @@ export function ContactCTA() {
   return (
     <section
       id="rdv"
+      aria-labelledby={idTitre}
       style={{ position: "relative", overflow: "hidden", background: "#0C192F", color: "#F5F3EE" }}
     >
       <div
@@ -143,7 +147,7 @@ export function ContactCTA() {
               background: "rgba(245,243,238,.4)",
             }}
           />
-          <h2 style={{ margin: 0, fontSize: "clamp(30px,3.6vw,50px)", lineHeight: 1.08 }}>
+          <h2 id={idTitre} style={{ margin: 0, fontSize: "clamp(30px,3.6vw,50px)", lineHeight: 1.08 }}>
             {t.titre}
           </h2>
           <p
