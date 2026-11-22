@@ -57,6 +57,12 @@
   --etat-place: var(--navy-500);
   --etat-place-fond: var(--brand-soft);
   --police-mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+
+  /* Parcours en etapes (components/site/Roadmap.tsx) : etat « a venir ». Avant : rgba(.28), soit
+     1,9:1, illisible sur tablette. Mesures : texte 5,7:1 sur blanc, 5,0:1 sur #EEF2FA (fond de
+     /sites-web) ; trait du point 3,4:1 sur son anneau blanc (WCAG 1.4.11 demande 3:1). */
+  --parcours-avenir-texte: rgba(12, 25, 47, .66);
+  --parcours-avenir-trait: #868C97;
 }
 
 @layer base {
@@ -928,8 +934,86 @@
   .nv-onglet:not([aria-current]):hover { color: #F5F3EE; border-bottom-color: rgba(245,243,238,.34); }
   .nv-filtre[aria-pressed="false"]:hover { border-color: rgba(12,25,47,.3); color: #0C192F; }
   .nv-video-jouer:hover .nv-video-rond { transform: scale(1.08); }
-  .nv-etape-point:hover [data-point] { transform: scale(1.3); }
+  .nv-etape-point:hover .nv-etape-pastille { transform: scale(1.3); }
 }
+
+/* ===== Parcours en etapes (components/site/Roadmap.tsx), declare UNE fois =====
+   Le composant pose les positions (calculees) ; ici, la forme et les trois etats, lus dans
+   `data-etat` : passe (plein navy-500), actuel (plein navy, sous la piece), a venir (creux, trait
+   gris). Le creux et le plein disent l'etat sans dependre de la couleur seule. Couleurs opaques :
+   avant, le point a venir etait translucide et la courbe se voyait au travers (un trait barrait
+   chaque point). Aucune graisse ne change d'un etat a l'autre : un libelle qui grossit changerait
+   de hauteur, donc la hauteur du bloc a chaque etape. */
+.nv-parcours { position: relative; margin-top: 40px; }
+.nv-parcours[data-mode="colonne"] { margin-top: 32px; }
+.nv-etape-point {
+  position: absolute;
+  z-index: 2;
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  margin: -22px 0 0 -22px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+}
+.nv-etape-pastille {
+  display: block;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: inset 0 0 0 2px var(--parcours-avenir-trait), 0 0 0 6px rgba(255, 255, 255, .85);
+  transition: background .3s cubic-bezier(.2, 0, 0, 1), box-shadow .3s cubic-bezier(.2, 0, 0, 1), transform .2s cubic-bezier(.2, 0, 0, 1);
+}
+.nv-etape-point[data-etat="passe"] .nv-etape-pastille {
+  background: var(--navy-500);
+  box-shadow: 0 0 0 6px rgba(255, 255, 255, .85), 0 6px 16px -8px rgba(12, 25, 47, .9);
+}
+.nv-etape-point[data-etat="actuel"] .nv-etape-pastille {
+  background: var(--navy);
+  box-shadow: 0 0 0 6px rgba(255, 255, 255, .85), 0 6px 16px -8px rgba(12, 25, 47, .9);
+}
+.nv-etape-libelle {
+  position: absolute;
+  margin: 0;
+  padding: 5px 8px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, .72);
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+  font-family: var(--font-display);
+  font-size: 13.5px;
+  font-weight: 500;
+  line-height: 1.25;
+  letter-spacing: -.01em;
+  text-wrap: balance;
+  color: var(--parcours-avenir-texte);
+  transition: color .3s cubic-bezier(.2, 0, 0, 1);
+}
+.nv-etape-point[data-etat="passe"] .nv-etape-libelle { color: var(--navy-500); }
+.nv-etape-point[data-etat="actuel"] .nv-etape-libelle { color: var(--navy); }
+/* La piece (goutte tournee) : sa position arrive par `transform`, ecrite image par image par le
+   composant. Cachee tant qu'elle n'est pas posee : sinon elle attendait dans le coin superieur
+   gauche jusqu'au JavaScript. */
+.nv-etape-piece {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 3;
+  width: 30px;
+  height: 30px;
+  border-radius: 50% 50% 50% 6px;
+  background: var(--navy);
+  box-shadow: 0 10px 22px -8px rgba(12, 25, 47, .9), 0 0 0 6px rgba(255, 255, 255, .6);
+  pointer-events: none;
+  will-change: transform;
+}
+.nv-etape-piece:not([data-pret]) { visibility: hidden; }
 
 /* ===== Verificateur Loi 25 (app/verificateur-loi-25, components/verificateur), declare UNE fois =====
    Haut de page : le titre et le formulaire cote a cote sur ordinateur, empiles sur telephone (le
