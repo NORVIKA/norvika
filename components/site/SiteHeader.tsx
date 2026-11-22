@@ -9,9 +9,10 @@ import { LienTelephone } from "@/components/site/LienTelephone";
 // Lockup horizontal de la marque (l'icone et le mot NORVIKA cote a cote), en SVG :
 // net a toutes les tailles. Le logo, les liens et le bouton viennent du Studio
 // (« Infos de l'entreprise » et « Menu et pied de page »).
-// Telephone (document de reference vitrine, phase 3) : a gauche du bouton sur ordinateur,
-// dans le menu deroulant sur telephone et tablette, ou la barre n'a de place que pour le
-// logo et le bouton du menu (components/site/LienTelephone.tsx).
+// Telephone : dans le menu deroulant seulement (components/site/LienTelephone.tsx). Retire de la
+// barre d'ordinateur le 2026-11-22, decision de William, pour faire place au lien du verificateur
+// Loi 25 : avec le numero, un 7e lien passait la barre sur deux lignes des 1200 px. Le numero
+// reste au pied de chaque page et sur /contact.
 export function SiteHeader() {
   const [open, setOpen] = useState(false);
   const bouton = useRef<HTMLButtonElement>(null);
@@ -89,7 +90,6 @@ export function SiteHeader() {
           ))}
         </nav>
         <div className="nv-header-actions">
-          <LienTelephone variante="entete" />
           <a
             href={LIEN_RDV}
             className="nv-btn-primary nv-header-cta"
@@ -167,7 +167,7 @@ export function SiteHeader() {
               {l.label}
             </Link>
           ))}
-          <LienTelephone variante="panneau" onClick={() => setOpen(false)} />
+          <LienTelephone onClick={() => setOpen(false)} />
           <a
             href={LIEN_RDV}
             onClick={() => setOpen(false)}

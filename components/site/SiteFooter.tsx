@@ -64,7 +64,8 @@ export function SiteFooter() {
                 fontSize: 14.5,
               }}
             >
-              {navigation.liensMenu.map((l) => (
+              {/* Le vérificateur a son propre lien en bas de la page : pas en double sous « Services ». */}
+              {navigation.liensMenu.filter((l) => l.lien !== CHEMIN_VERIFICATEUR).map((l) => (
                 <Link key={l.lien} href={l.lien} className="nv-lien">
                   {l.libelle}
                 </Link>

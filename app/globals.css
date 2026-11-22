@@ -420,9 +420,19 @@
 @media (max-width: 1024px) {
   .nv-shell { padding-left: 24px !important; padding-right: 24px !important; }
   .nv-header-shell { padding-left: 8px !important; padding-right: 8px !important; }
+  section > .nv-shell { padding-top: 64px !important; padding-bottom: 64px !important; }
+}
+
+/* Menu deroulant jusqu'a 1179 px, plus 1024 (2026-11-22, lien du verificateur Loi 25 au menu).
+   Mesure : logo + 7 liens (« Test Loi 25 » en 7e) + bouton tiennent sur une ligne a partir
+   d'environ 1105 a 1140 px selon le rendu des polices ; en dessous, liens et bouton passent sur
+   deux lignes. 1180 px garde la barre complete sur l'iPad en paysage (1180, 1194) avec une
+   marge ; l'iPad mini en paysage (1133) prend le menu deroulant.
+   ⚠️ Un libelle plus long au menu (ex. « Verificateur Loi 25 ») ne tient qu'a partir de 1145 a
+   1190 px : refaire la mesure avant de l'allonger. */
+@media (max-width: 1179px) {
   .nv-desktop-nav, .nv-header-cta { display: none !important; }
   .nv-burger { display: inline-flex !important; }
-  section > .nv-shell { padding-top: 64px !important; padding-bottom: 64px !important; }
 }
 
 /* Les grilles a deux colonnes s'empilent a 860 px, plus a 1024 (passe tablette, 2026-11-22).
@@ -448,7 +458,7 @@
 }
 
 .nv-burger-panel { display: none !important; }
-@media (max-width: 1024px) { .nv-burger-panel { display: flex !important; } }
+@media (max-width: 1179px) { .nv-burger-panel { display: flex !important; } }
 
 /* ===== Grille de logos clients (Realisations) ===== */
 .nv-logo-grid {
@@ -791,13 +801,10 @@
   .nv-fil a:hover { color: var(--fil-courant); text-decoration-color: currentColor; }
 }
 
-/* ===== Telephone de la barre du haut (components/site/LienTelephone.tsx) =====
-   Ordinateur : a gauche du bouton de rendez-vous. Telephone et tablette (barre trop
-   etroite) : dans le menu deroulant, sous les liens.
-   ⚠️ Mesure du 2026-11-15 : logo + six liens + numero + bouton demandent environ 1170 px.
-   Entre 1025 et 1199 px, le numero faisait passer les liens et le bouton sur deux lignes
-   (barre de 59 a 80 px). Il n'apparait donc qu'a partir de 1200 px ; en dessous de 1025 px,
-   il est dans le menu deroulant. */
+/* ===== Telephone (components/site/LienTelephone.tsx) =====
+   Dans le menu deroulant seulement. Retire de la barre d'ordinateur le 2026-11-22 (decision de
+   William) pour faire place au lien du verificateur Loi 25 : la barre est plafonnee a 1240 px, et
+   logo + 7 liens + numero + bouton n'y tenaient sur une ligne a aucune largeur. */
 .nv-header-actions { display: flex; align-items: center; gap: 22px; }
 .nv-tel {
   color: var(--navy);
@@ -810,13 +817,9 @@
   text-decoration-thickness: 1.5px;
   transition: color .2s, text-decoration-color .2s;
 }
-.nv-tel-entete { padding: 10px 2px; font-size: 14px; }
 .nv-tel-panneau { padding: 12px 4px; font-size: 16px; }
 @media (hover: hover) {
   .nv-tel:hover { color: var(--navy-500); text-decoration-color: currentColor; }
-}
-@media (max-width: 1199px) {
-  .nv-tel-entete { display: none !important; }
 }
 
 /* ===== Liens du bas du pied de page (politique, plan du site) ===== */
