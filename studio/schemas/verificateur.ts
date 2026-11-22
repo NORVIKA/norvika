@@ -134,8 +134,8 @@ export const pageVerificateurLoi25 = defineType({
         ],
         [
           'erreurSansHttps',
-          'Site sans https',
-          'Le site répond seulement en http. Chrome le bloque derrière son avertissement « site non sécurisé », pour nos visites comme pour les vrais visiteurs : rien ne peut être analysé. {domaine} est remplacé par le nom du site.',
+          'Site sans HTTPS',
+          'Le site ne répond pas en HTTPS, ou son certificat est expiré ou invalide. Notre outil s’arrête à l’avertissement de sécurité de Chrome : rien ne peut être analysé. {domaine} est remplacé par le nom du site.',
         ],
       ] as const
     ).map(([name, title, quand]) => paragraphe(name, title, `Message affiché quand : ${quand.charAt(0).toLowerCase()}${quand.slice(1)}`, { group: 'analyse', rows: 2 })),

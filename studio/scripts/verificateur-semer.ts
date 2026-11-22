@@ -88,7 +88,7 @@ const doc = {
   erreurAntiRobot: "La vérification anti-robot n'a pas abouti. Rechargez la page et réessayez.",
   erreurIndisponible: 'Le vérificateur est indisponible pour le moment. Réessayez plus tard, ou écrivez-nous à info@norvika.ca.',
   erreurSansHttps:
-    "Votre site {domaine} n'est pas en https. Chrome affiche maintenant un avertissement avant d'ouvrir un site comme le vôtre, et notre navigateur s'arrête au même endroit que vos visiteurs : nous ne pouvons rien analyser d'autre. Passez votre site en https, puis relancez la vérification.", // Mattew, 2026-11-19, à faire relire par Martin
+    "Votre site {domaine} ne répond pas en HTTPS, ou son certificat est expiré ou invalide. Depuis l'automne 2026, Chrome affiche par défaut un avertissement avant d'ouvrir pour la première fois un site sans HTTPS, et notre outil s'arrête à cet avertissement : nous ne pouvons rien analyser d'autre. Activez un certificat chez votre hébergeur (souvent sans frais), puis relancez la vérification.", // Martin, relu le 2026-11-21 (même texte que scripts/verificateur-textes-2026-11-19c.ts)
   erreurIncompatible: 'Notre outil ne peut pas analyser ce site automatiquement en toute sécurité. Plutôt que de vous donner un résultat incomplet, nous préférons ne rien conclure. Écrivez-nous à info@norvika.ca : nous le vérifierons nous-mêmes.', // Mattew, 2026-11-19, à faire relire par Martin
 
   /* Le résultat (Martin, section 3 ; libellés d'état et de preuve : Mattew) */

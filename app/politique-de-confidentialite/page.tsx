@@ -54,7 +54,7 @@ export default async function PolitiquePage() {
 
           <h2 className="mt-8 text-xl font-semibold">2. Données collectées</h2>
           <p className="mt-3 text-[var(--muted-foreground)]">
-            Nous collectons uniquement les données que vous nous fournissez volontairement :
+            Nous collectons seulement les données suivantes :
           </p>
           <ul className="mt-3 list-disc pl-5 text-[var(--muted-foreground)]">
             <li>Prénom, courriel et numéro de téléphone (via le formulaire Espace client)</li>
@@ -96,8 +96,10 @@ export default async function PolitiquePage() {
             </li>
             <li>
               <strong className="text-[var(--foreground)]">Adresse IP.</strong> Nous la gardons sous une
-              forme brouillée (un condensé qui ne permet pas de la relire), au plus 24 heures, pour limiter
-              le nombre d’analyses par appareil et bloquer les abus. Elle ne sert à rien d’autre.
+              forme brouillée (un condensé qui ne permet pas de la relire), chez Supabase, au plus 24 heures,
+              pour limiter le nombre d’analyses par appareil et bloquer les abus. Comme pour toute visite du
+              site, votre adresse IP figure aussi jusqu’à 7 jours dans les journaux techniques de Cloudflare.
+              Elle ne sert à rien d’autre.
             </li>
             <li>
               <strong className="text-[var(--foreground)]">Vérification anti-robot.</strong> Comme sur nos
@@ -220,7 +222,7 @@ export default async function PolitiquePage() {
             </li>
             <li>
               <strong className="text-[var(--foreground)]">Cloudflare</strong> : hébergement et
-              diffusion du site
+              diffusion du site. Ses journaux techniques gardent l’adresse IP des visiteurs jusqu’à 7 jours.
             </li>
             <li>
               <strong className="text-[var(--foreground)]">Cloudflare Browser Run</strong> : visite
