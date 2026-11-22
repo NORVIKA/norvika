@@ -950,12 +950,13 @@
 /* ===== Cibles au doigt (pointeur grossier : tablette, telephone), declarees UNE fois =====
    Passe tablette du 2026-11-22. Sur un iPad en paysage (1180, 1366 px), la barre du haut est celle
    de l'ordinateur : ses liens faisaient 21 px de haut, le logo 26, les liens du pied de page 19 a
-   22, les onglets Avant / Apres 29. Le doigt vise 44 px. On agrandit la ZONE de toucher, pas le
+   22, les onglets Avant / Apres 29. Le doigt vise 44 px (WCAG 2.5.8 en exige 24). On agrandit la ZONE de toucher, pas le
    dessin : rembourrage la ou la place existe, pseudo-element la ou le dessin doit rester tel quel.
    Detecte par la capacite du peripherique (pointer: coarse), jamais par la largeur (regle 10). */
 @media (pointer: coarse) {
-  .nv-desktop-nav .nv-navlink { padding-top: 12px; padding-bottom: 12px; }
-  .nv-logo-lien { padding-top: 9px; padding-bottom: 9px; }
+  /* 41 et 42 px, pas 44 : la barre du haut garde sa hauteur (bouton de 42 px + 2 x 8 px). */
+  .nv-desktop-nav .nv-navlink { padding-top: 10px; padding-bottom: 10px; }
+  .nv-logo-lien { padding-top: 8px; padding-bottom: 8px; }
   footer .nv-lien, footer .nv-pied-lien { padding-top: 8px; padding-bottom: 8px; }
   .nv-filtre { padding-top: 11px; padding-bottom: 11px; }
   .nv-plan-lien, .nv-plan-fiches .nv-plan-lien { padding-top: 11px; padding-bottom: 11px; }
