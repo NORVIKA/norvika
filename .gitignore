@@ -37,3 +37,6 @@ Claude outputs/
 securite/
 # Rapports QA (Pixel) : même raison, ils décrivent des défauts avant correctif (2026-11-20)
 qa/
+
+# Créé par next dev (Next 16.4) : jamais dans le dépôt public
+AGENTS.md
