@@ -15,7 +15,7 @@
 --   service_role y touche, par la fonction ci-dessous.
 -- - Fonction reserver_courriels_verificateur(p_nombre, p_max_jour) : réserve 1 ou 2 courriels en une
 --   transaction, sous verrou (aucune course). Rend 'ok' (réservé), 'jour' (plafond du jour atteint),
---   'refus' (nombre invalide).
+--   'refus' (nombre ou plafond invalide).
 --
 -- TANT QUE CE FICHIER N'EST PAS PASSÉ : l'analyse fonctionne normalement, mais AUCUN courriel du
 -- rapport ne part (le code reçoit « fonction introuvable », affiche le résultat à l'écran et le
@@ -52,6 +52,8 @@ create table if not exists public.verificateur_courriels (
 );
 
 alter table public.verificateur_courriels enable row level security;
+-- La RLS bloque déjà ces rôles par l'API ; le retrait des droits en plus (défense en profondeur).
+revoke all on table public.verificateur_courriels from anon, authenticated;
 
 comment on table public.verificateur_courriels is
   'Vérificateur Loi 25 (norvika.ca) : nombre de courriels du rapport envoyés par jour (heure du Québec), pour le plafond. Aucune donnée personnelle.';
@@ -69,8 +71,9 @@ declare
   aujourd_hui date := (now() at time zone 'America/Toronto')::date;
   n integer;
 begin
-  -- Le rapport seul (1), ou le rapport et la copie interne (2) : rien d'autre.
-  if p_nombre is null or p_nombre < 1 or p_nombre > 2 then
+  -- Le rapport seul (1), ou le rapport et la copie interne (2) : rien d'autre. Un plafond nul ou
+  -- négatif est refusé aussi : avec null, la comparaison plus bas vaudrait null et le plafond sauterait.
+  if p_nombre is null or p_nombre < 1 or p_nombre > 2 or p_max_jour is null or p_max_jour < 0 then
     return 'refus';
   end if;
 
