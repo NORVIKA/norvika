@@ -40,10 +40,16 @@ const PIEGES = {
   nomTemoin: "piege-temoin.example",
 } as const;
 const COURRIEL = "o'neil+essai@exemple.ca";
-/** La vraie adresse postale, celle que le semis écrira (studio/scripts/verificateur-courriel-parametres.json). */
-const ADRESSE_ESSAI = String(
+/**
+ * L'adresse du semis (studio/scripts/verificateur-courriel-parametres.json) ; vide depuis le 2026-11-23
+ * (William ne veut pas publier son adresse), donc une adresse fictive pour essayer le chemin « avec case ».
+ */
+const ADRESSE_SEMIS = String(
   (JSON.parse(readFileSync(join(process.cwd(), "studio/scripts/verificateur-courriel-parametres.json"), "utf8")) as { adressePostale?: unknown }).adressePostale ?? "",
-);
+).trim();
+const ADRESSE_ESSAI = ADRESSE_SEMIS || "C.P. 1000, succursale Essai, Montréal (Québec) H0H 0H0";
+/** Un morceau de l'adresse sans apostrophe (la typographie change ' en ’). */
+const REPERE_ADRESSE = ADRESSE_ESSAI.replace(/'/g, "’").slice(0, 10);
 
 const observations: Observations = {
   adresse: "https://exemple.ca/",
@@ -174,12 +180,15 @@ async function principal() {
   verifier("avec la case : paragraphe « si ce n'est pas vous » (point 5)", visiteurCase.html.includes("désabonnement"));
   verifier(
     "adresse postale au pied quand elle existe, absente sinon",
-    Boolean(ADRESSE_ESSAI) && visiteurCase.html.includes("684, rue Chapleau") && sansCase.html.includes("684, rue Chapleau") && !courrielVisiteur(rapport, variante(lus, false, ""), false).html.includes("Chapleau"),
+    visiteurCase.html.includes(REPERE_ADRESSE) &&
+      courrielVisiteur(rapport, variante(lus, false, ADRESSE_ESSAI), false).html.includes(REPERE_ADRESSE) &&
+      !courrielVisiteur(rapport, variante(lus, false, ""), false).html.includes(REPERE_ADRESSE),
   );
-  verifier("semis : la case est ouverte et l'adresse est connue (poste local)", lus.t.rapportCourriel?.afficherCase === true && lus.adressePostale === ADRESSE_ESSAI.replace(/'/g, "’"));
+  // Sans adresse au semis (décision de William, 2026-11-23), la case reste cachée même ouverte.
+  verifier("semis : case ouverte, adresse lue telle que semée (poste local)", lus.t.rapportCourriel?.afficherCase === true && lus.adressePostale === ADRESSE_SEMIS.replace(/'/g, "’"));
   verifier("copie interne : préfixe fixe de l'objet (C6)", interne.objet.startsWith(`${PREFIXE_CONSENTEMENT} : `));
   verifier("copie interne : identifiant Resend", interne.html.includes("essai-id-resend"));
-  verifier("copie interne : texte de la case et adresse postale", interne.html.includes("Mont-Saint-Hilaire") && interne.html.includes("Norvika inc. m"));
+  verifier("copie interne : texte de la case et adresse postale", interne.html.includes(REPERE_ADRESSE) && interne.html.includes("Norvika inc. m"));
   verifier("copie interne : adresse de la personne", interne.html.includes("neil+essai@exemple.ca"));
 
   /* ------------------------------------------------------------ 2. envoi, faux Resend */
