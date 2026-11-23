@@ -30,7 +30,8 @@ export function remplir(gabarit: string, variables: Record<string, string>): str
  */
 export function remplirAvecAdresse(gabarit: string, cle: string, adresse: string): string {
   const repere = "";
-  return remplir(gabarit, { [cle]: repere }).replace(repere, adresse);
+  // Remplacement par une fonction : « $& » ou « $' » dans une adresse resteraient sinon des motifs.
+  return remplir(gabarit, { [cle]: repere }).replace(repere, () => adresse);
 }
 
 /** Le nom d'hôte d'une adresse, ou la saisie telle quelle si elle ne se lit pas. */

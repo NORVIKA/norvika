@@ -28,7 +28,8 @@ import { formeCourrielValide } from "../../lib/garde-formulaire";
 import { reserverCourrielsVerificateur, type ReserveCourriels } from "../../lib/rate-limit";
 import { recoitDuCourriel } from "../../lib/verificateur/adresse";
 import { courrielInterne, courrielVisiteur, envoyerRapport, PREFIXE_CONSENTEMENT } from "../../lib/verificateur/courriel";
-import { lireTextesCourriel, type TextesCourriel } from "../../lib/verificateur/textes-serveur";
+import { remplirAvecAdresse } from "../../lib/verificateur/textes";
+import { lienAbsolu, lireTextesCourriel, type TextesCourriel } from "../../lib/verificateur/textes-serveur";
 
 const PIEGE = `<script>alert("x")</script>`;
 /** Les quatre pièges : chacun porte un domaine qui ne doit jamais sortir dans un courriel. */
@@ -218,6 +219,13 @@ async function principal() {
   const enPanne = async (): Promise<ReserveCourriels> => "panne";
   const l = await avecFauxResend([200], () => envoyer(avecCase, false, false, enPanne));
   verifier("compteur absent ou en panne : échec, AUCUN appel à Resend", l.appels.length === 0 && l.resultat.motif === "compteur");
+
+  /* ------------------------------------------------------------ adresse dans une phrase, liens du Studio */
+  verifier("une adresse avec « $& » reste intacte dans « Rapport envoyé à »", remplirAvecAdresse(rc.envoiReussi, "courriel", "a$&b$'c@exemple.ca").includes("a$&b$'c@exemple.ca"));
+  verifier("lien relatif du Studio rendu absolu", lienAbsolu("/contact") === "https://norvika.ca/contact" && lienAbsolu("#rdv") === "https://norvika.ca/#rdv");
+  verifier("lien complet du Studio gardé tel quel", lienAbsolu("https://cal.example/norvika") === "https://cal.example/norvika");
+  const relatif = courrielVisiteur(rapport, { ...lus, lienRendezVous: lienAbsolu("/contact") }, false);
+  verifier("courriel : le bouton de rendez-vous mène à une adresse complète", relatif.html.includes('href="https://norvika.ca/contact"'));
 
   /* ------------------------------------------------------------ forme du courriel (les trois formulaires) */
   for (const bonne of ["o'neil+essai@exemple.ca", "a@b.ca", "prenom.nom@sous.domaine-qc.ca"]) verifier(`forme acceptée : ${bonne}`, formeCourrielValide(bonne));

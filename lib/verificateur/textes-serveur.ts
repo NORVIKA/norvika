@@ -1,5 +1,6 @@
 import "server-only";
 
+import { BASE } from "@/lib/adresse";
 import { clientSanityExecution } from "@/lib/sanity";
 import type { PageVerificateur } from "@/lib/types-contenu";
 import { insecablesPartout, typographier } from "@/lib/typographie";
@@ -34,6 +35,18 @@ type Lu = {
   parametres: { nom?: string; nomLegal?: string; adressePostale?: string | null; courriel?: string; lienRendezVous?: string } | null;
 };
 
+/**
+ * Un lien du Studio rendu utilisable dans un courriel : le Studio accepte « /contact » ou « #ancre »
+ * (une page du site), qui ne mènent nulle part depuis une boîte de réception. Ils deviennent
+ * https://norvika.ca/contact. Un lien complet (https://, mailto:, tel:) reste tel quel.
+ */
+export function lienAbsolu(lien: string): string {
+  const l = lien.trim();
+  if (l.startsWith("/")) return `${BASE}${l}`;
+  if (l.startsWith("#")) return `${BASE}/${l}`;
+  return l;
+}
+
 export async function lireTextesCourriel(): Promise<TextesCourriel | null> {
   try {
     const lu = await clientSanityExecution.fetch<Lu>(REQUETE, {}, { signal: AbortSignal.timeout(5000) });
@@ -48,7 +61,7 @@ export async function lireTextesCourriel(): Promise<TextesCourriel | null> {
       nomLegal: typographier(lu.parametres.nomLegal),
       adressePostale: typographier(adresseLocale(lu.parametres.adressePostale)),
       courriel: lu.parametres.courriel || "info@norvika.ca",
-      lienRendezVous: lu.parametres.lienRendezVous,
+      lienRendezVous: lienAbsolu(lu.parametres.lienRendezVous),
     };
   } catch (e) {
     console.error("[verificateur] textes du courriel illisibles :", e instanceof Error ? e.name : "erreur");
