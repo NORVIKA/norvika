@@ -21,13 +21,17 @@ export function ligneSimpleValide(valeur: string): boolean {
 }
 
 /**
- * Forme d'une adresse courriel : quelque chose@domaine.ext, sans espace. Volontairement large (le
- * fournisseur d'envoi refuse lui-même une adresse impossible) ; déclarée une seule fois pour les
- * formulaires de contact, de /bienvenue et le rapport du vérificateur Loi 25. Fichier sans
+ * Forme d'une adresse courriel : la règle du champ `type="email"` des navigateurs (norme HTML de
+ * WHATWG), avec au moins un point dans le domaine. Une adresse nue seulement : ni nom affiché
+ * (« "Nom" <x@y.ca> »), ni espace, ni virgule, ni caractère hors ASCII. Déclarée une seule fois pour
+ * les formulaires de contact, de /bienvenue et le rapport du vérificateur Loi 25. Fichier sans
  * dépendance serveur : la page du vérificateur l'importe pour refuser une faute avant l'envoi.
  */
+const FORME_COURRIEL =
+  /^[a-zA-Z0-9.!#$%&'*+\/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)+$/;
+
 export function formeCourrielValide(valeur: string): boolean {
-  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(valeur);
+  return FORME_COURRIEL.test(valeur);
 }
 
 /** Vrai si le texte long ne contient que des caractères visibles, sauts de ligne permis. */

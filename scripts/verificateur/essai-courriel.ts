@@ -24,6 +24,7 @@ import { mkdirSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 
 import { analyser, type Observations } from "../../lib/verificateur/analyse";
+import { formeCourrielValide } from "../../lib/garde-formulaire";
 import { reserverCourrielsVerificateur, type ReserveCourriels } from "../../lib/rate-limit";
 import { recoitDuCourriel } from "../../lib/verificateur/adresse";
 import { courrielInterne, courrielVisiteur, envoyerRapport, PREFIXE_CONSENTEMENT } from "../../lib/verificateur/courriel";
@@ -221,6 +222,12 @@ async function principal() {
   const enPanne = { ...outilsOk, reserverCourrielsVerificateur: async (): Promise<ReserveCourriels> => "panne" };
   const l = await avecFauxResend([200], () => envoyer(avecCase, false, false, enPanne));
   verifier("compteur absent ou en panne : échec, AUCUN appel à Resend", l.appels.length === 0 && l.resultat.motif === "compteur");
+
+  /* ------------------------------------------------------------ forme du courriel (les trois formulaires) */
+  for (const bonne of ["o'neil+essai@exemple.ca", "a@b.ca", "prenom.nom@sous.domaine-qc.ca"]) verifier(`forme acceptée : ${bonne}`, formeCourrielValide(bonne));
+  for (const mauvaise of ['"Facturation"<x@domaine.example>', "Nom <x@y.ca>", "x@y", "a b@c.ca", "x@-y.ca", "x@y..ca", "x,y@z.ca", "é@x.ca", "x@exemple.ca\n"]) {
+    verifier(`forme refusée : ${JSON.stringify(mauvaise)}`, !formeCourrielValide(mauvaise));
+  }
 
   /* ------------------------------------------------------------ 3. MX et compteur, vrais modules, faux réseau */
   const reponsesDoh: Record<string, object | number> = {
