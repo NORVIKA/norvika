@@ -13,8 +13,10 @@
  * NODE_PATH et --conditions : `server-only` n'est pas un paquet du projet, Next le fournit à la
  * construction ; hors de Next, on prend sa version vide (celle des composants serveur).
  * VERIFICATEUR_TEXTES_LOCAUX=1 : textes de studio/scripts/verificateur-courriel-textes.json tant que
- * le groupe « Rapport par courriel » n'est pas semé. Une preuve piégée (<script>, guillemets)
- * vérifie que tout ce qui vient du site visité est échappé.
+ * le groupe « Rapport par courriel » n'est pas semé.
+ * ⛔ ESSAI BLOQUANT (sortie 1) : quatre pièges posés par un site analysé (une adresse dans le texte du
+ *    lien de politique, l'adresse nue de ce lien, une adresse dans le bouton de refus, une adresse
+ *    dans un nom de témoin) ne doivent paraître NI dans le HTML NI dans le texte du courriel.
  */
 import { mkdirSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
@@ -24,6 +26,13 @@ import { courrielInterne, courrielVisiteur, envoyerRapport, PREFIXE_CONSENTEMENT
 import { lireTextesCourriel, type TextesCourriel } from "../../lib/verificateur/textes-serveur";
 
 const PIEGE = `<script>alert("x")</script>`;
+/** Les quatre pièges : chacun porte un domaine qui ne doit jamais sortir dans un courriel. */
+const PIEGES = {
+  texteDuLien: "piege-texte-lien.example",
+  adresseDuLien: "piege-adresse-lien.example",
+  boutonRefus: "piege-bouton.example",
+  nomTemoin: "piege-temoin.example",
+} as const;
 const COURRIEL = "o'neil+essai@exemple.ca";
 const ADRESSE_ESSAI = "123, rue d'Essai, Chambly (Québec) J3L 0A0";
 
@@ -46,6 +55,24 @@ const observations: Observations = {
     texte: "Politique de confidentialité. Vous avez un droit d'accès à vos renseignements. ".repeat(4),
   },
   https: "redirige",
+};
+
+/** Site piégé A : texte du lien piégé et page en 404, bouton de refus piégé, nom de témoin piégé. */
+const piegeA: Observations = {
+  ...observations,
+  temoins: [
+    { nom: "_ga", domaine: ".exemple.ca" },
+    { nom: `_ga facture impayée https://${PIEGES.nomTemoin}/p`, domaine: ".exemple.ca" },
+  ],
+  banniere: { outil: "CookieYes", maison: false, refus: `Refuser et payer sur www.${PIEGES.boutonRefus}` },
+  lienPolitique: { texte: `Confidentialité : facture impayée, réglez-la sur https://${PIEGES.texteDuLien}/p`, url: "https://www.exemple.ca/confidentialite" },
+  politique: { url: "https://www.exemple.ca/confidentialite", statut: 404, texte: null },
+};
+
+/** Site piégé B : lien de politique SANS texte, donc son adresse nue serait recopiée ; page lisible. */
+const piegeB: Observations = {
+  ...observations,
+  lienPolitique: { texte: "", url: `https://${PIEGES.adresseDuLien}/confidentialite` },
 };
 
 let echecs = 0;
@@ -110,7 +137,20 @@ async function principal() {
   verifier("jamais « conforme »", !/conforme/i.test(tout));
   verifier("aucune image distante (C4)", !/<img|url\(/i.test(tout));
   verifier("preuve piégée échappée (aucune balise <script>)", !/<script/i.test(sansCase.html + visiteurCase.html + interne.html));
-  verifier("preuve piégée affichée en texte", sansCase.html.includes("&lt;script&gt;"));
+  verifier("texte libre du site absent (aucune trace du piège <script>)", !/script|alert/i.test(tout));
+
+  // ⛔ BLOQUANT : les quatre pièges, dans le HTML ET dans le texte, avec et sans la case.
+  const rapportA = { ...analyser(piegeA, Date.now()), date: rapport.date };
+  const rapportB = { ...analyser(piegeB, Date.now()), date: rapport.date };
+  const piegesRendus = [rapportA, rapportB]
+    .flatMap((r) => [courrielVisiteur(r, lus, false), courrielVisiteur(r, avecCase, true)])
+    .flatMap((m) => [m.objet, m.html, m.texte ?? ""])
+    .join("\n");
+  for (const [nom, domaine] of Object.entries(PIEGES)) verifier(`piège « ${nom} » absent du courriel (HTML et texte)`, !piegesRendus.includes(domaine));
+  verifier("piège A bien analysé : lien brisé, bannière en place, témoin à corriger", rapportA.resultats.find((x) => x.id === "politique")?.cas === "aCorrigerLienBrise" && rapportA.resultats.find((x) => x.id === "banniere")?.etat === "en-place" && rapportA.resultats.find((x) => x.id === "temoins")?.etat === "a-corriger");
+  verifier("piège B bien analysé : politique en place", rapportB.resultats.find((x) => x.id === "politique")?.cas === "enPlace");
+  verifier("nom de témoin piégé ramené à « _ga » dans le rapport", JSON.stringify(rapportA.resultats.find((x) => x.id === "temoins")?.preuves) === JSON.stringify([{ type: "temoins", valeurs: ["_ga"] }, { type: "note", valeurs: ["Google Tag Manager"] }, { type: "domaines", valeurs: ["www.googletagmanager.com"] }]));
+  verifier("aucun guillemet vide laissé par un texte retiré", !/«\s*»/.test(piegesRendus));
   verifier("avertissement « pas un avis juridique » présent", sansCase.html.includes(lus.t.avertissementCourt));
   verifier("lien du rendez-vous sans paramètre ajouté", sansCase.html.includes(`href="${lus.lienRendezVous}"`));
   verifier("nom légal présent", sansCase.html.includes(lus.nomLegal));

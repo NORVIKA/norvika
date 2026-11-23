@@ -14,7 +14,9 @@ import { VERIFICATIONS, type Preuve, type Rapport, type ResultatVerification } f
 export function remplir(gabarit: string, variables: Record<string, string>): string {
   const texte = gabarit
     .replace(/\{(\w+)\}/g, (tout, cle: string) => (cle in variables ? variables[cle] : tout))
-    // Une variable vide ne laisse ni parenthèses vides (« dépose _ga () dès »), ni espaces doubles.
+    // Une variable vide ne laisse ni guillemets vides (« Le lien « » mène »), ni parenthèses vides
+    // (« dépose _ga () dès »), ni espaces doubles. \s couvre les espaces insécables du Studio.
+    .replace(/«\s*»/g, "")
     .replace(/\s*\(\s*\)/g, "")
     .replace(/\s{2,}/g, " ")
     .replace(/\s+([.,])/g, "$1")
@@ -44,8 +46,13 @@ export const sansWww = (h: string) => h.replace(/^www\./, "");
 
 export const valeurs = (preuves: Preuve[], type: Preuve["type"]) => preuves.find((p) => p.type === type)?.valeurs ?? [];
 
-/** Le texte d'une vérification selon son état, avec ses variables remplies par les preuves. */
-export function texteResultat(r: ResultatVerification, textes: TextesVerification, t: PageVerificateur): string {
+/**
+ * Le texte d'une vérification selon son état, avec ses variables remplies par les preuves.
+ * `pourCourriel` : le courriel part de norvika.ca vers une adresse que l'auteur de l'analyse choisit.
+ * Il ne recopie donc AUCUN texte libre du site analysé : le texte du lien de politique et celui du
+ * bouton de refus restent vides (la page, elle, les montre à la personne qui a lancé l'analyse).
+ */
+export function texteResultat(r: ResultatVerification, textes: TextesVerification, t: PageVerificateur, pourCourriel = false): string {
   const droits: Record<string, string> = { acces: t.droitAcces, rectification: t.droitRectification, retrait: t.droitRetrait };
   const gabarit = r.cas
     .split("+")
@@ -57,8 +64,8 @@ export function texteResultat(r: ResultatVerification, textes: TextesVerificatio
     services: notes.join(", "),
     outil: notes[0] ?? "",
     code: notes[0] ?? "",
-    libelle_refus: valeurs(r.preuves, "extrait")[0] ?? "",
-    libelle_lien: valeurs(r.preuves, "lien")[0] ?? "",
+    libelle_refus: pourCourriel ? "" : (valeurs(r.preuves, "extrait")[0] ?? ""),
+    libelle_lien: pourCourriel ? "" : (valeurs(r.preuves, "lien")[0] ?? ""),
     droits_manquants: valeurs(r.preuves, "manquants")
       .map((d) => droits[d] ?? d)
       .join(", "),

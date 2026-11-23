@@ -86,6 +86,19 @@ export function estTemoinDeSuivi(nom: string): boolean {
   return TEMOINS_SUIVI_EXACTS.includes(nom) || PREFIXES_TEMOINS_SUIVI.some((p) => nom.startsWith(p));
 }
 
+/** Un nom de témoin ordinaire : lettres, chiffres, _ et -, 40 caractères au plus (_ga, _ga_X1Y2, _gcl_au). */
+const NOM_TEMOIN_ORDINAIRE = /^[A-Za-z0-9_-]{1,40}$/;
+
+/**
+ * Le nom d'un témoin de suivi tel qu'on le montre (page et courriel). Le site analysé choisit la suite
+ * du nom (« _ga » suivi de n'importe quoi) : un nom hors de la forme ordinaire est ramené au préfixe
+ * reconnu, pour qu'aucun texte libre du site ne soit recopié.
+ */
+export function nomTemoinAffiche(nom: string): string {
+  if (NOM_TEMOIN_ORDINAIRE.test(nom)) return nom;
+  return TEMOINS_SUIVI_EXACTS.find((n) => n === nom) ?? PREFIXES_TEMOINS_SUIVI.find((p) => nom.startsWith(p)) ?? "";
+}
+
 /** La politique, si elle a été lue (lien trouvé, page en 200, assez de texte). */
 function texteLisible(o: Observations): string | null {
   const p = o.politique;
@@ -122,7 +135,9 @@ function verifierTemoins(o: Observations): Verdict & { hotes: string[] } {
   }
 
   const preuves: Preuve[] = [];
-  if (temoins.length) preuves.push(preuve("temoins", temoins.map((t) => t.nom)));
+  // Noms ramenés à leur forme ordinaire, sans doublon (dix « _ga » piégés ne font qu'un « _ga »).
+  const noms = [...new Set(temoins.map((t) => nomTemoinAffiche(t.nom)).filter(Boolean))];
+  if (noms.length) preuves.push(preuve("temoins", noms));
   if (outils.size) preuves.push(preuve("note", [...outils]));
   if (hotes.size) preuves.push(preuve("domaines", [...hotes]));
 

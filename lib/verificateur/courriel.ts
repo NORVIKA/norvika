@@ -13,7 +13,10 @@ import { VERIFICATIONS, type Etat, type EtatEnvoi, type Rapport } from "./types"
  *
  * ⛔ C7 : le contenu vient du rapport que la route VIENT de calculer et des textes du Studio, jamais
  *    de données envoyées par le navigateur : personne ne peut faire partir un faux rapport au nom de
- *    Norvika. Tout ce qui vient de l'extérieur (Studio, domaine visité, preuves) est échappé.
+ *    Norvika. Tout ce qui vient de l'extérieur est échappé.
+ * ⛔ Aucun texte libre du site analysé (texte du lien de politique, du bouton de refus, nom de
+ *    témoin hors forme ordinaire) : un client de courriel rend cliquable une adresse écrite en texte,
+ *    échapper le HTML ne suffit pas. Seul le domaine analysé reste (risque accepté par William).
  * ⛔ Jamais « conforme » : mêmes trois états et mêmes phrases que la page (lib/verificateur/textes.ts).
  * ⛔ C1 et C2 : rien n'est conservé (aucune écriture en base) ; au journal, l'état de l'envoi et le
  *    code HTTP de Resend, jamais l'adresse ni le corps d'une erreur de Resend.
@@ -82,7 +85,8 @@ export function courrielVisiteur(rapport: Rapport, textes: TextesCourriel, conse
   const lignesPied = [textes.nomLegal, textes.adressePostale, textes.courriel, "norvika.ca"].filter(Boolean);
   const lignes = VERIFICATIONS.map((id) => {
     const r = rapport.resultats.find((x) => x.id === id);
-    return r ? { nom: t[id].nom, article: t[id].article, etat: r.etat, texte: texteResultat(r, t[id], t) } : null;
+    // Mode courriel : aucun texte libre du site analysé n'entre dans le courriel.
+    return r ? { nom: t[id].nom, article: t[id].article, etat: r.etat, texte: texteResultat(r, t[id], t, true) } : null;
   }).filter((l): l is { nom: string; article: string; etat: Etat; texte: string } => l !== null);
 
   const p = (contenu: string, style = "") =>
