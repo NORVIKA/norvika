@@ -206,10 +206,10 @@ export type ReserveCourriels = "ok" | "plafond" | "panne";
 
 export async function reserverCourrielsVerificateur(nombre: 1 | 2): Promise<ReserveCourriels> {
   try {
-    const { data, error } = await serviceClient().rpc("reserver_courriels_verificateur", {
-      p_nombre: nombre,
-      p_max_jour: PLAFOND_COURRIELS_VERIFICATEUR.parJour,
-    });
+    // 3 s au plus : la personne attend sa réponse (délai de la page, constat F5).
+    const { data, error } = await serviceClient()
+      .rpc("reserver_courriels_verificateur", { p_nombre: nombre, p_max_jour: PLAFOND_COURRIELS_VERIFICATEUR.parJour })
+      .abortSignal(AbortSignal.timeout(3000));
     if (error) {
       console.error("[verificateur] compteur de courriels indisponible :", error.code ?? "");
       return "panne";

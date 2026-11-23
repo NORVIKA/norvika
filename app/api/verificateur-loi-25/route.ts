@@ -3,9 +3,9 @@ import { NextResponse } from "next/server";
 import { CHAMP_JETON, verifierAntiRobot } from "@/lib/anti-robot";
 import { champTexte, formeCourrielValide, ligneSimpleValide, lireCorpsJson } from "@/lib/garde-formulaire";
 import { verifierDebitVerificateur } from "@/lib/rate-limit";
-import { normaliserAdresse, resoudrePublic } from "@/lib/verificateur/adresse";
+import { normaliserAdresse, recoitDuCourriel, resoudrePublic } from "@/lib/verificateur/adresse";
 import { analyser } from "@/lib/verificateur/analyse";
-import { envoyerRapport, type ResultatEnvoi } from "@/lib/verificateur/courriel";
+import { domaineDuCourriel, envoyerRapport, type ResultatEnvoi } from "@/lib/verificateur/courriel";
 import { ErreurMoteur, observer, type CodeMoteur } from "@/lib/verificateur/moteur";
 import { lireTextesCourriel } from "@/lib/verificateur/textes-serveur";
 import { CHAMP_ADRESSE, CHAMP_COURRIEL, CHAMP_SUIVI, LONGUEUR_MAX_COURRIEL, type ReponseVerificateur } from "@/lib/verificateur/types";
@@ -110,13 +110,15 @@ export async function POST(req: Request) {
   const resolution = await resoudrePublic(adresse.url.hostname);
   if (!resolution.ok) return refus(400, MESSAGES_ADRESSE[resolution.code], resolution.code);
 
-  // Les textes du courriel se lisent PENDANT l'analyse (une requête au CDN de Sanity), pas après.
+  // Les textes du courriel (CDN de Sanity) et le MX du domaine de l'adresse (DNS sur HTTPS) se lisent
+  // PENDANT l'analyse, pas après : le temps d'attente de la personne n'en est pas allongé.
   const textes = courriel ? lireTextesCourriel() : null;
+  const domaineRecoit = courriel ? recoitDuCourriel(domaineDuCourriel(courriel)) : null;
   try {
     const observations = await observer(adresse.url);
     const rapport = analyser(observations, debut);
     // Ne lève jamais ; la ceinture en plus : une erreur d'envoi ne doit pas passer pour une panne d'analyse.
-    const envoi = await envoyerRapport({ rapport, courriel, suivi, textes, local: hoteLocal(req) }).catch(
+    const envoi = await envoyerRapport({ rapport, courriel, suivi, textes, domaineRecoit, local: hoteLocal(req) }).catch(
       (): ResultatEnvoi => ({ visiteur: "echec", interne: "aucun", motif: "resend" }),
     );
     // Au journal : l'état de l'envoi (envoye, simule, echec, aucun), JAMAIS l'adresse courriel.

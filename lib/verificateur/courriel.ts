@@ -252,6 +252,11 @@ export function courrielInterne(rapport: Rapport, textes: TextesCourriel, courri
   };
 }
 
+/** Le domaine d'une adresse courriel (après le dernier @), en minuscules. */
+export function domaineDuCourriel(courriel: string): string {
+  return courriel.slice(courriel.lastIndexOf("@") + 1).toLowerCase();
+}
+
 /** Pourquoi le rapport n'est pas parti : pour le journal, sans aucune donnée personnelle. */
 export type MotifEchec = "textes" | "sans-mx" | "plafond" | "compteur" | "resend";
 
@@ -261,28 +266,32 @@ export type ResultatEnvoi = { visiteur: EtatEnvoi; interne: EtatEnvoi; motif?: M
  * Envoie le rapport. Ne lève jamais. Appelé seulement APRÈS une analyse réussie : aucune analyse,
  * aucun courriel, aucune copie (C6). Dans l'ordre, du moins cher au plus cher :
  *   1. textes du Studio et interrupteurs (fonction fermée : rien ne part) ;
- *   2. le domaine de l'adresse reçoit-il du courriel (MX) ? Sinon, aucun appel à Resend ;
+ *   2. le domaine de l'adresse reçoit-il du courriel (MX) ? Sinon, aucun appel à Resend. La
+ *      question est posée par la route PENDANT l'analyse (`domaineRecoit`), pas après ;
  *   3. réserve dans le plafond PROPRE aux courriels (lib/rate-limit.ts), 1 ou 2 selon la copie ;
  *   4. Resend : le rapport, puis la copie interne seulement s'il est accepté.
  * `local` (next dev, aperçu wrangler sur localhost) : AUCUN courriel réel, même si une clé Resend
  * traîne sur le poste ; l'état rendu est « simule ». Le contrôle MX se fait quand même (lecture DNS
  * publique) ; le plafond, lui, vit dans Supabase, absent du poste local.
- * `outils` : remplaçables par l'essai sans réseau (scripts/verificateur/essai-courriel.ts).
+ * `reserver` : remplaçable par l'essai sans réseau (scripts/verificateur/essai-courriel.ts).
  */
 export async function envoyerRapport({
   rapport,
   courriel,
   suivi,
   textes,
+  domaineRecoit,
   local,
-  outils = { recoitDuCourriel, reserverCourrielsVerificateur },
+  reserver = reserverCourrielsVerificateur,
 }: {
   rapport: Rapport;
   courriel: string;
   suivi: boolean;
   textes: Promise<TextesCourriel | null> | null;
+  /** recoitDuCourriel(domaineDuCourriel(courriel)), lancé par la route en même temps que l'analyse. */
+  domaineRecoit: Promise<boolean> | null;
   local: boolean;
-  outils?: { recoitDuCourriel: (domaine: string) => Promise<boolean>; reserverCourrielsVerificateur: (nombre: 1 | 2) => Promise<ReserveCourriels> };
+  reserver?: (nombre: 1 | 2) => Promise<ReserveCourriels>;
 }): Promise<ResultatEnvoi> {
   if (!courriel || !textes) return { visiteur: "aucun", interne: "aucun" };
   const lus = await textes;
@@ -295,7 +304,7 @@ export async function envoyerRapport({
   const consentement = suivi && Boolean(rc.afficherCase) && Boolean(lus.adressePostale);
 
   // Une adresse dont le domaine ne reçoit pas de courriel ferait un rebond : aucun appel à Resend.
-  if (!(await outils.recoitDuCourriel(courriel.slice(courriel.lastIndexOf("@") + 1)))) {
+  if (!(await (domaineRecoit ?? recoitDuCourriel(domaineDuCourriel(courriel))))) {
     return { visiteur: "echec", interne: "aucun", motif: "sans-mx" };
   }
 
@@ -308,7 +317,7 @@ export async function envoyerRapport({
   }
 
   // Le plafond propre aux courriels, réservé AVANT Resend : le rapport, plus la copie s'il y en a une.
-  const reserve = await outils.reserverCourrielsVerificateur(consentement ? 2 : 1);
+  const reserve = await reserver(consentement ? 2 : 1);
   if (reserve !== "ok") return { visiteur: "echec", interne: "aucun", motif: reserve === "plafond" ? "plafond" : "compteur" };
 
   const envoi = await envoyerCourrielRapport({ a: courriel, de: EXPEDITEUR_RAPPORT, repondreA: DESTINATAIRE, ...visiteur });

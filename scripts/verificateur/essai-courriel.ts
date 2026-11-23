@@ -171,12 +171,9 @@ async function principal() {
   /* ------------------------------------------------------------ 2. envoi, faux Resend */
   // Faux MX et faux compteur par défaut : tout passe. Les essais du plafond et du MX les changent.
   const reserves: number[] = [];
-  const outilsOk = {
-    recoitDuCourriel: async () => true,
-    reserverCourrielsVerificateur: async (n: 1 | 2): Promise<ReserveCourriels> => (reserves.push(n), "ok"),
-  };
-  const envoyer = (textes: TextesCourriel, suivi: boolean, local = false, outils = outilsOk) =>
-    envoyerRapport({ rapport, courriel: COURRIEL, suivi, textes: Promise.resolve(textes), local, outils });
+  const reserverOk = async (n: 1 | 2): Promise<ReserveCourriels> => (reserves.push(n), "ok");
+  const envoyer = (textes: TextesCourriel, suivi: boolean, local = false, reserver = reserverOk, mx = true) =>
+    envoyerRapport({ rapport, courriel: COURRIEL, suivi, textes: Promise.resolve(textes), domaineRecoit: Promise.resolve(mx), local, reserver });
 
   const a = await avecFauxResend([200, 200], () => envoyer(avecCase, true));
   verifier("case comptée + rapport accepté : rapport puis copie interne", a.appels.length === 2 && a.resultat.visiteur === "envoye" && a.resultat.interne === "envoye");
@@ -202,7 +199,7 @@ async function principal() {
   const f = await avecFauxResend([200, 200], () => envoyer(avecCase, true, true));
   verifier("poste local : aucun appel à Resend, état simulé", f.appels.length === 0 && f.resultat.visiteur === "simule" && f.resultat.interne === "simule");
 
-  const g = await avecFauxResend([200], () => envoyerRapport({ rapport, courriel: COURRIEL, suivi: true, textes: Promise.resolve(null), local: false, outils: outilsOk }));
+  const g = await avecFauxResend([200], () => envoyerRapport({ rapport, courriel: COURRIEL, suivi: true, textes: Promise.resolve(null), domaineRecoit: Promise.resolve(true), local: false, reserver: reserverOk }));
   verifier("textes illisibles : échec, aucun appel, aucune copie", g.appels.length === 0 && g.resultat.visiteur === "echec" && g.resultat.interne === "aucun");
 
   reserves.length = 0;
@@ -210,16 +207,15 @@ async function principal() {
   await avecFauxResend([200], () => envoyer(avecCase, false));
   verifier("plafond : 2 réservés avec la copie, 1 sans", JSON.stringify(reserves) === "[2,1]");
 
-  const sansMx = { ...outilsOk, recoitDuCourriel: async () => false };
-  const h = await avecFauxResend([200, 200], () => envoyer(avecCase, true, false, sansMx));
+  const h = await avecFauxResend([200, 200], () => envoyer(avecCase, true, false, reserverOk, false));
   verifier("domaine sans MX : échec, AUCUN appel à Resend", h.appels.length === 0 && h.resultat.visiteur === "echec" && h.resultat.motif === "sans-mx");
-  const h2 = await avecFauxResend([200], () => envoyer(avecCase, true, true, sansMx));
+  const h2 = await avecFauxResend([200], () => envoyer(avecCase, true, true, reserverOk, false));
   verifier("domaine sans MX, poste local : échec aussi (pas de « simulé »)", h2.resultat.visiteur === "echec");
 
-  const plein = { ...outilsOk, reserverCourrielsVerificateur: async (): Promise<ReserveCourriels> => "plafond" };
+  const plein = async (): Promise<ReserveCourriels> => "plafond";
   const k = await avecFauxResend([200, 200], () => envoyer(avecCase, true, false, plein));
   verifier("plafond de courriels atteint : échec, AUCUN appel à Resend", k.appels.length === 0 && k.resultat.visiteur === "echec" && k.resultat.motif === "plafond");
-  const enPanne = { ...outilsOk, reserverCourrielsVerificateur: async (): Promise<ReserveCourriels> => "panne" };
+  const enPanne = async (): Promise<ReserveCourriels> => "panne";
   const l = await avecFauxResend([200], () => envoyer(avecCase, false, false, enPanne));
   verifier("compteur absent ou en panne : échec, AUCUN appel à Resend", l.appels.length === 0 && l.resultat.motif === "compteur");
 

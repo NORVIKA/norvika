@@ -18,8 +18,12 @@ const EXPEDITEUR = "Norvika Contact <contact@norvika.ca>";
 /** Le rapport du vérificateur, vu par la personne qui l'a demandé : « Norvika », sans « Contact ». */
 export const EXPEDITEUR_RAPPORT = "Norvika <contact@norvika.ca>";
 
-/** Au-delà, Resend est jugé injoignable : la réponse au visiteur n'attend pas plus. */
-const DELAI_ENVOI_MS = 6000;
+/**
+ * Au-delà, Resend est jugé injoignable : la réponse au visiteur n'attend pas plus. 4 s : au pire,
+ * 30 s d'analyse et ses contrôles + 2 x 4 s (rapport et copie) restent sous les 45 s de la page
+ * (DELAI_NAVIGATEUR_MS, components/verificateur/Verificateur.tsx).
+ */
+const DELAI_ENVOI_MS = 4000;
 
 /** Le courriel est du HTML : tout ce qui vient du visiteur y est échappé. */
 export function esc(s: string): string {
