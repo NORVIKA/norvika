@@ -29,7 +29,7 @@ export default async function PageVerificateur() {
         t={insecablesPartout(verificateur)}
         lienRendezVous={parametres.lienRendezVous}
         // Vide tant que William ne l'a pas donnée : la case de consentement reste éteinte.
-        adressePostale={adresseLocale(parametres.adressePostale)}
+        adressePostale={await adresseLocale(parametres.adressePostale)}
       />
     </SiteShell>
   );

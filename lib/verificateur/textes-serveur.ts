@@ -59,7 +59,7 @@ export async function lireTextesCourriel(): Promise<TextesCourriel | null> {
       t,
       nom: typographier(lu.parametres.nom ?? "Norvika"),
       nomLegal: typographier(lu.parametres.nomLegal),
-      adressePostale: typographier(adresseLocale(lu.parametres.adressePostale)),
+      adressePostale: typographier(await adresseLocale(lu.parametres.adressePostale)),
       courriel: lu.parametres.courriel || "info@norvika.ca",
       lienRendezVous: lienAbsolu(lu.parametres.lienRendezVous),
     };

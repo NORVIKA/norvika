@@ -17,19 +17,20 @@ export async function avecTextesLocaux<T extends Pick<PageVerificateur, "rapport
   const { readFile } = await import("node:fs/promises");
   const { join } = await import("node:path");
   const brut = await readFile(join(process.cwd(), "studio/scripts/verificateur-courriel-textes.json"), "utf8");
-  const textes = JSON.parse(brut) as RapportCourriel;
-  // La case est semée éteinte (elle attend l'adresse postale) : VERIFICATEUR_CASE_LOCALE=1 l'allume
-  // sur le poste, pour l'essayer avant que William donne l'adresse.
-  if (process.env.VERIFICATEUR_CASE_LOCALE === "1") textes.afficherCase = true;
-  return { ...page, rapportCourriel: textes };
+  return { ...page, rapportCourriel: JSON.parse(brut) as RapportCourriel };
 }
 
 /**
- * POSTE LOCAL SEULEMENT, mêmes verrous : une adresse postale d'essai (VERIFICATEUR_ADRESSE_LOCALE)
- * tant que celle de « Infos de l'entreprise » est vide. Jamais lue en ligne.
+ * L'adresse postale de « Infos de l'entreprise ». POSTE LOCAL SEULEMENT, mêmes verrous : tant que
+ * le Studio ne l'a pas, celle qui sera semée (studio/scripts/verificateur-courriel-parametres.json,
+ * même fichier que le semis). En ligne, la valeur du Studio, telle quelle.
  */
-export function adresseLocale(adresse: string | null | undefined): string {
+export async function adresseLocale(adresse: string | null | undefined): Promise<string> {
   const lue = (adresse ?? "").trim();
-  if (process.env.NODE_ENV !== "development" || lue) return lue;
-  return process.env.VERIFICATEUR_TEXTES_LOCAUX === "1" ? (process.env.VERIFICATEUR_ADRESSE_LOCALE ?? "").trim() : "";
+  if (process.env.NODE_ENV !== "development") return lue;
+  if (process.env.VERIFICATEUR_TEXTES_LOCAUX !== "1" || lue) return lue;
+  const { readFile } = await import("node:fs/promises");
+  const { join } = await import("node:path");
+  const brut = await readFile(join(process.cwd(), "studio/scripts/verificateur-courriel-parametres.json"), "utf8");
+  return String((JSON.parse(brut) as { adressePostale?: unknown }).adressePostale ?? "").trim();
 }

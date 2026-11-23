@@ -1,6 +1,6 @@
 {
   "afficher": true,
-  "afficherCase": false,
+  "afficherCase": true,
   "champLibelle": "Votre courriel (facultatif)",
   "champExemple": "vous@exemple.ca",
   "champAide": "Pour recevoir aussi le rapport par courriel. Le résultat s'affiche ici dans tous les cas.",

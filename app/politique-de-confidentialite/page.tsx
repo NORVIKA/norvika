@@ -43,7 +43,7 @@ export default async function PolitiquePage() {
   // Le nom légal vient de « Infos de l'entreprise » (zéro texte en dur) : il a changé le 2026-11-18.
   const { parametres, verificateur } = await obtenirContenu();
   const courriel = Boolean(verificateur.rapportCourriel?.afficher);
-  const avecCase = courriel && Boolean(verificateur.rapportCourriel?.afficherCase) && Boolean(adresseLocale(parametres.adressePostale));
+  const avecCase = courriel && Boolean(verificateur.rapportCourriel?.afficherCase) && Boolean(await adresseLocale(parametres.adressePostale));
   return (
     <SiteShell>
       <div className="mx-auto max-w-3xl px-6 py-20 md:py-28">
