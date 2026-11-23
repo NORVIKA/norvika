@@ -96,7 +96,17 @@ const NOM_TEMOIN_ORDINAIRE = /^[A-Za-z0-9_-]{1,40}$/;
  */
 export function nomTemoinAffiche(nom: string): string {
   if (NOM_TEMOIN_ORDINAIRE.test(nom)) return nom;
-  return TEMOINS_SUIVI_EXACTS.find((n) => n === nom) ?? PREFIXES_TEMOINS_SUIVI.find((p) => nom.startsWith(p)) ?? "";
+  return nomTemoinReconnu(nom);
+}
+
+/**
+ * Le nom CONNU d'un témoin de suivi : le nom exact de la liste, sinon le plus long préfixe reconnu
+ * (« _ga_X1Y2 » donne « _ga », « _gat_UA » donne « _gat »). Rien de ce que le site a choisi après le
+ * préfixe. Sert au courriel du rapport, qui part vers une adresse choisie par l'auteur de l'analyse.
+ */
+export function nomTemoinReconnu(nom: string): string {
+  if (TEMOINS_SUIVI_EXACTS.includes(nom)) return nom;
+  return PREFIXES_TEMOINS_SUIVI.filter((p) => nom.startsWith(p)).sort((a, b) => b.length - a.length)[0] ?? "";
 }
 
 /** La politique, si elle a été lue (lien trouvé, page en 200, assez de texte). */

@@ -69,6 +69,8 @@ const piegeA: Observations = {
   temoins: [
     { nom: "_ga", domaine: ".exemple.ca" },
     { nom: `_ga facture impayée https://${PIEGES.nomTemoin}/p`, domaine: ".exemple.ca" },
+    { nom: "_gaPIEGEMOT", domaine: ".exemple.ca" },
+    { nom: "_fbp_514-555-0123", domaine: ".exemple.ca" },
   ],
   banniere: { outil: "CookieYes", maison: false, refus: `Refuser et payer sur www.${PIEGES.boutonRefus}` },
   lienPolitique: { texte: `Confidentialité : facture impayée, réglez-la sur https://${PIEGES.texteDuLien}/p`, url: "https://www.exemple.ca/confidentialite" },
@@ -155,7 +157,8 @@ async function principal() {
   for (const [nom, domaine] of Object.entries(PIEGES)) verifier(`piège « ${nom} » absent du courriel (HTML et texte)`, !piegesRendus.includes(domaine));
   verifier("piège A bien analysé : lien brisé, bannière en place, témoin à corriger", rapportA.resultats.find((x) => x.id === "politique")?.cas === "aCorrigerLienBrise" && rapportA.resultats.find((x) => x.id === "banniere")?.etat === "en-place" && rapportA.resultats.find((x) => x.id === "temoins")?.etat === "a-corriger");
   verifier("piège B bien analysé : politique en place", rapportB.resultats.find((x) => x.id === "politique")?.cas === "enPlace");
-  verifier("nom de témoin piégé ramené à « _ga » dans le rapport", JSON.stringify(rapportA.resultats.find((x) => x.id === "temoins")?.preuves) === JSON.stringify([{ type: "temoins", valeurs: ["_ga"] }, { type: "note", valeurs: ["Google Tag Manager"] }, { type: "domaines", valeurs: ["www.googletagmanager.com"] }]));
+  verifier("nom de témoin piégé ramené à « _ga » dans le rapport (la page garde les noms ordinaires)", JSON.stringify(rapportA.resultats.find((x) => x.id === "temoins")?.preuves[0]) === JSON.stringify({ type: "temoins", valeurs: ["_ga", "_gaPIEGEMOT", "_fbp_514-555-0123"] }));
+  verifier("courriel : noms de témoins réduits au nom connu (_ga, _fbp), rien après", !piegesRendus.includes("PIEGEMOT") && !piegesRendus.includes("514-555-0123") && piegesRendus.includes("_ga, _fbp"));
   verifier("aucun guillemet vide laissé par un texte retiré", !/«\s*»/.test(piegesRendus));
   verifier("avertissement « pas un avis juridique » présent", sansCase.html.includes(lus.t.avertissementCourt));
   verifier("lien du rendez-vous sans paramètre ajouté", sansCase.html.includes(`href="${lus.lienRendezVous}"`));

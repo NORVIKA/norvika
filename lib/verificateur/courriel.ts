@@ -4,6 +4,7 @@ import { DESTINATAIRE, envoyerCourrielRapport, esc, EXPEDITEUR_RAPPORT, gabarit,
 import { reserverCourrielsVerificateur, type ReserveCourriels } from "@/lib/rate-limit";
 
 import { recoitDuCourriel } from "./adresse";
+import { nomTemoinReconnu } from "./analyse";
 import { dateEtHeure, hote, phraseAccompagnement, pied, remplir, synthese, texteResultat } from "./textes";
 import type { TextesCourriel } from "./textes-serveur";
 import { VERIFICATIONS, type Etat, type EtatEnvoi, type Rapport } from "./types";
@@ -87,8 +88,13 @@ export function courrielVisiteur(rapport: Rapport, textes: TextesCourriel, conse
   const lignesPied = [textes.nomLegal, textes.adressePostale, textes.courriel, "norvika.ca"].filter(Boolean);
   const lignes = VERIFICATIONS.map((id) => {
     const r = rapport.resultats.find((x) => x.id === id);
-    // Mode courriel : aucun texte libre du site analysé n'entre dans le courriel.
-    return r ? { nom: t[id].nom, article: t[id].article, etat: r.etat, texte: texteResultat(r, t[id], t, true) } : null;
+    if (!r) return null;
+    // Mode courriel : aucun texte libre du site analysé n'entre dans le courriel. Les noms de témoins
+    // se réduisent à leur nom connu (_ga, _fbp...) ; la page, elle, garde le nom complet.
+    const preuves = r.preuves.map((p) =>
+      p.type === "temoins" ? { ...p, valeurs: [...new Set(p.valeurs.map(nomTemoinReconnu).filter(Boolean))] } : p,
+    );
+    return { nom: t[id].nom, article: t[id].article, etat: r.etat, texte: texteResultat({ ...r, preuves }, t[id], t, true) };
   }).filter((l): l is { nom: string; article: string; etat: Etat; texte: string } => l !== null);
 
   const p = (contenu: string, style = "") =>
