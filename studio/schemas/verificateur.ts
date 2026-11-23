@@ -330,7 +330,12 @@ export const pageVerificateurLoi25 = defineType({
         ),
         texteCourriel('erreurCourriel', 'Message : courriel invalide', 'Sous le champ, quand l’adresse courriel n’a pas une forme valide. L’analyse n’est pas lancée.', { rows: 2 }),
         texteCourriel('envoiReussi', 'Message : rapport envoyé', 'Sous le résultat. {courriel} est remplacé par l’adresse.', { rows: 2 }),
-        texteCourriel('envoiEchec', 'Message : envoi impossible', 'Sous le résultat, quand le courriel n’a pas pu partir. Le résultat reste affiché.', { rows: 3 }),
+        texteCourriel(
+          'envoiEchec',
+          'Message : envoi impossible',
+          'Sous le résultat, quand le courriel n’a pas pu partir, quelle qu’en soit la raison (adresse qui ne reçoit pas de courriel, limite du jour, panne) : un seul message, qui ne dit jamais laquelle. Le résultat reste affiché.',
+          { rows: 3 },
+        ),
         texteCourriel('envoiEchecCase', 'Ajout à l’envoi impossible, case cochée', 'Ajouté au message précédent quand la case était cochée : sans rapport parti, la case ne compte pas.', { rows: 2 }),
         texteCourriel('sansResultat', 'Ajout quand l’analyse n’a pas de résultat', 'Ajouté au message d’erreur (site injoignable, délai…) quand un courriel était entré.', { rows: 2 }),
         texteCourriel('objet', 'Objet du courriel', '{domaine} est remplacé par le site analysé (ex. : « Votre rapport Loi 25 pour {domaine} »).'),

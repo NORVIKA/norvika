@@ -10,7 +10,7 @@
   "mentionSansCase": "Votre courriel, recueilli par ce formulaire, est facultatif. S'il est entré, il sert seulement à vous envoyer ce rapport. Norvika ne le garde pas ; Resend, qui fait l'envoi, garde une copie du courriel envoyé (votre adresse et le rapport) 30 jours dans notre compte. Cloudflare (site) et Resend (envoi) peuvent traiter ces renseignements hors du Québec. Pour les consulter, les faire corriger ou retirer votre consentement : info@norvika.ca. Détails dans notre politique de confidentialité.",
   "erreurCourriel": "Cette adresse courriel ne semble pas valide. Corrigez-la, ou videz le champ pour voir le résultat ici seulement.",
   "envoiReussi": "Rapport envoyé à {courriel}. Il arrive d'ici quelques minutes ; regardez aussi dans vos courriels indésirables.",
-  "envoiEchec": "Votre résultat est ci-dessous, mais le courriel n'a pas pu partir. Vérifiez votre adresse courriel. Pour le recevoir quand même, relancez la vérification (elle compte dans la limite de 3 par heure) ou écrivez-nous à info@norvika.ca.",
+  "envoiEchec": "Le rapport n'a pas pu partir par courriel. Vérifiez l'adresse inscrite ou réessayez plus tard. Votre résultat est affiché ci-dessous.",
   "envoiEchecCase": "Comme le courriel n'est pas parti, la case cochée n'a pas été prise en compte.",
   "sansResultat": "Aucun courriel n'a été envoyé, puisqu'il n'y a pas de résultat.",
   "objet": "Votre rapport Loi 25 pour {domaine}",
