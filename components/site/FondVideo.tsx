@@ -206,10 +206,17 @@ function Fond({
                 <source media="(max-width: 767px)" srcSet={srcSetAffiche(tailles, "portrait")} sizes="100vw" />
               </>
             ) : null}
+            {/* `sizes` : la largeur AFFICHÉE de l'affiche, pas celle de l'écran. Plein écran depuis le
+                2026-11-23, elle couvre toute la hauteur : sur un écran moins allongé qu'elle (16:10,
+                4:3), elle déborde sur les côtés et s'affiche plus large que 100vw (1600 px à 1440 x 900).
+                Avec « 100vw », le navigateur prenait la version de 1440 px, agrandie ; Chrome compte une
+                image agrandie pour moins que sa surface, et la vidéo (1920 px, jamais agrandie) devenait
+                l'élément LCP : Lighthouse ordinateur, LCP de 0,69 s à 1,0 s, et en ligne, l'heure de la
+                première image d'une vidéo de 3,6 Mo. Mesuré le 2026-11-23. */}
             <img
               src={repli}
               srcSet={tailles.length ? srcSetAffiche(tailles, "paysage") : undefined}
-              sizes="100vw"
+              sizes={`(min-aspect-ratio: ${affiche.largeur ?? 1920}/${affiche.hauteur ?? 1080}) 100vw, ${Math.ceil(((affiche.largeur ?? 1920) / (affiche.hauteur ?? 1080)) * 100)}vh`}
               alt=""
               width={affiche.largeur ?? 1920}
               height={affiche.hauteur ?? 1080}

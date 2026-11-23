@@ -53,7 +53,9 @@ function Index({
     <div
       style={{ position: "relative", overflowX: "hidden", background: "#fff" }}
     >
-      <SiteHeader />
+      {/* Barre transparente posée sur la vidéo du haut de page, bleu marine dès qu'on descend
+          (globals.css, « Barre du haut »). */}
+      <SiteHeader surVideo />
       {/* Repère « contenu principal » (lecteurs d'écran) et cible du lien d'évitement de l'en-tête. */}
       <main id="contenu">
 
@@ -68,8 +70,9 @@ function Index({
           toute blanche (voile a 66 %, globals.css « Fond video »).
           Sans video dans le Studio (« Video de fond du haut de page »), c'est le
           fond uni d'avant, sans rien changer d'autre.
-          Hauteur (2026-11-18, demande de William « plus gros ») : classe
-          nv-hero-accueil dans globals.css, ordinateur seulement. */}
+          Hauteur : classe nv-hero-accueil dans globals.css. Plein écran sur
+          ordinateur et tablette en paysage depuis le 2026-11-23 (demande de
+          William), la barre du haut posée par-dessus. */}
       <section
         className="nv-hero-accueil"
         style={{

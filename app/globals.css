@@ -63,6 +63,14 @@
      /sites-web) ; trait du point 3,4:1 sur son anneau blanc (WCAG 1.4.11 demande 3:1). */
   --parcours-avenir-texte: rgba(12, 25, 47, .66);
   --parcours-avenir-trait: #868C97;
+
+  /* Barre du haut (components/site/SiteHeader.tsx, bloc « Barre du haut » plus bas). Sa hauteur
+     est lue par la cale des pages interieures, le haut de page de l'accueil et scroll-padding-top :
+     une seule valeur, sinon le contenu glisse sous la barre ou laisse un vide. */
+  --nv-entete-h: 60px;
+  /* Liens de la barre, sur le bleu marine ET sur la video de l'accueil. Contrastes mesures dans le
+     bloc « Barre du haut ». */
+  --nv-entete-lien: rgba(255, 255, 255, .82);
 }
 
 @layer base {
@@ -72,6 +80,9 @@
 
   html {
     scroll-behavior: smooth;
+    /* La barre du haut est fixe : une ancre, un element qui recoit le focus clavier ou un
+       scrollIntoView s'arretent sous elle, jamais derriere (WCAG 2.4.11). */
+    scroll-padding-top: var(--nv-entete-h);
   }
 
   body {
@@ -148,6 +159,118 @@
 }
 .nv-evitement:focus { transform: none; color: #fff; }
 
+/* ===== Barre du haut (components/site/SiteHeader.tsx), declaree UNE fois =====
+   2026-11-23, demande de William (modele : bfroz.com). Fixe en haut de l'ecran, toujours foncee,
+   logo et textes blancs, en deux tons :
+   - bleu marine plein (--navy) : pages interieures des le depart ; accueil des qu'on a descendu
+     de plus de 80 px ; partout des que le menu deroulant est ouvert ;
+   - transparente sur la video du haut de l'accueil (data-ton="video") tant qu'on est en haut.
+     Le degrade sombre qui la porte est dans le voile de la video (« Fond video », plus bas).
+   Il n'y a plus de barre blanche : blanche sur un haut de page fonce, ou blanche sur blanc une
+   fois la page descendue, c'etait le defaut a eviter.
+   Elle se cache pendant qu'on descend et revient des qu'on remonte (data-cache, pose par le
+   composant) : une translation courte, plus rapide a la sortie qu'a l'entree. Jamais cachee en
+   haut de page, menu ouvert, ou quand le focus clavier est dedans (:has(:focus-visible) ci-dessous).
+   Une translation ne decale rien dans la page : CLS 0 (mesure, Chrome).
+   CONTRASTES MESURES (2026-11-23) :
+   - bleu marine : liens (blanc a 82 %) 12,0:1, logo blanc 17,6:1, bouton navy sur creme 15,8:1 ;
+   - sur la video, PIRE PIXEL de la bande de texte sur les 480 images de chaque video (ordinateur
+     et telephone) et sur l'affiche, voile et degrade compris : liens 7,0:1, logo 9,5:1. Meme un
+     pixel tout blanc ne descend pas plus bas. A 80 px de defilement (dernier instant ou elle est
+     transparente, le degrade a remonte), borne sur un pixel blanc : liens 5,7:1.
+     ⛔ Ne pas alleger le voile ni le degrade sans remesurer.
+   z-index 40 : au-dessus du contenu (fond video 0 et 1, parcours 2 et 3), sous CookieYes (releve
+   sur norvika.ca : banniere 9 999 999, bouton du bas a gauche 999 999, fenetre 999 999 999). */
+.nv-entete-cale { flex: none; height: var(--nv-entete-h); }
+.nv-entete {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 40;
+  background-color: var(--navy);
+  color: #fff;
+  transition: transform .26s cubic-bezier(.2, 0, 0, 1), background-color .3s cubic-bezier(.2, 0, 0, 1);
+}
+/* Accueil sans JavaScript : la barre transparente defile avec la page (rien ne la ferait virer au
+   bleu marine, elle finirait blanche sur blanc). Le composant pose data-actif au montage. */
+.nv-entete[data-ton="video"]:not([data-actif]) { position: absolute; }
+.nv-entete[data-ton="video"]:not([data-defile]):not([data-menu]) { background-color: transparent; }
+/* :has(:focus-visible) et non :focus-within : un clic de souris laisse le focus sur le bouton
+   « Reserver » (nouvel onglet) ou sur le bouton du menu, et la barre ne se cachait plus jamais.
+   Seul le focus CLAVIER la retient. Navigateur sans :has() : la regle est ignoree, la barre ne se
+   cache simplement pas. */
+.nv-entete[data-cache]:not([data-menu]):not(:has(:focus-visible)) {
+  transform: translateY(-100%);
+  transition: transform .2s cubic-bezier(.4, 0, 1, 1), background-color .3s cubic-bezier(.2, 0, 0, 1);
+}
+/* Moins d'animations demande : jamais de glissade. Le composant ne cache deja plus la barre dans ce
+   cas ; ceci la garde en place meme si l'attribut restait pose. */
+@media (prefers-reduced-motion: reduce) {
+  .nv-entete { transition: none; }
+  .nv-entete[data-cache] { transform: none; }
+}
+.nv-header-shell {
+  max-width: 1240px;
+  height: var(--nv-entete-h);
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+}
+/* Le logo du Studio est d'une seule couleur (navy) : le filtre le rend blanc pur, sans deuxieme
+   fichier a tenir. ⚠️ Un logo de plusieurs couleurs deviendrait une silhouette blanche : il
+   faudrait alors un champ « logo clair » dans « Infos de l'entreprise ». */
+.nv-logo-lien { display: flex; align-items: center; transition: opacity .2s; }
+.nv-logo-lien img { display: block; width: auto; height: 26px; filter: brightness(0) invert(1); }
+/* nowrap : un libelle trop long deborde au lieu de passer la barre sur deux lignes (sa hauteur
+   est fixe). Voir « Menu deroulant jusqu'a 1179 px » avant d'allonger un libelle. */
+.nv-desktop-nav { display: flex; gap: 30px; font-size: 14px; white-space: nowrap; }
+.nv-navlink {
+  color: var(--nv-entete-lien);
+  text-decoration-line: underline;
+  text-decoration-color: transparent;
+  text-underline-offset: 6px;
+  transition: color .2s, text-decoration-color .2s;
+}
+/* Le bouton de la barre : le creme du bouton principal du haut de page (.nv-btn-cream), lisible
+   sur le bleu marine comme sur la video (navy sur creme : 15,8:1). */
+.nv-header-cta { padding: 11px 20px; border-radius: 8px; font-size: 13.5px; font-weight: 600; white-space: nowrap; }
+.nv-burger {
+  align-items: center;
+  justify-content: center;
+  width: 42px;
+  height: 42px;
+  padding: 0;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, .3);
+  background: rgba(255, 255, 255, .06);
+  color: #fff;
+  cursor: pointer;
+  transition: background .2s, border-color .2s;
+}
+/* Menu deroulant (sous 1180 px) : bleu marine, comme la barre ouverte au-dessus. Plafonne a la
+   hauteur de l'ecran et defilant lui-meme : la page derriere est verrouillee, et un telephone
+   tenu en paysage (390 px de haut) ne montrait pas la fin du menu. */
+.nv-burger-panel {
+  flex-direction: column;
+  gap: 4px;
+  max-height: calc(100dvh - var(--nv-entete-h));
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 8px 18px 18px;
+  border-top: 1px solid rgba(255, 255, 255, .1);
+  background: var(--navy);
+}
+.nv-burger-panel .nv-navlink { padding: 12px 4px; font-size: 16px; }
+.nv-burger-cta { margin-top: 8px; padding: 14px 20px; border-radius: 10px; font-size: 15px; font-weight: 600; text-align: center; }
+@media (hover: hover) {
+  .nv-navlink:hover { color: #fff; text-decoration-color: currentColor; }
+  .nv-logo-lien:hover { opacity: .72; }
+  .nv-burger:hover { background: rgba(255, 255, 255, .14); border-color: rgba(255, 255, 255, .55); }
+}
+
 /* ===== Animations ===== */
 @keyframes dash { to { stroke-dashoffset: -320; } }
 @keyframes pulseNode { 0%, 100% { opacity: .35; } 50% { opacity: 1; } }
@@ -192,23 +315,29 @@
   to { transform: none; }
 }
 
-/* Hauteur du haut de page de l'accueil (2026-11-18, demande de William : « plus gros »).
-   Ordinateur : presque tout l'ecran, moins l'en-tete (59 px) et assez de place pour voir le
-   titre « Nos clients en parlent » sous le haut de page (Lau voulait les videos juste en
-   dessous : le titre visible dit qu'il y a une suite). Mesure a 1440 x 900 : 190 px laissent
-   55 px du titre visibles ; 140 px ne montraient que le blanc de la section suivante (76 px de
-   marge), donc aucun signal. Plafond 820 px sur les tres grands ecrans.
-   Telephone : inchange. Le haut de page y prend deja les trois quarts de l'ecran ; le grandir
-   ajoute du defilement avant la suite (regle 6 de William : optimiser la largeur, pas empiler).
+/* Hauteur du haut de page de l'accueil. Depuis le 2026-11-23 (demande de William, modele
+   bfroz.com), la barre du haut est posee PAR-DESSUS la video : le haut de page commence en haut
+   de l'ecran, et sa marge du haut (--nv-entete-h) garde le texte centre SOUS la barre.
+   - Ordinateur et tablette en paysage : tout l'ecran (100svh). Avant : l'ecran moins 190 px, pour
+     laisser voir le titre « Nos clients en parlent » ; William prefere le plein ecran.
+   - Tablette en portrait (744 a 1024 px de large, plus haute que large) : la hauteur d'avant, plus
+     la barre. Plein ecran, un iPad de 834 x 1194 aurait 1194 px de video pour 500 px de texte, et
+     la suite 314 px plus bas (regle 6 de William : pas de defilement gaspille).
+   - Telephone : la hauteur d'avant, plus la barre. Le bas du haut de page tombe au meme endroit
+     qu'avant (630 px a 390 x 844, contre 629) : zero defilement ajoute.
    Le texte reste centre verticalement ; le fond video et le bouton pause sont en absolu, donc
    hors du flux. Hauteur fixee par le CSS au premier rendu : aucun decalage de mise en page. */
 .nv-hero-accueil {
   display: flex;
   flex-direction: column;
   justify-content: center;
+  padding-top: var(--nv-entete-h);
 }
 @media (min-width: 768px) {
-  .nv-hero-accueil { min-height: clamp(560px, calc(100svh - 190px), 820px); }
+  .nv-hero-accueil { min-height: calc(clamp(560px, calc(100svh - 190px), 820px) + var(--nv-entete-h)); }
+}
+@media (min-width: 768px) and (orientation: landscape) {
+  .nv-hero-accueil { min-height: 100vh; min-height: 100svh; }
 }
 
 /* ===== Fond video du haut de l'accueil (components/site/FondVideo.tsx), declare UNE fois =====
@@ -247,11 +376,17 @@
   transition: opacity .9s cubic-bezier(.2, 0, 0, 1);
 }
 .nv-fond-video video[data-pret] { opacity: 1; }
+/* Degrade du haut (2026-11-23) : la barre du haut est transparente sur la video. Il assombrit les
+   200 premiers pixels (45 % en haut, rien en bas), par-dessus le voile : les liens de la barre y
+   gardent une marge de contraste sur l'image la plus claire (mesures : bloc « Barre du haut »). */
 .nv-fond-video::after {
   content: "";
   position: absolute;
   inset: 0;
-  background: linear-gradient(to top, #081120 1px, transparent 1px), rgba(8, 17, 32, .66);
+  background:
+    linear-gradient(to top, #081120 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(8, 17, 32, .45), rgba(8, 17, 32, 0) 200px),
+    rgba(8, 17, 32, .66);
 }
 /* Le bouton pause : couleurs, contour et survol viennent de .nv-cream-hover (le second bouton du
    haut de page), donc le survol n'existe qu'avec un pointeur qui survole. Ici, la forme seulement.
@@ -320,7 +455,6 @@
    div), de la bande de logos de l'accueil et du div des lignes de services ; ajoutes ceux qui
    manquaient (logo, bouton du menu, liens du pied de page, onglets des services, filtres,
    boutons contour, video, points du parcours, onglets avant/apres). */
-.nv-navlink { color: rgba(12,25,47,.6); }
 .nv-btn-primary { background: var(--navy); color: #fff; }
 .nv-btn-cream { background: var(--cream); color: var(--navy); }
 .nv-card-hover { transition: transform .3s cubic-bezier(.2,0,0,1), box-shadow .3s cubic-bezier(.2,0,0,1); }
@@ -379,7 +513,6 @@
   box-shadow: inset 0 0 0 4px var(--focus-halo);
 }
 @media (hover: hover) {
-  .nv-navlink:hover { color: var(--navy); }
   .nv-btn-primary:hover { background: #16294a; color: #fff; }
   .nv-btn-cream:hover { background: #fff; color: var(--navy); }
   .nv-card-hover:hover { transform: translateY(-3px); box-shadow: 0 30px 70px -40px rgba(12,25,47,.6); }
@@ -415,7 +548,8 @@
 
 /* ===== Responsive (mobile / tablette) ===== */
 .nv-burger { display: none; }
-.nv-header-shell { padding: 8px 16px !important; }
+/* Hauteur fixe (--nv-entete-h), declaree dans « Barre du haut » : la marge verticale est a zero. */
+.nv-header-shell { padding: 0 16px !important; }
 
 @media (max-width: 1024px) {
   .nv-shell { padding-left: 24px !important; padding-right: 24px !important; }
@@ -804,10 +938,11 @@
 /* ===== Telephone (components/site/LienTelephone.tsx) =====
    Dans le menu deroulant seulement. Retire de la barre d'ordinateur le 2026-11-22 (decision de
    William) pour faire place au lien du verificateur Loi 25 : la barre est plafonnee a 1240 px, et
-   logo + 7 liens + numero + bouton n'y tenaient sur une ligne a aucune largeur. */
+   logo + 7 liens + numero + bouton n'y tenaient sur une ligne a aucune largeur.
+   Blanc depuis le 2026-11-23 : le menu deroulant est bleu marine, comme la barre. */
 .nv-header-actions { display: flex; align-items: center; gap: 22px; }
 .nv-tel {
-  color: var(--navy);
+  color: #fff;
   font-weight: 600;
   white-space: nowrap;
   font-variant-numeric: tabular-nums;
@@ -819,7 +954,7 @@
 }
 .nv-tel-panneau { padding: 12px 4px; font-size: 16px; }
 @media (hover: hover) {
-  .nv-tel:hover { color: var(--navy-500); text-decoration-color: currentColor; }
+  .nv-tel:hover { text-decoration-color: currentColor; }
 }
 
 /* ===== Liens du bas du pied de page (politique, plan du site) ===== */
@@ -905,12 +1040,6 @@
   text-underline-offset: 3px;
   transition: text-decoration-thickness .15s;
 }
-.nv-logo-lien { transition: opacity .2s; }
-.nv-burger {
-  border: 1px solid rgba(12,25,47,.14);
-  background: rgba(255,255,255,.6);
-  transition: background .2s, border-color .2s;
-}
 /* Bouton contour sur fond fonce (pages de services, portfolio). --contour regle le trait. */
 .nv-btn-contour-clair {
   color: #F5F3EE;
@@ -941,8 +1070,6 @@
 @media (hover: hover) {
   .nv-lien:hover { text-decoration-color: currentColor; }
   .nv-lien-texte:hover { text-decoration-thickness: 2px; }
-  .nv-logo-lien:hover { opacity: .72; }
-  .nv-burger:hover { background: #fff; border-color: rgba(12,25,47,.3); }
   .nv-btn-contour-clair:hover { color: #F5F3EE; border-color: #F5F3EE; background: rgba(245,243,238,.08); }
   .nv-onglet:not([aria-current]):hover { color: #F5F3EE; border-bottom-color: rgba(245,243,238,.34); }
   .nv-filtre[aria-pressed="false"]:hover { border-color: rgba(12,25,47,.3); color: #0C192F; }
@@ -1175,7 +1302,9 @@
 }
 /* Le titre du resultat recoit le focus par programme (tabindex -1, jamais atteint au clavier) : pas
    de contour, il n'est pas une commande. Marge pour passer sous l'en-tete colle a l'arrivee. */
-.nv-verif-synthese h2 { scroll-margin-top: 96px; }
+/* 36 px, plus les 60 px de scroll-padding-top de la page (barre du haut fixe, 2026-11-23) :
+   le titre s'arrete a 96 px du haut, comme avant. */
+.nv-verif-synthese h2 { scroll-margin-top: 36px; }
 .nv-verif-synthese h2:focus,
 .nv-verif-synthese h2:focus-visible { outline: none !important; box-shadow: none !important; }
 .nv-verif-avertissement-court { margin: 14px 0 0; font-size: 14px; font-weight: 600; color: rgba(12,25,47,.7); }
