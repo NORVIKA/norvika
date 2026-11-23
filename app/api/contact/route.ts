@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { supabaseService, verifierDebit } from "@/lib/rate-limit";
 import { CHAMP_JETON, verifierAntiRobot } from "@/lib/anti-robot";
 import { envoyerCourrielInterne, esc, gabarit, ligne, lienCourriel } from "@/lib/courriel";
-import { champTexte, ligneSimpleValide, lireCorpsJson, texteLongValide } from "@/lib/garde-formulaire";
+import { champTexte, formeCourrielValide, ligneSimpleValide, lireCorpsJson, texteLongValide } from "@/lib/garde-formulaire";
 
 /**
  * Formulaires de contact du site : bandeau du bas de page, page /contact, et la fin du quiz
@@ -80,7 +80,7 @@ export async function POST(req: Request) {
   if (!nom || !courriel || !message) {
     return NextResponse.json({ error: "Champs obligatoires manquants." }, { status: 400 });
   }
-  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(courriel)) {
+  if (!formeCourrielValide(courriel)) {
     return NextResponse.json({ error: "Courriel invalide." }, { status: 400 });
   }
   if (

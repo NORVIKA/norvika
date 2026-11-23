@@ -3,6 +3,7 @@ import { cache } from "react";
 
 import { clientSanity } from "./sanity";
 import { typographier } from "./typographie";
+import { avecTextesLocaux } from "./verificateur/textes-locaux";
 import type {
   Avis,
   BlocContact,
@@ -113,8 +114,11 @@ type Brut = {
 export type Contenu = Omit<Brut, "services"> & { services: ServiceResume[] };
 
 async function lire(): Promise<Contenu> {
+  const lu = await clientSanity.fetch<Brut>(REQUETE);
+  // Poste local seulement : textes provisoires du rapport par courriel avant leur semis.
+  if (lu.verificateur) lu.verificateur = await avecTextesLocaux(lu.verificateur);
   // Apostrophes typographiques à l'affichage (lib/typographie.ts), avant tout le reste.
-  const brut = typographier(await clientSanity.fetch<Brut>(REQUETE));
+  const brut = typographier(lu);
   const manquants = (Object.keys(brut) as (keyof Brut)[]).filter((cle) => brut[cle] == null);
   if (manquants.length) {
     throw new Error(`Sanity (k99pdqd1) : document(s) introuvable(s) : ${manquants.join(", ")}. Lancer le semis (studio/scripts/semer.ts).`);

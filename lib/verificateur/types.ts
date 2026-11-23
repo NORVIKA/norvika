@@ -61,8 +61,17 @@ export type Rapport = {
   synthese: Record<Etat, number>;
 };
 
+/**
+ * Rapport par courriel (2026-11-23) : ce qu'il est advenu du courriel demandé par la personne.
+ *   envoye : Resend l'a accepté ;   simule : poste local, aucun courriel réel (jamais en production) ;
+ *   echec  : textes illisibles ou refus de Resend ;   aucun : pas de courriel demandé, ou fonction fermée.
+ * L'analyse ne dépend jamais de l'envoi : un échec d'envoi rend quand même le rapport.
+ */
+export const ETATS_ENVOI = ["envoye", "simule", "echec", "aucun"] as const;
+export type EtatEnvoi = (typeof ETATS_ENVOI)[number];
+
 /** Réponse de la route /api/verificateur-loi-25. */
-export type ReponseVerificateur = { ok: true; rapport: Rapport } | { ok?: false; error: string; code?: string };
+export type ReponseVerificateur = { ok: true; rapport: Rapport; envoi: EtatEnvoi } | { ok?: false; error: string; code?: string };
 
 /** L'adresse de la page : une affaire de code, déclarée une fois (page, bloc de Sites web, pied de page, sitemap). */
 export const CHEMIN_VERIFICATEUR = "/verificateur-loi-25";
@@ -72,3 +81,12 @@ export const CHAMP_ADRESSE = "adresse";
 
 /** Longueur maximale d'une adresse soumise. */
 export const LONGUEUR_MAX_ADRESSE = 300;
+
+/** Nom du champ facultatif du courriel qui reçoit le rapport. */
+export const CHAMP_COURRIEL = "courriel";
+
+/** Nom de la case facultative « Norvika peut m'écrire ensuite » : `true` seulement si elle est cochée. */
+export const CHAMP_SUIVI = "suivi";
+
+/** Longueur maximale d'une adresse courriel (RFC 5321). */
+export const LONGUEUR_MAX_COURRIEL = 254;

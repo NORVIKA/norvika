@@ -1118,6 +1118,42 @@
 .nv-champ[readonly] { background: var(--muted); color: rgba(12,25,47,.72); }
 .nv-verif-erreur { margin: 12px 0 0; font-size: 14.5px; line-height: 1.5; color: var(--etat-corriger); }
 .nv-verif-mention { margin-top: 18px; color: rgba(12,25,47,.72); }
+/* Rapport par courriel (2026-11-23), seulement si le Studio l'active : la meme etiquette et le meme
+   champ que l'adresse (une seule declaration, regle 5). La case ne parait qu'avec une adresse
+   inscrite ; sa cible fait 44 px de haut sur toute la ligne, texte compris. Le bouton passe sous
+   les champs, a sa largeur naturelle (pleine largeur sous 400 px, regle plus bas). */
+.nv-verif-courriel { margin-top: 18px; }
+.nv-verif-courriel .nv-champ { display: block; width: 100%; margin-top: 8px; }
+.nv-verif-case {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  min-height: 44px;
+  padding: 10px 0 8px;
+  font-size: 14.5px;
+  line-height: 1.5;
+  color: var(--navy);
+  cursor: pointer;
+}
+.nv-verif-case input {
+  flex: none;
+  width: 20px;
+  height: 20px;
+  margin: 1px 0 0;
+  border-radius: 4px;
+  accent-color: var(--navy);
+  cursor: pointer;
+  transition: box-shadow .15s;
+}
+/* L'aide sous le champ et le texte sous la case : meme taille et meme couleur lisible que la mention. */
+.nv-verif-aide { margin: 8px 0 0; font-size: 13.5px; line-height: 1.55; color: rgba(12,25,47,.72); }
+/* La demande de consentement, presentee distinctement du champ (loi sur le prive, art. 14) : un
+   trait la separe du champ et de son aide (regle 3 : il separe deux choses). */
+.nv-verif-consentement { margin-top: 14px; padding-top: 4px; border-top: 1px solid var(--hairline); }
+.nv-verif-consentement .nv-verif-aide { margin-top: 0; padding-left: 32px; }
+.nv-verif-courriel .nv-verif-bouton { margin-top: 16px; }
+.nv-verif-mention-suite { margin-top: 10px; }
+.nv-verif-envoi { margin: 12px 0 0; font-size: 14.5px; line-height: 1.5; color: rgba(12,25,47,.74); overflow-wrap: anywhere; }
 
 /* Le resultat. */
 .nv-verif-resultat .nv-verif-cadre {
@@ -1281,6 +1317,7 @@
 @media (hover: hover) {
   .nv-verif-bouton:not([aria-disabled="true"]):hover { background: var(--navy-600); }
   .nv-champ:not([readonly]):hover { border-color: rgba(12,25,47,.42); }
+  .nv-verif-case:hover input:not([aria-disabled="true"]) { box-shadow: 0 0 0 4px rgba(51,73,108,.14); }
   .nv-verif-refaire:hover { text-decoration-thickness: 2px; }
   .nv-verif-pourquoi summary:hover { color: var(--navy); }
   .nv-verif-pourquoi summary:hover::before { transform: scale(1.2); }

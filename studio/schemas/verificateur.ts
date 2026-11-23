@@ -10,6 +10,8 @@
  * ⛔ RÈGLE CENTRALE (avis accepté par William le 2026-11-18) : jamais « conforme » ni « non
  * conforme ». Chaque vérification sort en « à corriger », « à vérifier » ou « en place ». Textes
  * rédigés par Martin (contenu/verificateur-loi25-textes.md) : un changement de fond repasse par lui.
+ * Groupe « Rapport par courriel » (2026-11-23) : textes provisoires de Mattew, définitifs par Martin
+ * (contenu/verificateur-courriel-textes.md), semés par scripts/verificateur-courriel-semer.ts.
  */
 import { defineField, defineType, type FieldDefinition } from 'sanity'
 
@@ -45,9 +47,32 @@ const GROUPES = [
   { name: 'analyse', title: 'Analyse et erreurs' },
   { name: 'resultat', title: 'Résultat' },
   { name: 'verifications', title: 'Les 8 vérifications' },
+  { name: 'courriel', title: 'Rapport par courriel' },
   { name: 'ailleurs', title: 'Sites web et pied de page' },
   GROUPES_PAGE[1],
 ]
+
+/**
+ * Un texte du rapport par courriel : obligatoire seulement quand l'envoi est activé (une case vide
+ * ne bloque pas la publication tant que l'interrupteur est éteint). `variable` : une {variable} que
+ * le texte doit garder (ex. {adresse_postale}, sans laquelle la demande de consentement serait illégale).
+ */
+function texteCourriel(name: string, title: string, description: string, o: { rows?: number; variable?: string } = {}) {
+  const base = o.rows
+    ? paragraphe(name, title, description, { requis: false, rows: o.rows })
+    : ligne(name, title, description, { requis: false })
+  return defineField({
+    ...base,
+    validation: (r) =>
+      r.custom((valeur, contexte) => {
+        const texte = String(valeur ?? '').trim()
+        if ((contexte.parent as { afficher?: boolean } | undefined)?.afficher && !texte)
+          return 'Ce texte s’affiche quand l’envoi par courriel est activé : il ne peut pas être vide.'
+        if (texte && o.variable && !texte.includes(`{${o.variable}}`)) return `Gardez {${o.variable}} tel quel dans ce texte.`
+        return true
+      }),
+  })
+}
 
 export const pageVerificateurLoi25 = defineType({
   name: 'pageVerificateurLoi25',
@@ -249,6 +274,90 @@ export const pageVerificateurLoi25 = defineType({
       etat('aCorrigerSansRedirection', 'À corriger, pas de redirection', 'L’adresse en http:// reste accessible sans passer en https://.'),
       etat('aVerifier', 'À vérifier', 'HTTPS, mais la redirection depuis http:// n’a pas pu être confirmée.'),
     ]),
+
+    /* ---------------------------------------------------------------- rapport par courriel */
+    defineField({
+      name: 'rapportCourriel',
+      title: 'Rapport par courriel',
+      type: 'object',
+      group: 'courriel',
+      description:
+        'Un champ facultatif sous l’adresse du site : la personne peut recevoir son rapport par courriel et, si la case est en ligne, accepter que Norvika lui écrive ensuite. Le résultat s’affiche à l’écran dans tous les cas. Textes de Martin (contenu/verificateur-courriel-textes.md) : un changement de fond repasse par lui.',
+      options: { collapsible: true, collapsed: false },
+      fields: [
+        defineField({
+          name: 'afficher',
+          title: 'Offrir l’envoi du rapport par courriel',
+          type: 'boolean',
+          initialValue: false,
+          description:
+            'Décochez pour retirer le champ de courriel (et la case) : le formulaire redevient une seule case d’adresse, sans perdre ces textes. La politique de confidentialité suit toute seule. Le changement paraît en ligne après la reconstruction du site (quelques minutes).',
+        }),
+        defineField({
+          name: 'afficherCase',
+          title: 'Afficher la case « Norvika peut m’écrire »',
+          type: 'boolean',
+          initialValue: false,
+          description:
+            'La case de consentement, sous le champ de courriel. Elle ne paraît JAMAIS tant que l’adresse postale est vide dans « Infos de l’entreprise », même cochée ici : la loi exige l’adresse postale dans la demande elle-même. La politique de confidentialité suit toute seule.',
+        }),
+        texteCourriel('champLibelle', 'Étiquette du champ de courriel', 'Au-dessus du champ (ex. : « Votre courriel (facultatif) »). Le mot « facultatif » doit rester : le courriel ne peut pas être exigé.'),
+        texteCourriel('champExemple', 'Exemple dans le champ', 'Le texte pâle dans le champ vide (ex. : « vous@exemple.ca »).'),
+        texteCourriel('champAide', 'Aide sous le champ', 'Sous le champ de courriel : à quoi il sert, et que le résultat s’affiche quand même.', { rows: 2 }),
+        texteCourriel(
+          'caseTexte',
+          'Texte de la case de consentement',
+          'Le libellé de la case, jamais cochée d’avance ; elle paraît dès qu’une adresse courriel est inscrite. Ce texte exact est recopié dans le courriel que Norvika reçoit : c’est la preuve du consentement. Le changer change ce que la personne accepte.',
+          { rows: 3 },
+        ),
+        texteCourriel(
+          'caseIdentification',
+          'Texte sous la case',
+          'Fait partie de la demande de consentement : qui la fait, son adresse postale et comment retirer son consentement. {adresse_postale} est remplacé par l’adresse de « Infos de l’entreprise ».',
+          { rows: 4, variable: 'adresse_postale' },
+        ),
+        texteCourriel(
+          'mention',
+          'Mention de collecte du courriel (case en ligne)',
+          'Sous le formulaire, après la mention de l’adresse du site (Loi 25, art. 8), quand la case est en ligne. Les mots « politique de confidentialité » deviennent un lien.',
+          { rows: 8 },
+        ),
+        texteCourriel(
+          'mentionSansCase',
+          'Mention de collecte du courriel (sans la case)',
+          'La même mention, sans les phrases sur la case, tant que la case n’est pas en ligne.',
+          { rows: 6 },
+        ),
+        texteCourriel('erreurCourriel', 'Message : courriel invalide', 'Sous le champ, quand l’adresse courriel n’a pas une forme valide. L’analyse n’est pas lancée.', { rows: 2 }),
+        texteCourriel('envoiReussi', 'Message : rapport envoyé', 'Sous le résultat. {courriel} est remplacé par l’adresse.', { rows: 2 }),
+        texteCourriel('envoiEchec', 'Message : envoi impossible', 'Sous le résultat, quand le courriel n’a pas pu partir. Le résultat reste affiché.', { rows: 3 }),
+        texteCourriel('envoiEchecCase', 'Ajout à l’envoi impossible, case cochée', 'Ajouté au message précédent quand la case était cochée : sans rapport parti, la case ne compte pas.', { rows: 2 }),
+        texteCourriel('sansResultat', 'Ajout quand l’analyse n’a pas de résultat', 'Ajouté au message d’erreur (site injoignable, délai…) quand un courriel était entré.', { rows: 2 }),
+        texteCourriel('objet', 'Objet du courriel', '{domaine} est remplacé par le site analysé (ex. : « Votre rapport Loi 25 pour {domaine} »).'),
+        texteCourriel(
+          'preEntete',
+          'Texte d’aperçu du courriel',
+          'La ligne grise que la boîte de réception montre après l’objet. {corriger}, {verifier} et {enPlace} : les comptes de la phrase de synthèse, déjà accordés.',
+          { rows: 2 },
+        ),
+        texteCourriel('salutation', 'Salutation', 'La première ligne du courriel (ex. : « Bonjour, »).'),
+        texteCourriel('intro', 'Première phrase du courriel', '{date}, {heure} et {domaine} sont remplacés.', { rows: 2 }),
+        texteCourriel(
+          'invisibleCourriel',
+          'Ce que le test ne voit pas (courriel)',
+          'Sous les huit points, après le titre « Ce que ce test ne peut pas voir » de la page. Version courte du courriel.',
+          { rows: 4 },
+        ),
+        texteCourriel('paragrapheSansCase', 'Pourquoi ce courriel (case non cochée)', 'Avant le pied du courriel, quand la case n’a pas été cochée.', { rows: 4 }),
+        texteCourriel(
+          'paragrapheAvecCase',
+          'Pourquoi ce courriel (case cochée)',
+          'Avant le pied du courriel, quand la case a été cochée : il tient lieu de confirmation (« si ce n’est pas vous, répondez désabonnement »).',
+          { rows: 5 },
+        ),
+        texteCourriel('libellePolitique', 'Libellé du lien vers la politique', 'Au pied du courriel, devant l’adresse de la politique (ex. : « Politique de confidentialité »).'),
+      ],
+    }),
 
     /* ---------------------------------------------------------------- ailleurs sur le site */
     defineField({

@@ -19,6 +19,12 @@ export const parametres = defineType({
     ligne('nom', 'Nom de l’entreprise', 'Le nom affiché à Google et dans les partages (ex. : « Norvika »).', { group: 'coordonnees' }),
     ligne('nomLegal', 'Nom légal', 'Nom légal exact, affiché après le © dans le pied de page.', { group: 'coordonnees' }),
     paragraphe(
+      'adressePostale',
+      'Adresse postale',
+      'Sur une ligne (ex. : « 123, rue Principale, Chambly (Québec) J3L 0A0 »). Affichée seulement dans la demande de consentement du vérificateur Loi 25 et au pied de son courriel, jamais ailleurs sur le site. Tant qu’elle est vide, la case « Norvika peut m’écrire » ne paraît pas : la loi exige l’adresse postale dans la demande de consentement elle-même.',
+      { group: 'coordonnees', requis: false, rows: 2 },
+    ),
+    paragraphe(
       'description',
       'Phrase de présentation',
       'Une phrase qui dit ce que fait l’entreprise. Affichée sous le logo du pied de page et lue par Google.',

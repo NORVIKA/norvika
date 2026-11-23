@@ -36,6 +36,11 @@ export type Parametres = {
   nom: string;
   /** Affiché après le © du pied de page. */
   nomLegal: string;
+  /**
+   * Adresse postale de l'entreprise. Affichée seulement dans la demande de consentement du
+   * vérificateur Loi 25 et le pied de son courriel ; vide, la case de consentement ne paraît pas.
+   */
+  adressePostale?: string | null;
   description: string;
   courriel: string;
   telephone: string;
@@ -359,6 +364,49 @@ export function categories(page: PageRealisations): { id: CategorieId; label: st
 /** Les textes d'une vérification : nom, pourquoi, article, puis un texte par cas (voir lib/verificateur/types.ts). */
 export type TextesVerification = { nom: string; pourquoi: string; article: string } & Record<string, string | undefined>;
 
+/**
+ * Rapport par courriel (groupe « Rapport par courriel » du Studio, 2026-11-23, textes de Martin :
+ * contenu/verificateur-courriel-textes.md). DEUX interrupteurs (fait C8) :
+ *   afficher      : le champ de courriel et l'envoi du rapport ; absent ou décoché = formulaire V1 ;
+ *   afficherCase  : la case de consentement, qui ne paraît JAMAIS sans l'adresse postale de
+ *                   « Infos de l'entreprise » (Règlement DORS/2012-36, art. 4 d) : l'adresse doit
+ *                   figurer dans la demande de consentement elle-même).
+ */
+export type RapportCourriel = {
+  afficher?: boolean | null;
+  afficherCase?: boolean | null;
+  champLibelle: string;
+  champExemple: string;
+  champAide: string;
+  /** Le libellé de la case, recopié tel quel dans la copie interne (preuve du consentement). */
+  caseTexte: string;
+  /** Sous la case : qui demande, {adresse_postale}, comment retirer le consentement. */
+  caseIdentification: string;
+  /** Mention de collecte du courriel quand la case est en ligne. */
+  mention: string;
+  /** La même, sans les phrases sur la case, tant que la case est éteinte. */
+  mentionSansCase: string;
+  erreurCourriel: string;
+  /** {courriel} est remplacé par l'adresse. */
+  envoiReussi: string;
+  envoiEchec: string;
+  /** Ajouté à envoiEchec quand la case était cochée. */
+  envoiEchecCase: string;
+  /** Ajouté au message d'erreur d'une analyse sans résultat, si un courriel était entré. */
+  sansResultat: string;
+  /** {domaine} est remplacé par le site analysé. */
+  objet: string;
+  /** Texte d'aperçu : {corriger}, {verifier} et {enPlace}, déjà accordés. */
+  preEntete: string;
+  salutation: string;
+  /** {date}, {heure} et {domaine} sont remplacés. */
+  intro: string;
+  invisibleCourriel: string;
+  paragrapheSansCase: string;
+  paragrapheAvecCase: string;
+  libellePolitique: string;
+};
+
 export type PageVerificateur = DocumentPage & {
   nom: string;
   h1: string;
@@ -430,4 +478,5 @@ export type PageVerificateur = DocumentPage & {
   /** Annonce de l'outil : page Sites web (`afficher`) et accueil (`afficherAccueil`, absent = affiché). */
   blocSitesWeb: { afficher?: boolean | null; afficherAccueil?: boolean | null; titre: string; texte: string; bouton: string };
   lienPied: string;
+  rapportCourriel?: RapportCourriel | null;
 };

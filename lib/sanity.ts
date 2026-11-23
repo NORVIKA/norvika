@@ -22,3 +22,17 @@ export const clientSanity = createClient({
   useCdn: false,
   perspective: "published",
 });
+
+/**
+ * Le client de l'EXÉCUTION : une lecture faite pendant une requête, jamais au build. Seul usage :
+ * la route du vérificateur Loi 25 lit les textes du rapport par courriel au moment de l'envoyer.
+ * `useCdn: true` (règle Sanity 7) : une lecture rapide et mise en cache par Sanity, sans réveiller
+ * l'API à chaque analyse. Un texte publié à l'instant peut y arriver avec quelques secondes de retard.
+ */
+export const clientSanityExecution = createClient({
+  projectId: ID_PROJET,
+  dataset: JEU_DE_DONNEES,
+  apiVersion: "2025-02-19",
+  useCdn: true,
+  perspective: "published",
+});

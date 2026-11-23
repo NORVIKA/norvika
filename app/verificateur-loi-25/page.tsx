@@ -5,6 +5,7 @@ import { Verificateur } from "@/components/verificateur/Verificateur";
 import { obtenirContenu } from "@/lib/contenu";
 import { metaPage } from "@/lib/meta";
 import { insecablesPartout } from "@/lib/typographie";
+import { adresseLocale } from "@/lib/verificateur/textes-locaux";
 import { CHEMIN_VERIFICATEUR } from "@/lib/verificateur/types";
 
 /**
@@ -24,7 +25,12 @@ export default async function PageVerificateur() {
   const { verificateur, parametres } = await obtenirContenu();
   return (
     <SiteShell>
-      <Verificateur t={insecablesPartout(verificateur)} lienRendezVous={parametres.lienRendezVous} />
+      <Verificateur
+        t={insecablesPartout(verificateur)}
+        lienRendezVous={parametres.lienRendezVous}
+        // Vide tant que William ne l'a pas donnée : la case de consentement reste éteinte.
+        adressePostale={adresseLocale(parametres.adressePostale)}
+      />
     </SiteShell>
   );
 }

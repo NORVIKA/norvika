@@ -1,12 +1,14 @@
 import { NextResponse } from "next/server";
 
 import { CHAMP_JETON, verifierAntiRobot } from "@/lib/anti-robot";
-import { champTexte, lireCorpsJson } from "@/lib/garde-formulaire";
+import { champTexte, formeCourrielValide, ligneSimpleValide, lireCorpsJson } from "@/lib/garde-formulaire";
 import { verifierDebitVerificateur } from "@/lib/rate-limit";
 import { normaliserAdresse, resoudrePublic } from "@/lib/verificateur/adresse";
 import { analyser } from "@/lib/verificateur/analyse";
+import { envoyerRapport } from "@/lib/verificateur/courriel";
 import { ErreurMoteur, observer, type CodeMoteur } from "@/lib/verificateur/moteur";
-import { CHAMP_ADRESSE, type ReponseVerificateur } from "@/lib/verificateur/types";
+import { lireTextesCourriel } from "@/lib/verificateur/textes-serveur";
+import { CHAMP_ADRESSE, CHAMP_COURRIEL, CHAMP_SUIVI, LONGUEUR_MAX_COURRIEL, type ReponseVerificateur } from "@/lib/verificateur/types";
 
 /**
  * Vérificateur Loi 25 (page /verificateur-loi-25) : visite le site soumis avec un vrai navigateur
@@ -14,7 +16,8 @@ import { CHAMP_ADRESSE, type ReponseVerificateur } from "@/lib/verificateur/type
  * ⛔ Jamais « conforme » ni « non conforme » dans la réponse : voir lib/verificateur/types.ts.
  *
  * Ordre, du moins cher au plus cher (même patron que /api/contact) :
- *   corps (32 Ko) → forme de l'adresse → Turnstile → limite de débit → DNS → navigateur.
+ *   corps (32 Ko) → forme de l'adresse → forme du courriel → Turnstile → limite de débit → DNS
+ *   → navigateur → courriel du rapport (facultatif).
  * Un robot ne consomme ni le quota d'une IP, ni une résolution DNS, ni un navigateur. Une adresse
  * refusée par le DNS consomme le quota : sinon la route servirait à sonder des réseaux gratuitement.
  *
@@ -24,6 +27,11 @@ import { CHAMP_ADRESSE, type ReponseVerificateur } from "@/lib/verificateur/type
  * note que le résultat chiffré, la durée et un code d'erreur, jamais l'adresse. ⚠️ Cloudflare, lui,
  * affiche les adresses visitées dans l'onglet « Runs » de Browser Run, pour une durée non
  * documentée (constat de Sentinel, 2026-11-19) : la mention de collecte et la politique le disent.
+ *
+ * Rapport par courriel (2026-11-23, lib/verificateur/courriel.ts) : facultatif, dans la MÊME requête,
+ * écrit à partir du rapport calculé ici. Le courriel n'est ni enregistré ni journalisé (au journal :
+ * l'état de l'envoi seulement). Turnstile, la limite par IP et les plafonds globaux bornent donc
+ * aussi le nombre de courriels. Un échec d'envoi ne fait jamais échouer l'analyse.
  */
 
 /** Le widget Turnstile du vérificateur (components/verificateur/Verificateur.tsx) et ses hôtes. */
@@ -75,6 +83,15 @@ export async function POST(req: Request) {
   const adresse = normaliserAdresse(champTexte(corps.donnees, CHAMP_ADRESSE));
   if (!adresse.ok) return refus(400, MESSAGES_ADRESSE[adresse.code], adresse.code);
 
+  // Courriel facultatif : une faute de forme est refusée AVANT Turnstile et l'analyse, pour que la
+  // personne la corrige sans perdre une de ses 3 analyses. La case n'a de sens qu'avec un courriel :
+  // cochée sans courriel, elle est ignorée.
+  const courriel = champTexte(corps.donnees, CHAMP_COURRIEL);
+  if (courriel && (courriel.length > LONGUEUR_MAX_COURRIEL || !ligneSimpleValide(courriel) || !formeCourrielValide(courriel))) {
+    return refus(400, "Cette adresse courriel ne semble pas valide.", "courriel");
+  }
+  const suivi = Boolean(courriel) && corps.donnees[CHAMP_SUIVI] === true;
+
   // Anti-robot AVANT la limite de débit et avant tout accès réseau (patron de /api/contact). Le jeton
   // doit venir du widget du vérificateur, sur norvika.ca (F5 de Sentinel).
   const antiRobot = await verifierAntiRobot(req, champTexte(corps.donnees, CHAMP_JETON), JETON_ATTENDU);
@@ -93,11 +110,21 @@ export async function POST(req: Request) {
   const resolution = await resoudrePublic(adresse.url.hostname);
   if (!resolution.ok) return refus(400, MESSAGES_ADRESSE[resolution.code], resolution.code);
 
+  // Les textes du courriel se lisent PENDANT l'analyse (une requête au CDN de Sanity), pas après.
+  const textes = courriel ? lireTextesCourriel() : null;
   try {
     const observations = await observer(adresse.url);
     const rapport = analyser(observations, debut);
-    console.log("[verificateur] analyse terminée", JSON.stringify({ ...rapport.synthese, duree: rapport.duree }));
-    return NextResponse.json<ReponseVerificateur>({ ok: true, rapport }, { headers: { "Cache-Control": "no-store" } });
+    // Ne lève jamais ; la ceinture en plus : une erreur d'envoi ne doit pas passer pour une panne d'analyse.
+    const envoi = await envoyerRapport({ rapport, courriel, suivi, textes, local: hoteLocal(req) }).catch(
+      () => ({ visiteur: "echec", interne: "aucun" }) as const,
+    );
+    // Au journal : l'état de l'envoi (envoye, simule, echec, aucun), JAMAIS l'adresse courriel.
+    console.log(
+      "[verificateur] analyse terminée",
+      JSON.stringify({ ...rapport.synthese, duree: rapport.duree, courriel: envoi.visiteur, suivi: envoi.interne }),
+    );
+    return NextResponse.json<ReponseVerificateur>({ ok: true, rapport, envoi: envoi.visiteur }, { headers: { "Cache-Control": "no-store" } });
   } catch (e) {
     const code: CodeMoteur = e instanceof ErreurMoteur ? e.code : "indisponible";
     // Au journal : le code d'erreur et un code technique court (net::ERR_..., HTTP 404), JAMAIS

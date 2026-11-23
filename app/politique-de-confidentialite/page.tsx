@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { SiteShell } from "@/components/site/SiteShell";
 import { obtenirContenu } from "@/lib/contenu";
 import { imagePartage, partage } from "@/lib/meta";
+import { adresseLocale } from "@/lib/verificateur/textes-locaux";
 
 // Texte légal, laissé dans le code (exception de la phase 4). Son propre aperçu de partage : sans
 // lui, la page héritait du titre et de la description de l'accueil (openGraph du layout).
@@ -12,6 +13,13 @@ const TITRE = "Politique de confidentialité";
 // Date de la version EN LIGNE aujourd'hui. Elle se fixe le jour de la mise en ligne (Pixel,
 // 2026-11-19), pas avant : c'est cette ligne qui change à ce moment-là.
 const MISE_A_JOUR = "21 novembre 2026";
+// ⚠️ Rapport par courriel du vérificateur (textes de Martin, contenu/verificateur-courriel-textes.md,
+// section 6) : les passages sur le courriel paraissent SEULEMENT quand le Studio active l'envoi, et
+// ceux marqués « (case) » seulement quand la case est en ligne (interrupteur ET adresse postale).
+// La page est rebâtie à chaque publication du Studio : la politique suit l'outil toute seule.
+// ⚠️ À FIXER au jour du déploiement qui publie la fonction courriel (Martin, 6.6), puis à changer
+// encore le jour où la case s'allume.
+const MISE_A_JOUR_COURRIEL = "23 novembre 2026";
 // Jamais « conforme à la Loi 25 » : c'est l'auto-attestation que le vérificateur Loi 25 refuse de
 // faire, sur le site qui l'offre (Martin, 2026-11-18, point B).
 const DESCRIPTION = "Politique de confidentialité de Norvika : renseignements recueillis, utilisation, fournisseurs, conservation et vos droits.";
@@ -33,7 +41,9 @@ export async function generateMetadata(): Promise<Metadata> {
 
 export default async function PolitiquePage() {
   // Le nom légal vient de « Infos de l'entreprise » (zéro texte en dur) : il a changé le 2026-11-18.
-  const { parametres } = await obtenirContenu();
+  const { parametres, verificateur } = await obtenirContenu();
+  const courriel = Boolean(verificateur.rapportCourriel?.afficher);
+  const avecCase = courriel && Boolean(verificateur.rapportCourriel?.afficherCase) && Boolean(adresseLocale(parametres.adressePostale));
   return (
     <SiteShell>
       <div className="mx-auto max-w-3xl px-6 py-20 md:py-28">
@@ -41,7 +51,7 @@ export default async function PolitiquePage() {
           Politique de confidentialité
         </h1>
         <p className="mt-4 text-sm text-[var(--muted-foreground)]">
-          Dernière mise à jour et entrée en vigueur : {MISE_A_JOUR}
+          Dernière mise à jour et entrée en vigueur : {courriel ? MISE_A_JOUR_COURRIEL : MISE_A_JOUR}
         </p>
 
         <div className="prose prose-sm mt-10 max-w-none text-[var(--foreground)]">
@@ -63,6 +73,7 @@ export default async function PolitiquePage() {
               formulaire ou lancez le vérificateur Loi 25, pour limiter le nombre d’envois et bloquer les abus
             </li>
             <li>L’adresse d’un site web, quand vous utilisez le vérificateur Loi 25</li>
+            {courriel ? <li>Votre courriel, si vous demandez le rapport du vérificateur Loi 25 par courriel (facultatif)</li> : null}
           </ul>
 
           <h2 className="mt-8 text-xl font-semibold">3. Utilisation des données</h2>
@@ -72,6 +83,10 @@ export default async function PolitiquePage() {
           <ul className="mt-3 list-disc pl-5 text-[var(--muted-foreground)]">
             <li>Vous recontacter suite à votre demande</li>
             <li>Gérer la relation client dans le cadre d’un projet</li>
+            {courriel ? <li>Vous envoyer le rapport du vérificateur Loi 25, si vous le demandez par courriel</li> : null}
+            {avecCase ? (
+              <li>Vous écrire au sujet de ce rapport et de nos services, seulement si vous avez coché la case prévue à cette fin</li>
+            ) : null}
           </ul>
           <p className="mt-3 text-[var(--muted-foreground)]">
             Nous ne vendons, ne louons et ne partageons jamais vos données avec des tiers à des fins
@@ -83,8 +98,11 @@ export default async function PolitiquePage() {
             Notre vérificateur Loi 25 (norvika.ca/verificateur-loi-25) visite automatiquement le site dont
             vous entrez l’adresse, puis la page de politique de confidentialité vers laquelle ce site
             renvoie, même si elle est hébergée sur un autre domaine. Il relève des signaux visibles de
-            l’extérieur. Il ne vous demande pas de courriel. Voici ce qu’il recueille et ce que nous en
-            faisons.
+            l’extérieur.{" "}
+            {courriel
+              ? "Votre courriel est facultatif : il sert seulement si vous demandez le rapport par courriel."
+              : "Il ne vous demande pas de courriel."}{" "}
+            Voici ce qu’il recueille et ce que nous en faisons.
           </p>
           <ul className="mt-3 list-disc pl-5 text-[var(--muted-foreground)]">
             <li>
@@ -101,6 +119,29 @@ export default async function PolitiquePage() {
               site, votre adresse IP figure aussi jusqu’à 7 jours dans les journaux techniques de Cloudflare.
               Elle ne sert à rien d’autre.
             </li>
+            {courriel ? (
+              <li>
+                <strong className="text-[var(--foreground)]">Courriel, facultatif.</strong> Si vous l’entrez, il sert
+                à vous envoyer le rapport que vous venez d’obtenir. L’envoi passe par Resend, qui garde une copie
+                du courriel envoyé (votre adresse et le rapport) pendant 30 jours dans notre compte. Sans autre
+                accord de votre part, Norvika ne garde pas votre courriel et ne vous écrit pas d’autre courriel à
+                la suite de cette demande.
+              </li>
+            ) : null}
+            {avecCase ? (
+              <li>
+                <strong className="text-[var(--foreground)]">Accord pour que nous vous écrivions, facultatif.</strong>{" "}
+                Une case distincte, jamais cochée d’avance, permet d’accepter que Norvika inc. vous écrive par
+                courriel au sujet de ce rapport et de ses services. Si vous la cochez, une copie de votre demande
+                (votre courriel, le site analysé, le résultat, la date et le texte de la case) arrive dans notre
+                messagerie. Elle sert seulement à vous écrire personnellement et à garder la preuve de votre
+                consentement. Nous la gardons jusqu’à ce que vous retiriez votre consentement, et au plus 24 mois
+                après la date de votre demande. Vous pouvez le retirer en tout temps en répondant « désabonnement »
+                à l’un de nos courriels ou en écrivant à info@norvika.ca ; nous y donnons suite au plus tard dans
+                les 10 jours ouvrables. Votre courriel n’est ajouté à aucune liste d’envoi et n’est communiqué à
+                aucune autre entreprise que celles nommées dans cette politique.
+              </li>
+            ) : null}
             <li>
               <strong className="text-[var(--foreground)]">Vérification anti-robot.</strong> Comme sur nos
               autres formulaires, Cloudflare Turnstile reçoit des signaux techniques de votre navigateur pour
@@ -150,6 +191,15 @@ export default async function PolitiquePage() {
             Vos données sont conservées aussi longtemps que nécessaire pour la gestion de votre projet,
             puis supprimées dans un délai raisonnable.
           </p>
+          {courriel ? (
+            <p className="mt-3 text-[var(--muted-foreground)]">
+              Courriels envoyés par notre site (avis de vos messages, rapports du vérificateur Loi 25) : une copie
+              reste 30 jours chez Resend, notre fournisseur d’envoi.
+              {avecCase
+                ? " Copie d’une demande de rapport quand vous acceptez que nous vous écrivions : jusqu’au retrait de votre consentement, et au plus 24 mois."
+                : null}
+            </p>
+          ) : null}
 
           <h2 className="mt-8 text-xl font-semibold">7. Vos droits (Loi 25 Québec)</h2>
           <p className="mt-3 text-[var(--muted-foreground)]">
@@ -219,6 +269,9 @@ export default async function PolitiquePage() {
             <li>
               <strong className="text-[var(--foreground)]">Resend</strong> : acheminement des
               courriels de notification qui nous préviennent de votre message
+              {courriel
+                ? ", et des rapports du vérificateur Loi 25 demandés par courriel. Resend garde une copie de chaque courriel envoyé (destinataire et contenu) pendant 30 jours."
+                : null}
             </li>
             <li>
               <strong className="text-[var(--foreground)]">Cloudflare</strong> : hébergement et
@@ -240,7 +293,8 @@ export default async function PolitiquePage() {
             </li>
             <li>
               <strong className="text-[var(--foreground)]">Google Workspace</strong> : notre messagerie, qui
-              reçoit les courriels de notification de vos messages.
+              reçoit les courriels de notification de vos messages
+              {avecCase ? " et, quand vous acceptez que nous vous écrivions, la copie de votre demande de rapport." : "."}
             </li>
             <li>
               <strong className="text-[var(--foreground)]">Cloudflare Turnstile</strong> : vérification

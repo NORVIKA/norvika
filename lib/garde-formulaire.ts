@@ -20,6 +20,16 @@ export function ligneSimpleValide(valeur: string): boolean {
   return !INVISIBLES.test(valeur);
 }
 
+/**
+ * Forme d'une adresse courriel : quelque chose@domaine.ext, sans espace. Volontairement large (le
+ * fournisseur d'envoi refuse lui-même une adresse impossible) ; déclarée une seule fois pour les
+ * formulaires de contact, de /bienvenue et le rapport du vérificateur Loi 25. Fichier sans
+ * dépendance serveur : la page du vérificateur l'importe pour refuser une faute avant l'envoi.
+ */
+export function formeCourrielValide(valeur: string): boolean {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(valeur);
+}
+
 /** Vrai si le texte long ne contient que des caractères visibles, sauts de ligne permis. */
 export function texteLongValide(valeur: string): boolean {
   return !INVISIBLES_SAUF_LIGNES.test(valeur);

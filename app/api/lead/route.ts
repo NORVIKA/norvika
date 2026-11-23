@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { supabaseService, verifierDebit } from "@/lib/rate-limit";
 import { CHAMP_JETON, verifierAntiRobot } from "@/lib/anti-robot";
 import { envoyerCourrielInterne, esc, gabarit, ligne, lienCourriel } from "@/lib/courriel";
-import { champTexte, ligneSimpleValide, lireCorpsJson } from "@/lib/garde-formulaire";
+import { champTexte, formeCourrielValide, ligneSimpleValide, lireCorpsJson } from "@/lib/garde-formulaire";
 
 /**
  * Formulaire « Espace client » de /bienvenue.
@@ -38,7 +38,7 @@ export async function POST(req: Request) {
   if (!prenom || !courriel || !telephone) {
     return NextResponse.json({ error: "Tous les champs sont requis." }, { status: 400 });
   }
-  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(courriel)) {
+  if (!formeCourrielValide(courriel)) {
     return NextResponse.json({ error: "Courriel invalide." }, { status: 400 });
   }
   if (prenom.length > MAX.prenom || courriel.length > MAX.courriel || telephone.length > MAX.telephone) {
