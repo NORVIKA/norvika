@@ -165,13 +165,16 @@ export type DebitVerificateur = "ok" | "ip" | "quota" | "panne";
 
 export async function verifierDebitVerificateur(req: Request): Promise<DebitVerificateur> {
   try {
-    const { data, error } = await serviceClient().rpc("verifier_debit_verificateur", {
-      p_ip_hash: await hashIp(clientIp(req)),
-      p_max_ip: PLAFONDS_VERIFICATEUR.parIp,
-      p_fenetre: PLAFONDS_VERIFICATEUR.fenetre,
-      p_max_jour: PLAFONDS_VERIFICATEUR.parJour,
-      p_max_mois: PLAFONDS_VERIFICATEUR.parMois,
-    });
+    // 3 s au plus : au-delà, refus comme pour toute panne du compteur (fermé).
+    const { data, error } = await serviceClient()
+      .rpc("verifier_debit_verificateur", {
+        p_ip_hash: await hashIp(clientIp(req)),
+        p_max_ip: PLAFONDS_VERIFICATEUR.parIp,
+        p_fenetre: PLAFONDS_VERIFICATEUR.fenetre,
+        p_max_jour: PLAFONDS_VERIFICATEUR.parJour,
+        p_max_mois: PLAFONDS_VERIFICATEUR.parMois,
+      })
+      .abortSignal(AbortSignal.timeout(3000));
     if (error) {
       console.error("[verificateur] compteur indisponible :", error.code ?? "", error.message.slice(0, 120));
       return "panne";

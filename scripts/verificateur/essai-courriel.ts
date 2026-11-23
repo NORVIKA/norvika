@@ -25,7 +25,7 @@ import { join } from "node:path";
 
 import { analyser, type Observations } from "../../lib/verificateur/analyse";
 import { formeCourrielValide } from "../../lib/garde-formulaire";
-import { reserverCourrielsVerificateur, type ReserveCourriels } from "../../lib/rate-limit";
+import { reserverCourrielsVerificateur, verifierDebitVerificateur, type ReserveCourriels } from "../../lib/rate-limit";
 import { recoitDuCourriel } from "../../lib/verificateur/adresse";
 import { courrielInterne, courrielVisiteur, envoyerRapport, PREFIXE_CONSENTEMENT } from "../../lib/verificateur/courriel";
 import { remplirAvecAdresse } from "../../lib/verificateur/textes";
@@ -126,6 +126,9 @@ async function avecFauxResend<T>(statuts: number[], essai: () => Promise<T>): Pr
 }
 
 async function principal() {
+  // Sortie 1 si le script s'arrête avant son bilan (une promesse jamais résolue vide la boucle de
+  // Node sans erreur) : un essai qui ne va pas au bout ne doit jamais passer pour réussi.
+  process.exitCode = 1;
   const rapport = { ...analyser(observations, Date.now()), date: "2026-11-23T19:05:00.000Z" };
   const lus = await lireTextesCourriel();
   if (!lus?.t.rapportCourriel) {
@@ -247,12 +250,17 @@ async function principal() {
   };
   const fetchAvant = globalThis.fetch;
   let rpc: { statut: number; corps: unknown } = { statut: 200, corps: "ok" };
-  globalThis.fetch = (async (url: string | URL | Request) => {
+  globalThis.fetch = (async (url: string | URL | Request, init?: RequestInit) => {
     const u = new URL(String(url));
     if (u.hostname === "cloudflare-dns.com") {
       const r = reponsesDoh[u.searchParams.get("name") ?? ""];
       if (typeof r === "number") return new Response("", { status: r });
       return new Response(JSON.stringify(r ?? { Status: 0, Answer: [] }), { status: 200 });
+    }
+    if (u.pathname.endsWith("/rpc/verifier_debit_verificateur")) {
+      // Un compteur des analyses qui ne répond jamais : seul le délai de 3 s peut l'arrêter.
+      const signal = init?.signal;
+      return new Promise<Response>((_, rejeter) => signal?.addEventListener("abort", () => rejeter(signal.reason)));
     }
     if (u.pathname.endsWith("/rpc/reserver_courriels_verificateur")) {
       return new Response(JSON.stringify(rpc.corps), { status: rpc.statut, headers: { "Content-Type": "application/json" } });
@@ -282,6 +290,13 @@ async function principal() {
     verifier("compteur répond « ok » : réservé", (await reserverCourrielsVerificateur(1)) === "ok");
     rpc = { statut: 200, corps: "autre" };
     verifier("réponse inconnue : panne (fermé dans le doute)", (await reserverCourrielsVerificateur(1)) === "panne");
+    const avant = Date.now();
+    // AbortSignal.timeout ne retient pas Node : un minuteur ordinaire garde l'essai en vie le temps du délai.
+    const garde = setTimeout(() => undefined, 10_000);
+    const debit = await verifierDebitVerificateur(new Request("https://norvika.ca/api/verificateur-loi-25", { headers: { "cf-connecting-ip": "203.0.113.5" } }));
+    clearTimeout(garde);
+    const duree = Date.now() - avant;
+    verifier(`compteur des analyses muet : refus après le délai (${duree} ms)`, debit === "panne" && duree >= 2900 && duree < 4500);
     if (urlAvant === undefined) delete process.env.NEXT_PUBLIC_SUPABASE_URL;
     else process.env.NEXT_PUBLIC_SUPABASE_URL = urlAvant;
     if (cleAvant === undefined) delete process.env.SUPABASE_SERVICE_KEY;

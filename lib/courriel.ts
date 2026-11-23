@@ -19,9 +19,12 @@ const EXPEDITEUR = "Norvika Contact <contact@norvika.ca>";
 export const EXPEDITEUR_RAPPORT = "Norvika <contact@norvika.ca>";
 
 /**
- * Au-delà, Resend est jugé injoignable : la réponse au visiteur n'attend pas plus. 4 s : au pire,
- * 30 s d'analyse et ses contrôles + 2 x 4 s (rapport et copie) restent sous les 45 s de la page
- * (DELAI_NAVIGATEUR_MS, components/verificateur/Verificateur.tsx).
+ * Au-delà, Resend est jugé injoignable : la réponse au visiteur n'attend pas plus. Pire cas réel de
+ * la route du vérificateur, chaque étape à son délai maximal :
+ *   Turnstile 5 s + compteur des analyses 3 s + DNS du site 3 s + analyse 30 s (MX de l'adresse et
+ *   textes du Studio lus en même temps) + réserve du plafond de courriels 3 s + rapport 4 s + copie
+ *   interne 4 s = environ 52 s, sous les 55 s de la page (DELAI_NAVIGATEUR_MS,
+ *   components/verificateur/Verificateur.tsx).
  */
 const DELAI_ENVOI_MS = 4000;
 

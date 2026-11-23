@@ -56,8 +56,12 @@ type Phase =
 /** Le champ qui porte une erreur : son message s'affiche sous lui, et le focus y revient. */
 type Champ = "adresse" | "courriel";
 
-/** Délai côté navigateur : au-delà, la route a de toute façon abandonné (30 s plus ses marges). */
-const DELAI_NAVIGATEUR_MS = 45_000;
+/**
+ * Délai côté navigateur : au-delà, la route a de toute façon abandonné. Pire cas du serveur, environ
+ * 52 s (détail à DELAI_ENVOI_MS, lib/courriel.ts) : la page attend 55 s pour ne jamais afficher une
+ * erreur alors que le rapport est parti.
+ */
+const DELAI_NAVIGATEUR_MS = 55_000;
 
 /** Code d'erreur de la route → texte du Studio. Un code inconnu donne « indisponible ». */
 const ERREURS: Record<string, keyof PageVerificateur> = {
