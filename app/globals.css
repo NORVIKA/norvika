@@ -1280,6 +1280,13 @@
 .nv-verif-consentement .nv-verif-aide { margin-top: 0; padding-left: 32px; }
 .nv-verif-courriel .nv-verif-bouton { margin-top: 16px; }
 .nv-verif-mention-suite { margin-top: 10px; }
+/* Mention par couches (2026-11-23) : la phrase visible, puis le repli JUSTE dessous (son libelle fait
+   le renvoi aux durees et aux droits). Libelle a la taille de la mention (condition de Martin), en
+   navy-500 et en gras pour se lire cliquable ; sa cible garde 44 px de haut. Ouvert, les mentions
+   suivent le libelle, pleine largeur (regle 6 : pas de retrait qui allonge le texte sur telephone).
+   8 px au-dessus : le halo du contour clavier (6 px, declare plus haut) ne couvre pas la phrase. */
+.nv-verif-mention-repli { margin-top: 8px; }
+.nv-repli.nv-verif-mention-repli summary { font-size: 13.5px; }
 .nv-verif-envoi { margin: 12px 0 0; font-size: 14.5px; line-height: 1.5; color: rgba(12,25,47,.74); overflow-wrap: anywhere; }
 
 /* Le resultat. */
@@ -1388,9 +1395,11 @@
   overflow-wrap: anywhere;
 }
 
-/* « Pourquoi ca compte » : le texte est dans la page (cache a l'oeil), jamais ajoute au clic. */
-.nv-verif-pourquoi { margin-top: 12px; }
-.nv-verif-pourquoi summary {
+/* Le repli « + », DECLARE UNE FOIS (regle 5) : <details> natif, le texte est dans la page (cache a
+   l'oeil), jamais ajoute au clic, et s'ouvre au clavier sans JavaScript. Utilise par « Pourquoi ca
+   compte » et par la mention de collecte du formulaire ; chacun AJOUTE sa classe pour le reste.
+   Le survol (plus bas, @media hover) ne vise que le summary : c'est lui qui est cliquable (regle 10). */
+.nv-repli summary {
   display: inline-flex;
   align-items: center;
   gap: 8px;
@@ -1401,10 +1410,13 @@
   cursor: pointer;
   list-style: none;
 }
-.nv-verif-pourquoi summary::-webkit-details-marker { display: none; }
+.nv-repli summary::-webkit-details-marker { display: none; }
 /* Le « + » qui devient « - » : il EST la fonction (ouvrir, fermer), comme le chevron d'un menu. */
-.nv-verif-pourquoi summary::before { content: "+"; width: 14px; font-size: 18px; line-height: 1; text-align: center; transition: transform .2s; }
-.nv-verif-pourquoi[open] summary::before { content: "\2212"; }
+.nv-repli summary::before { content: "+"; flex: none; width: 14px; font-size: 18px; line-height: 1; text-align: center; transition: transform .2s; }
+.nv-repli[open] summary::before { content: "\2212"; }
+
+/* « Pourquoi ca compte », sous chacune des huit lignes. */
+.nv-verif-pourquoi { margin-top: 12px; }
 .nv-verif-pourquoi p { margin: 4px 0 0; max-width: 68ch; font-size: 14.5px; line-height: 1.62; color: rgba(12,25,47,.72); }
 
 /* Sous le resultat : ce que le test ne voit pas, puis l'avertissement complet. */
@@ -1448,8 +1460,8 @@
   .nv-champ:not([readonly]):hover { border-color: rgba(12,25,47,.42); }
   .nv-verif-case:hover input:not([aria-disabled="true"]) { box-shadow: 0 0 0 4px rgba(51,73,108,.14); }
   .nv-verif-refaire:hover { text-decoration-thickness: 2px; }
-  .nv-verif-pourquoi summary:hover { color: var(--navy); }
-  .nv-verif-pourquoi summary:hover::before { transform: scale(1.2); }
+  .nv-repli summary:hover { color: var(--navy); }
+  .nv-repli summary:hover::before { transform: scale(1.2); }
   .nv-verif-appel a:hover, .nv-verif-annonce a:hover { background: #fff; color: var(--navy); }
 }
 .nv-verif-bouton:not([aria-disabled="true"]):active { transform: translateY(1px); }

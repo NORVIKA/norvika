@@ -46,6 +46,11 @@ import {
  * l'adresse postale de « Infos de l'entreprise » (DORS/2012-36, art. 4 d). Jamais cochée d'avance,
  * séparée du champ par un trait, elle n'apparaît qu'une fois une adresse courriel inscrite :
  * « cochée sans courriel » ne peut donc pas arriver (et le serveur l'ignorerait, fait C5).
+ *
+ * Mention par couches (2026-11-23, demande de William, avis de Martin dans
+ * contenu/verificateur-courriel-textes.md) : sous le bouton, une phrase toujours visible (premier
+ * niveau, art. 8), puis les deux mentions complètes, inchangées, dans un <details> fermé. La case et
+ * son texte d'identification restent au-dessus du bouton, jamais repliés (DORS/2012-36, art. 4 d).
  */
 
 type Phase =
@@ -109,6 +114,15 @@ export function Verificateur({ t, lienRendezVous, adressePostale }: { t: PageVer
   // La case : son interrupteur ET l'adresse postale, qui doit figurer dans la demande elle-même.
   const caseEnLigne = Boolean(rc?.afficherCase && adressePostale.trim());
   const enAnalyse = phase.nom === "analyse";
+  // Mention par couches (2026-11-23, avis de Martin) : la phrase visible, avec ou sans le courriel,
+  // puis les mentions complètes dans un repli fermé. Une phrase ou un libellé absent du Studio :
+  // pas de repli, les mentions restent affichées en entier (jamais cachées sans premier niveau).
+  const resume = (rc ? rc.mentionResume : t.mentionResume)?.trim() ?? "";
+  const libelleRepli = t.mentionRepliLibelle?.trim() ?? "";
+  const repli = Boolean(resume && libelleRepli);
+  // Ce que les champs annoncent aux lecteurs d'écran : la phrase visible, pas les 25 lignes repliées.
+  const idMention = repli ? "verif-mention-resume" : "verif-mention";
+  const idMentionCourriel = repli ? "verif-mention-resume" : "verif-mention-courriel";
 
   function montrerErreur(message: string, champ: Champ = "adresse") {
     setErreur((avant) => ({ texte: message, n: (avant?.n ?? 0) + 1, champ }));
@@ -209,6 +223,18 @@ export function Verificateur({ t, lienRendezVous, adressePostale }: { t: PageVer
     </button>
   );
 
+  // Les mentions complètes (textes de Martin, mot pour mot) : dans le repli, ou seules sans lui.
+  const mentions = (
+    <>
+      <MentionVerificateur id="verif-mention" texte={t.mentionCollecte} lien={t.mentionLien} />
+      {rc ? (
+        <div className="nv-verif-mention-suite">
+          <MentionVerificateur id="verif-mention-courriel" texte={caseEnLigne ? rc.mention : rc.mentionSansCase} lien={t.mentionLien} />
+        </div>
+      ) : null}
+    </>
+  );
+
   const domaineEntre = phase.nom === "resultat" ? hote(phase.saisie) : "";
   const domaineFinal = rapport ? hote(rapport.adresseFinale) : "";
   const redirige = rapport && sansWww(domaineEntre) !== sansWww(domaineFinal);
@@ -244,7 +270,7 @@ export function Verificateur({ t, lienRendezVous, adressePostale }: { t: PageVer
                 value={adresse}
                 onChange={(e) => setAdresse(e.target.value)}
                 aria-invalid={erreur?.champ === "adresse" ? true : undefined}
-                aria-describedby={`${erreur?.champ === "adresse" ? "verif-erreur " : ""}verif-mention`}
+                aria-describedby={`${erreur?.champ === "adresse" ? "verif-erreur " : ""}${idMention}`}
                 readOnly={enAnalyse}
               />
               {rc ? null : bouton}
@@ -282,7 +308,7 @@ export function Verificateur({ t, lienRendezVous, adressePostale }: { t: PageVer
                     if (erreur?.champ === "courriel") setErreur(null);
                   }}
                   aria-invalid={erreur?.champ === "courriel" ? true : undefined}
-                  aria-describedby={`${erreur?.champ === "courriel" ? "verif-erreur-courriel " : ""}verif-aide-courriel verif-mention-courriel`}
+                  aria-describedby={`${erreur?.champ === "courriel" ? "verif-erreur-courriel " : ""}verif-aide-courriel ${idMentionCourriel}`}
                   readOnly={enAnalyse}
                 />
                 <p id="verif-aide-courriel" className="nv-verif-aide">
@@ -319,12 +345,20 @@ export function Verificateur({ t, lienRendezVous, adressePostale }: { t: PageVer
 
             <AntiRobot action="verificateur" />
             <div className="nv-verif-mention">
-              <MentionVerificateur id="verif-mention" texte={t.mentionCollecte} lien={t.mentionLien} />
-              {rc ? (
-                <div className="nv-verif-mention-suite">
-                  <MentionVerificateur id="verif-mention-courriel" texte={caseEnLigne ? rc.mention : rc.mentionSansCase} lien={t.mentionLien} />
-                </div>
-              ) : null}
+              {repli ? (
+                <>
+                  {/* Premier niveau, toujours visible, et le repli IMMÉDIATEMENT dessous (condition de
+                      Martin) : son libellé fait le renvoi aux durées et aux droits. <details> natif :
+                      le texte est dans le HTML replié, s'ouvre au clavier et sans JavaScript. */}
+                  <MentionVerificateur id="verif-mention-resume" texte={resume} lien="" />
+                  <details className="nv-repli nv-verif-mention-repli">
+                    <summary>{libelleRepli}</summary>
+                    {mentions}
+                  </details>
+                </>
+              ) : (
+                mentions
+              )}
             </div>
           </form>
         </div>
@@ -413,7 +447,7 @@ export function Verificateur({ t, lienRendezVous, adressePostale }: { t: PageVer
                         ))}
                     </>
                   ) : null}
-                  <details className="nv-verif-pourquoi">
+                  <details className="nv-repli nv-verif-pourquoi">
                     {/* Huit « Pourquoi ça compte » : le nom du point les distingue au lecteur d'écran. */}
                     <summary aria-describedby={`verif-nom-${id}`}>{t.libellePourquoi}</summary>
                     <p>{textes.pourquoi}</p>

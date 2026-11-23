@@ -12,6 +12,8 @@
  * rédigés par Martin (contenu/verificateur-loi25-textes.md) : un changement de fond repasse par lui.
  * Groupe « Rapport par courriel » (2026-11-23) : textes provisoires de Mattew, définitifs par Martin
  * (contenu/verificateur-courriel-textes.md), semés par scripts/verificateur-courriel-semer.ts.
+ * Mention par couches (2026-11-23) : phrase visible et libellé du repli (mentionResume,
+ * mentionRepliLibelle, rapportCourriel.mentionResume), semés par scripts/verificateur-mention-semer.ts.
  */
 import { defineField, defineType, type FieldDefinition } from 'sanity'
 
@@ -99,9 +101,21 @@ export const pageVerificateurLoi25 = defineType({
     ligne('champExemple', 'Exemple dans le champ', 'Le texte pâle dans la case vide (ex. : « exemple.ca »).', { group: 'contenu' }),
     ligne('bouton', 'Texte du bouton', 'Ex. : « Lancer la vérification ».', { group: 'contenu' }),
     paragraphe(
+      'mentionResume',
+      'Phrase visible sous le bouton',
+      'Toujours affichée sous le bouton (Loi 25, art. 8) : ce que Norvika reçoit, à quoi ça sert, et que nos fournisseurs peuvent traiter ces renseignements hors du Québec. Les mentions complètes sont dans le repli juste en dessous. Quand l’envoi par courriel est offert, c’est la phrase du groupe « Rapport par courriel » qui s’affiche à la place. Vide : pas de repli, les mentions complètes restent affichées en entier. Texte de Martin : un changement de fond repasse par lui.',
+      { group: 'contenu', requis: false, rows: 3 },
+    ),
+    ligne(
+      'mentionRepliLibelle',
+      'Libellé du repli des mentions',
+      'Le texte cliquable sous la phrase visible, qui ouvre les mentions complètes (ex. : « Détails, durées et vos droits »). Il fait le renvoi aux droits que la loi veut au premier coup d’œil : gardez « vos droits ». Le repli est fermé à l’arrivée, mais son texte reste dans la page (Google, lecteurs d’écran). Vide : les mentions complètes restent affichées en entier.',
+      { group: 'contenu', requis: false },
+    ),
+    paragraphe(
       'mentionCollecte',
       'Mention de collecte sous le champ',
-      'Texte légal (Loi 25, art. 8) rédigé par Martin. Ne pas le raccourcir sans lui : il décrit ce que l’outil recueille vraiment.',
+      'Texte légal (Loi 25, art. 8) rédigé par Martin, dans le repli sous la phrase visible (affiché en entier s’il n’y a pas de repli). Ne pas le raccourcir sans lui : il décrit ce que l’outil recueille vraiment.',
       { group: 'contenu', rows: 6 },
     ),
     ligne(
@@ -319,7 +333,7 @@ export const pageVerificateurLoi25 = defineType({
         texteCourriel(
           'mention',
           'Mention de collecte du courriel (case en ligne)',
-          'Sous le formulaire, après la mention de l’adresse du site (Loi 25, art. 8), quand la case est en ligne. Les mots « politique de confidentialité » deviennent un lien.',
+          'Dans le repli sous la phrase visible, après la mention de l’adresse du site (Loi 25, art. 8), quand la case est en ligne. Les mots « politique de confidentialité » deviennent un lien.',
           { rows: 8 },
         ),
         texteCourriel(
@@ -327,6 +341,12 @@ export const pageVerificateurLoi25 = defineType({
           'Mention de collecte du courriel (sans la case)',
           'La même mention, sans les phrases sur la case, tant que la case n’est pas en ligne.',
           { rows: 6 },
+        ),
+        paragraphe(
+          'mentionResume',
+          'Phrase visible sous le bouton (avec le courriel)',
+          'Remplace la « Phrase visible sous le bouton » de l’onglet Contenu quand l’envoi par courriel est offert : la même phrase, avec ce que devient le courriel (facultatif, sert à envoyer le rapport). Les deux mentions de courriel ci-dessus vont dans le repli. Vide alors que l’envoi est offert : pas de repli, toutes les mentions restent affichées en entier. Texte de Martin : un changement de fond repasse par lui.',
+          { requis: false, rows: 3 },
         ),
         texteCourriel('erreurCourriel', 'Message : courriel invalide', 'Sous le champ, quand l’adresse courriel n’a pas une forme valide. L’analyse n’est pas lancée.', { rows: 2 }),
         texteCourriel('envoiReussi', 'Message : rapport envoyé', 'Sous le résultat. {courriel} est remplacé par l’adresse.', { rows: 2 }),

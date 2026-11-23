@@ -386,6 +386,11 @@ export type RapportCourriel = {
   mention: string;
   /** La même, sans les phrases sur la case, tant que la case est éteinte. */
   mentionSansCase: string;
+  /**
+   * La phrase visible sous le bouton quand le courriel est offert : la même que
+   * PageVerificateur.mentionResume, avec le segment sur le courriel. Absente : pas de repli.
+   */
+  mentionResume?: string | null;
   erreurCourriel: string;
   /** {courriel} est remplacé par l'adresse. */
   envoiReussi: string;
@@ -417,6 +422,13 @@ export type PageVerificateur = DocumentPage & {
   bouton: string;
   mentionCollecte: string;
   mentionLien: string;
+  /**
+   * Mention par couches (2026-11-23, avis de Martin) : la phrase toujours visible sous le bouton
+   * (premier niveau) et le libellé du repli qui contient les mentions complètes (deuxième niveau).
+   * L'un des deux absent : pas de repli, les mentions complètes restent affichées en entier.
+   */
+  mentionResume?: string | null;
+  mentionRepliLibelle?: string | null;
   listeTitre: string;
   invisibleTitre: string;
   invisibleTexte: string;
