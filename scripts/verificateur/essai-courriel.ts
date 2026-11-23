@@ -5,7 +5,9 @@
  *      non versionné) pour relecture : rapport sans la case, rapport avec la case, copie interne ;
  *   2. rejoue envoyerRapport() avec un faux Resend (fetch remplacé, AUCUN appel réseau vers Resend) :
  *      copie interne seulement si le rapport est accepté, case ignorée si elle n'était pas en ligne,
- *      aucun paramètre de suivi, aucune adresse ni corps d'erreur au journal, rien en local.
+ *      aucun paramètre de suivi, aucune adresse ni corps d'erreur au journal, rien en local ;
+ *      aucun appel à Resend sans MX ou au-delà du plafond de courriels ;
+ *   3. rejoue le contrôle MX et le compteur de courriels avec un faux résolveur et un faux Supabase.
  *
  *   NODE_PATH=node_modules/next/dist/compiled NODE_ENV=development VERIFICATEUR_TEXTES_LOCAUX=1 \
  *     npx tsx --conditions=react-server scripts/verificateur/essai-courriel.ts
@@ -22,6 +24,8 @@ import { mkdirSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 
 import { analyser, type Observations } from "../../lib/verificateur/analyse";
+import { reserverCourrielsVerificateur, type ReserveCourriels } from "../../lib/rate-limit";
+import { recoitDuCourriel } from "../../lib/verificateur/adresse";
 import { courrielInterne, courrielVisiteur, envoyerRapport, PREFIXE_CONSENTEMENT } from "../../lib/verificateur/courriel";
 import { lireTextesCourriel, type TextesCourriel } from "../../lib/verificateur/textes-serveur";
 
@@ -164,8 +168,14 @@ async function principal() {
   verifier("copie interne : adresse de la personne", interne.html.includes("neil+essai@exemple.ca"));
 
   /* ------------------------------------------------------------ 2. envoi, faux Resend */
-  const envoyer = (textes: TextesCourriel, suivi: boolean, local = false) =>
-    envoyerRapport({ rapport, courriel: COURRIEL, suivi, textes: Promise.resolve(textes), local });
+  // Faux MX et faux compteur par défaut : tout passe. Les essais du plafond et du MX les changent.
+  const reserves: number[] = [];
+  const outilsOk = {
+    recoitDuCourriel: async () => true,
+    reserverCourrielsVerificateur: async (n: 1 | 2): Promise<ReserveCourriels> => (reserves.push(n), "ok"),
+  };
+  const envoyer = (textes: TextesCourriel, suivi: boolean, local = false, outils = outilsOk) =>
+    envoyerRapport({ rapport, courriel: COURRIEL, suivi, textes: Promise.resolve(textes), local, outils });
 
   const a = await avecFauxResend([200, 200], () => envoyer(avecCase, true));
   verifier("case comptée + rapport accepté : rapport puis copie interne", a.appels.length === 2 && a.resultat.visiteur === "envoye" && a.resultat.interne === "envoye");
@@ -191,8 +201,81 @@ async function principal() {
   const f = await avecFauxResend([200, 200], () => envoyer(avecCase, true, true));
   verifier("poste local : aucun appel à Resend, état simulé", f.appels.length === 0 && f.resultat.visiteur === "simule" && f.resultat.interne === "simule");
 
-  const g = await avecFauxResend([200], () => envoyerRapport({ rapport, courriel: COURRIEL, suivi: true, textes: Promise.resolve(null), local: false }));
+  const g = await avecFauxResend([200], () => envoyerRapport({ rapport, courriel: COURRIEL, suivi: true, textes: Promise.resolve(null), local: false, outils: outilsOk }));
   verifier("textes illisibles : échec, aucun appel, aucune copie", g.appels.length === 0 && g.resultat.visiteur === "echec" && g.resultat.interne === "aucun");
+
+  reserves.length = 0;
+  await avecFauxResend([200, 200], () => envoyer(avecCase, true));
+  await avecFauxResend([200], () => envoyer(avecCase, false));
+  verifier("plafond : 2 réservés avec la copie, 1 sans", JSON.stringify(reserves) === "[2,1]");
+
+  const sansMx = { ...outilsOk, recoitDuCourriel: async () => false };
+  const h = await avecFauxResend([200, 200], () => envoyer(avecCase, true, false, sansMx));
+  verifier("domaine sans MX : échec, AUCUN appel à Resend", h.appels.length === 0 && h.resultat.visiteur === "echec" && h.resultat.motif === "sans-mx");
+  const h2 = await avecFauxResend([200], () => envoyer(avecCase, true, true, sansMx));
+  verifier("domaine sans MX, poste local : échec aussi (pas de « simulé »)", h2.resultat.visiteur === "echec");
+
+  const plein = { ...outilsOk, reserverCourrielsVerificateur: async (): Promise<ReserveCourriels> => "plafond" };
+  const k = await avecFauxResend([200, 200], () => envoyer(avecCase, true, false, plein));
+  verifier("plafond de courriels atteint : échec, AUCUN appel à Resend", k.appels.length === 0 && k.resultat.visiteur === "echec" && k.resultat.motif === "plafond");
+  const enPanne = { ...outilsOk, reserverCourrielsVerificateur: async (): Promise<ReserveCourriels> => "panne" };
+  const l = await avecFauxResend([200], () => envoyer(avecCase, false, false, enPanne));
+  verifier("compteur absent ou en panne : échec, AUCUN appel à Resend", l.appels.length === 0 && l.resultat.motif === "compteur");
+
+  /* ------------------------------------------------------------ 3. MX et compteur, vrais modules, faux réseau */
+  const reponsesDoh: Record<string, object | number> = {
+    "avec-mx.example": { Status: 0, Answer: [{ type: 15, data: "10 mx.avec-mx.example." }] },
+    "sans-mx.example": { Status: 0, Answer: [] },
+    "inexistant.example": { Status: 3 },
+    "mx-nul.example": { Status: 0, Answer: [{ type: 15, data: "0 ." }] },
+    "servfail.example": { Status: 2 },
+    "en-panne.example": 503,
+  };
+  const fetchAvant = globalThis.fetch;
+  let rpc: { statut: number; corps: unknown } = { statut: 200, corps: "ok" };
+  globalThis.fetch = (async (url: string | URL | Request) => {
+    const u = new URL(String(url));
+    if (u.hostname === "cloudflare-dns.com") {
+      const r = reponsesDoh[u.searchParams.get("name") ?? ""];
+      if (typeof r === "number") return new Response("", { status: r });
+      return new Response(JSON.stringify(r ?? { Status: 0, Answer: [] }), { status: 200 });
+    }
+    if (u.pathname.endsWith("/rpc/reserver_courriels_verificateur")) {
+      return new Response(JSON.stringify(rpc.corps), { status: rpc.statut, headers: { "Content-Type": "application/json" } });
+    }
+    return new Response("", { status: 500 });
+  }) as typeof fetch;
+  const erreurAvant = console.error;
+  console.error = () => undefined;
+  try {
+    verifier("MX présent : reçoit du courriel", await recoitDuCourriel("avec-mx.example"));
+    verifier("aucun MX : refusé", !(await recoitDuCourriel("sans-mx.example")));
+    verifier("domaine inexistant : refusé", !(await recoitDuCourriel("inexistant.example")));
+    verifier("MX nul (RFC 7505) : refusé", !(await recoitDuCourriel("mx-nul.example")));
+    verifier("résolveur en échec (SERVFAIL, HTTP 503) : refusé", !(await recoitDuCourriel("servfail.example")) && !(await recoitDuCourriel("en-panne.example")));
+
+    const urlAvant = process.env.NEXT_PUBLIC_SUPABASE_URL;
+    const cleAvant = process.env.SUPABASE_SERVICE_KEY;
+    delete process.env.SUPABASE_SERVICE_KEY;
+    verifier("compteur sans configuration Supabase : panne (aucun envoi)", (await reserverCourrielsVerificateur(1)) === "panne");
+    process.env.NEXT_PUBLIC_SUPABASE_URL = "https://faux-projet.supabase.co";
+    process.env.SUPABASE_SERVICE_KEY = "cle-factice";
+    rpc = { statut: 404, corps: { code: "PGRST202", message: "Could not find the function" } };
+    verifier("fonction SQL pas encore créée : panne (aucun envoi)", (await reserverCourrielsVerificateur(1)) === "panne");
+    rpc = { statut: 200, corps: "jour" };
+    verifier("compteur répond « jour » : plafond", (await reserverCourrielsVerificateur(2)) === "plafond");
+    rpc = { statut: 200, corps: "ok" };
+    verifier("compteur répond « ok » : réservé", (await reserverCourrielsVerificateur(1)) === "ok");
+    rpc = { statut: 200, corps: "autre" };
+    verifier("réponse inconnue : panne (fermé dans le doute)", (await reserverCourrielsVerificateur(1)) === "panne");
+    if (urlAvant === undefined) delete process.env.NEXT_PUBLIC_SUPABASE_URL;
+    else process.env.NEXT_PUBLIC_SUPABASE_URL = urlAvant;
+    if (cleAvant === undefined) delete process.env.SUPABASE_SERVICE_KEY;
+    else process.env.SUPABASE_SERVICE_KEY = cleAvant;
+  } finally {
+    globalThis.fetch = fetchAvant;
+    console.error = erreurAvant;
+  }
 
   /* ------------------------------------------------------------ dépôt pour relecture */
   const dossier = join(process.cwd(), "qa");

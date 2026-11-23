@@ -214,13 +214,12 @@ export function ipReservee(ip: string): boolean {
 
 const DOH = "https://cloudflare-dns.com/dns-query";
 const DELAI_DNS_MS = 3000;
-/** Types d'enregistrement DNS : A (1), CNAME (5), AAAA (28). */
-const TYPE_A = 1;
-const TYPE_AAAA = 28;
+/** Types d'enregistrement DNS demandés : A (1), MX (15), AAAA (28). */
+const TYPES_DNS = { A: 1, MX: 15, AAAA: 28 } as const;
 
 type ReponseDoh = { Status?: number; Answer?: { type: number; data: string }[] };
 
-async function interroger(nom: string, type: "A" | "AAAA"): Promise<string[] | null> {
+async function interroger(nom: string, type: keyof typeof TYPES_DNS): Promise<string[] | null> {
   const params = new URLSearchParams({ name: nom, type });
   const reponse = await fetch(`${DOH}?${params.toString()}`, {
     headers: { accept: "application/dns-json" },
@@ -230,8 +229,24 @@ async function interroger(nom: string, type: "A" | "AAAA"): Promise<string[] | n
   const donnees = (await reponse.json()) as ReponseDoh;
   // 3 = NXDOMAIN (le nom n'existe pas) : une réponse, pas une panne.
   if (donnees.Status !== 0 && donnees.Status !== 3) return null;
-  const voulu = type === "A" ? TYPE_A : TYPE_AAAA;
+  const voulu = TYPES_DNS[type];
   return (donnees.Answer ?? []).filter((r) => r.type === voulu).map((r) => r.data);
+}
+
+/**
+ * Rapport par courriel du vérificateur : vrai si le domaine de l'adresse annonce un serveur de
+ * courriel (enregistrement MX), même résolveur que resoudrePublic. Une adresse inventée ou mal tapée
+ * ferait un rebond chez Resend, et les rebonds usent la réputation d'envoi de tout le domaine
+ * norvika.ca. Faux aussi pour un « MX nul » (« 0 . », RFC 7505 : ce domaine ne reçoit rien) et en
+ * cas de panne du résolveur : dans le doute, aucun envoi.
+ */
+export async function recoitDuCourriel(domaine: string): Promise<boolean> {
+  try {
+    const mx = await interroger(domaine.toLowerCase().replace(/\.$/, ""), "MX");
+    return Boolean(mx?.some((donnee) => !/^\s*0\s+\.\s*$/.test(donnee)));
+  } catch {
+    return false;
+  }
 }
 
 export type Resolution = { ok: true; adresses: string[] } | { ok: false; code: "introuvable" | "privee" | "dns" };

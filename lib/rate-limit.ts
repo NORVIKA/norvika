@@ -188,6 +188,42 @@ export async function verifierDebitVerificateur(req: Request): Promise<DebitVeri
   }
 }
 
+/**
+ * Verificateur Loi 25, rapport par courriel (2026-11-23) : un plafond PROPRE aux courriels, plus bas
+ * que celui des analyses. La cle Resend et le domaine d'envoi sont ceux des formulaires de contact :
+ * sans ce plafond, le verificateur seul pourrait epuiser le quota d'envoi du jour, et William ne
+ * serait plus averti des nouveaux messages. 50 courriels par jour (heure du Quebec) au total, rapport
+ * ET copie interne comptes ; la reserve est prise AVANT l'appel a Resend.
+ *   - « ok » : la reserve est faite ;  « plafond » : le plafond du jour serait depasse ;
+ *   - « panne » : compteur injoignable, OU fonction pas encore creee (SQL a passer par William,
+ *     supabase/migration-2026-11-23-verificateur-courriels.sql). FERME : l'analyse s'affiche quand
+ *     meme, seul le courriel ne part pas.
+ * Aucune donnee personnelle : un nombre par jour, rien d'autre.
+ */
+export const PLAFOND_COURRIELS_VERIFICATEUR = { parJour: 50 } as const;
+
+export type ReserveCourriels = "ok" | "plafond" | "panne";
+
+export async function reserverCourrielsVerificateur(nombre: 1 | 2): Promise<ReserveCourriels> {
+  try {
+    const { data, error } = await serviceClient().rpc("reserver_courriels_verificateur", {
+      p_nombre: nombre,
+      p_max_jour: PLAFOND_COURRIELS_VERIFICATEUR.parJour,
+    });
+    if (error) {
+      console.error("[verificateur] compteur de courriels indisponible :", error.code ?? "");
+      return "panne";
+    }
+    if (data === "ok") return "ok";
+    if (data === "jour") return "plafond";
+    // Toute autre valeur : refus (fermé en cas de doute).
+    return "panne";
+  } catch (e) {
+    console.error("[verificateur] compteur de courriels indisponible :", e instanceof Error ? e.name : "erreur");
+    return "panne";
+  }
+}
+
 /** Client Supabase a privileges serveur, pour les insertions de formulaires. */
 export function supabaseService(): SupabaseClient {
   return serviceClient();

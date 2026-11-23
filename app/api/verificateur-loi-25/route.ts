@@ -5,7 +5,7 @@ import { champTexte, formeCourrielValide, ligneSimpleValide, lireCorpsJson } fro
 import { verifierDebitVerificateur } from "@/lib/rate-limit";
 import { normaliserAdresse, resoudrePublic } from "@/lib/verificateur/adresse";
 import { analyser } from "@/lib/verificateur/analyse";
-import { envoyerRapport } from "@/lib/verificateur/courriel";
+import { envoyerRapport, type ResultatEnvoi } from "@/lib/verificateur/courriel";
 import { ErreurMoteur, observer, type CodeMoteur } from "@/lib/verificateur/moteur";
 import { lireTextesCourriel } from "@/lib/verificateur/textes-serveur";
 import { CHAMP_ADRESSE, CHAMP_COURRIEL, CHAMP_SUIVI, LONGUEUR_MAX_COURRIEL, type ReponseVerificateur } from "@/lib/verificateur/types";
@@ -117,12 +117,12 @@ export async function POST(req: Request) {
     const rapport = analyser(observations, debut);
     // Ne lève jamais ; la ceinture en plus : une erreur d'envoi ne doit pas passer pour une panne d'analyse.
     const envoi = await envoyerRapport({ rapport, courriel, suivi, textes, local: hoteLocal(req) }).catch(
-      () => ({ visiteur: "echec", interne: "aucun" }) as const,
+      (): ResultatEnvoi => ({ visiteur: "echec", interne: "aucun", motif: "resend" }),
     );
     // Au journal : l'état de l'envoi (envoye, simule, echec, aucun), JAMAIS l'adresse courriel.
     console.log(
       "[verificateur] analyse terminée",
-      JSON.stringify({ ...rapport.synthese, duree: rapport.duree, courriel: envoi.visiteur, suivi: envoi.interne }),
+      JSON.stringify({ ...rapport.synthese, duree: rapport.duree, courriel: envoi.visiteur, suivi: envoi.interne, motif: envoi.motif }),
     );
     return NextResponse.json<ReponseVerificateur>({ ok: true, rapport, envoi: envoi.visiteur }, { headers: { "Cache-Control": "no-store" } });
   } catch (e) {
