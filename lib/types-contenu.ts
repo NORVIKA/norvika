@@ -412,6 +412,29 @@ export type RapportCourriel = {
   libellePolitique: string;
 };
 
+/**
+ * « Ce que ça peut coûter » (demande de William, 2026-11-24 ; textes et sources de Martin) : affiché
+ * sous les huit lignes et dans le courriel, SEULEMENT si au moins un point est à corriger.
+ * Éteint ou incomplet : rien ne s'affiche (voir blocSanctions, lib/verificateur/textes.ts).
+ */
+export type SanctionsVerificateur = {
+  afficher?: boolean | null;
+  titre?: string | null;
+  /** Une ligne par montant ; les montants (15 000$, 2%) sont mis en gras à l'affichage. */
+  montants?: string[] | null;
+  /** Sous la liste : ce que ces montants veulent dire (seuils de la loi), et quoi faire. */
+  notes?: string[] | null;
+  /** Les articles de loi, en petit. */
+  source?: string | null;
+  /**
+   * Par couches, sur la PAGE seulement (le courriel garde tout déplié) : la phrase visible sous la
+   * liste, puis `notes` et `source` dans un repli fermé portant `repliLibelle`. L'un des deux
+   * absent : pas de repli, tout reste affiché (règle 6 : 954 px sur téléphone sans repli).
+   */
+  resume?: string | null;
+  repliLibelle?: string | null;
+};
+
 export type PageVerificateur = DocumentPage & {
   nom: string;
   h1: string;
@@ -491,4 +514,5 @@ export type PageVerificateur = DocumentPage & {
   blocSitesWeb: { afficher?: boolean | null; afficherAccueil?: boolean | null; titre: string; texte: string; bouton: string };
   lienPied: string;
   rapportCourriel?: RapportCourriel | null;
+  sanctions?: SanctionsVerificateur | null;
 };

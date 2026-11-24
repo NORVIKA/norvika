@@ -176,6 +176,27 @@ async function principal() {
   verifier("lien du rendez-vous sans paramètre ajouté", sansCase.html.includes(`href="${lus.lienRendezVous}"`));
   verifier("nom légal présent", sansCase.html.includes(lus.nomLegal));
   verifier("huit points dans le courriel", (sansCase.texte ?? "").split("\n").filter((l) => /^(À corriger|À vérifier|En place) : /.test(l)).length === 8);
+  /* « Ce que ça peut coûter » (2026-11-24) : seulement s'il y a à corriger, et seulement s'il est allumé. */
+  const sc = lus.t.sanctions;
+  verifier("sanctions : textes présents (semis ou poste local)", Boolean(sc?.afficher && sc.titre && sc.montants?.length));
+  const titreCout = sc?.titre ?? "¤ absent ¤";
+  // Un point sanctionnable à corriger (témoins), puis aucun point à corriger.
+  const avecCorriger = { ...rapport, resultats: rapport.resultats.map((r) => (r.id === "temoins" ? { ...r, etat: "a-corriger" as const } : r)) };
+  const sansCorriger = { ...rapport, resultats: rapport.resultats.map((r) => (r.etat === "a-corriger" ? { ...r, etat: "en-place" as const } : r)) };
+  const cout = courrielVisiteur(avecCorriger, lus, false);
+  verifier("sanctions : encadré présent quand un point est à corriger (HTML et texte)", cout.html.includes(titreCout) && (cout.texte ?? "").includes(titreCout));
+  verifier("sanctions : montants insécables, jamais en gras (Martin)", /<span style="white-space: nowrap;">[\d \u00a0\u202f,]+[$%]<\/span>/.test(cout.html) && !/<strong[^>]*>[\d \u00a0\u202f,]+[$%]</.test(cout.html));
+  verifier("sanctions : la phrase visible de la page est aussi dans le courriel", !sc?.resume || (cout.texte ?? "").includes(sc.resume));
+  verifier("sanctions : avant « ce que le test ne voit pas » (Martin)", cout.html.indexOf(titreCout) < cout.html.indexOf(lus.t.invisibleTitre) && (cout.texte ?? "").indexOf(titreCout) < (cout.texte ?? "").indexOf(lus.t.invisibleTitre));
+  const seulResponsable = {
+    ...rapport,
+    resultats: rapport.resultats.map((r) => ({ ...r, etat: r.id === "responsable" ? ("a-corriger" as const) : ("en-place" as const) })),
+    synthese: { "a-corriger": 1, "a-verifier": 0, "en-place": 7 },
+  };
+  verifier("sanctions : absent quand le seul point à corriger est le responsable (vérification 4)", !courrielVisiteur(seulResponsable, lus, false).html.includes(titreCout));
+  verifier("sanctions : encadré absent quand rien n'est à corriger", !courrielVisiteur(sansCorriger, lus, false).html.includes(titreCout));
+  const eteint = { ...lus, t: { ...lus.t, sanctions: { ...sc, afficher: false } } };
+  verifier("sanctions : encadré absent quand l'interrupteur est éteint", !courrielVisiteur(avecCorriger, eteint, false).html.includes(titreCout));
   verifier("sans la case : paragraphe « sans case »", sansCase.html.includes(rc.paragrapheSansCase.slice(0, 40)) && !sansCase.html.includes("désabonnement"));
   verifier("avec la case : paragraphe « si ce n'est pas vous » (point 5)", visiteurCase.html.includes("désabonnement"));
   verifier(
@@ -328,6 +349,8 @@ async function principal() {
   writeFileSync(join(dossier, "2026-11-23-courriel-rapport-sans-case.html"), sansCase.html);
   writeFileSync(join(dossier, "2026-11-23-courriel-rapport-sans-case.txt"), `Objet : ${sansCase.objet}\n\n${sansCase.texte}`);
   writeFileSync(join(dossier, "2026-11-23-courriel-rapport-avec-case.html"), visiteurCase.html);
+  writeFileSync(join(dossier, "2026-11-24-courriel-rapport-avec-sanctions.html"), cout.html);
+  writeFileSync(join(dossier, "2026-11-24-courriel-rapport-avec-sanctions.txt"), `Objet : ${cout.objet}\n\n${cout.texte}`);
   writeFileSync(
     join(dossier, "2026-11-23-courriel-copie-interne.html"),
     `<!doctype html><html lang="fr"><head><meta charset="utf-8"><title>${interne.objet}</title></head><body>${interne.html}</body></html>`,

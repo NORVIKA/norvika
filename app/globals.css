@@ -1434,6 +1434,19 @@
 .nv-verif-limites .nv-verif-avertissement { margin-top: 32px; padding-top: 24px; border-top: 1px solid rgba(12,25,47,.12); }
 .nv-verif-avertissement p { margin: 0 0 10px; max-width: 72ch; font-size: 14px; line-height: 1.6; color: rgba(12,25,47,.7); }
 
+/* Ce que ca peut couter (2026-11-24) : apres un resultat avec un point a corriger sanctionnable. Un
+   cadre clair, pas le bloc fonce : il informe, l'invitation juste dessous est l'action. Montants ni en
+   gras ni en rouge (Martin : information, pas alarme), jamais coupes en fin de ligne. */
+.nv-verif-sanctions { margin-top: 32px; padding: clamp(20px, 4vw, 28px); border: 1px solid rgba(12,25,47,.12); border-radius: 20px; }
+.nv-verif-sanctions h3 { margin: 0; font-size: 20px; line-height: 1.25; letter-spacing: -.02em; }
+.nv-verif-sanctions ul { margin: 12px 0 0; padding-left: 20px; list-style: disc; font-size: 15.5px; line-height: 1.62; color: rgba(12,25,47,.8); }
+.nv-verif-sanctions li + li { margin-top: 6px; }
+.nv-verif-sanctions .nv-montant { white-space: nowrap; }
+.nv-verif-sanctions p { margin: 12px 0 0; max-width: 68ch; font-size: 14.5px; line-height: 1.6; color: rgba(12,25,47,.72); }
+.nv-verif-sanctions p.nv-verif-sanctions-source { font-size: 13px; color: rgba(12,25,47,.62); }
+.nv-verif-sanctions-repli { margin-top: 4px; }
+.nv-verif-sanctions + .nv-verif-appel { margin-top: 16px; }
+
 /* L'invitation, apres un resultat seulement : le bloc fonce du site. */
 .nv-verif-appel { margin-top: 32px; padding: 28px; border-radius: 20px; background: var(--navy); color: var(--cream); }
 .nv-verif-appel h3 { margin: 0; font-size: 22px; line-height: 1.2; color: #fff; }

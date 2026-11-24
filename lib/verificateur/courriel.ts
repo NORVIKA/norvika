@@ -5,7 +5,7 @@ import { reserverCourrielsVerificateur, type ReserveCourriels } from "@/lib/rate
 
 import { recoitDuCourriel } from "./adresse";
 import { nomTemoinReconnu } from "./analyse";
-import { dateEtHeure, hote, phraseAccompagnement, pied, remplir, synthese, texteResultat } from "./textes";
+import { blocSanctions, dateEtHeure, hote, morceauxMontants, phraseAccompagnement, pied, remplir, synthese, texteResultat } from "./textes";
 import type { TextesCourriel } from "./textes-serveur";
 import { VERIFICATIONS, type Etat, type EtatEnvoi, type Rapport } from "./types";
 
@@ -82,6 +82,10 @@ export function courrielVisiteur(rapport: Rapport, textes: TextesCourriel, conse
   const phraseSynthese = synthese(rapport, t);
   const accompagnement = remplir(phraseAccompagnement(rapport, t), {});
   const appelTexte = n["a-corriger"] > 0 ? t.appelTexte : t.appelTexteSansCorrection;
+  // Ce que ça peut coûter : mêmes conditions et mêmes textes que la page (blocSanctions), placé
+  // entre les huit points et « ce que le test ne voit pas » (Martin). Tout déplié : la phrase visible
+  // de la page, puis ce que la page met dans son repli.
+  const sanctions = blocSanctions(rapport, t);
   // Le premier paragraphe de l'avertissement complet de la page : celui que Martin reprend au courriel.
   const avertissement = t.avertissement[0] ?? t.avertissementCourt;
   const paragrapheCase = consentement ? rc.paragrapheAvecCase : rc.paragrapheSansCase;
@@ -120,6 +124,25 @@ export function courrielVisiteur(rapport: Rapport, textes: TextesCourriel, conse
     )
     .join("");
 
+  // Les montants jamais coupés en fin de ligne (ni gras ni rouge : information, pas alarme).
+  const insecable = (texte: string) =>
+    morceauxMontants(texte)
+      .map((m) => (m.montant ? `<span style="white-space: nowrap;">${esc(m.texte)}</span>` : esc(m.texte)))
+      .join("");
+  const blocCout = sanctions
+    ? `
+            <tr>
+              <td style="padding: 8px 28px 12px;">
+                ${p(esc(sanctions.titre), `font-size: 16px; font-weight: bold; color: ${C.navy};`)}
+                ${sanctions.montants.map((m) => p(`&bull;&nbsp;${insecable(m)}`, "margin-top: 8px; font-size: 14.5px; line-height: 1.55;")).join("")}
+                ${sanctions.resume ? p(insecable(sanctions.resume), "margin-top: 10px; font-size: 14.5px; line-height: 1.55;") : ""}
+                ${sanctions.resume ? p(esc(sanctions.repliLibelle), `margin-top: 14px; font-size: 14px; font-weight: bold; color: ${C.navy};`) : ""}
+                ${sanctions.notes.map((note) => p(insecable(note), "margin-top: 10px; font-size: 14.5px; line-height: 1.55;")).join("")}
+                ${sanctions.source ? p(esc(sanctions.source), `margin-top: 8px; font-size: 13px; color: ${C.pale};`) : ""}
+              </td>
+            </tr>`
+    : "";
+
   const html = `<!doctype html>
 <html lang="fr">
   <head>
@@ -148,7 +171,7 @@ export function courrielVisiteur(rapport: Rapport, textes: TextesCourriel, conse
                 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">${points}
                 </table>
               </td>
-            </tr>
+            </tr>${blocCout}
             <tr>
               <td style="padding: 8px 28px 4px;">
                 ${p(esc(t.invisibleTitre), `font-size: 16px; font-weight: bold; color: ${C.navy};`)}
@@ -201,6 +224,17 @@ export function courrielVisiteur(rapport: Rapport, textes: TextesCourriel, conse
     accompagnement,
     "",
     ...lignes.flatMap((l) => [`${etats[l.etat]} : ${l.nom}`, l.texte, l.article, ""]),
+    ...(sanctions
+      ? [
+          sanctions.titre,
+          ...sanctions.montants.map((m) => `• ${m}`),
+          // Le libellé du repli en intertitre (Martin) : résumé, puis détail, comme sur la page.
+          ...(sanctions.resume ? [sanctions.resume, "", sanctions.repliLibelle] : []),
+          ...sanctions.notes,
+          ...(sanctions.source ? [sanctions.source] : []),
+          "",
+        ]
+      : []),
     t.invisibleTitre,
     rc.invisibleCourriel,
     "",

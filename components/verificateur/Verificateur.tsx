@@ -8,7 +8,18 @@ import { CHAMP_JETON } from "@/lib/anti-robot-commun";
 import { formeCourrielValide, ligneSimpleValide } from "@/lib/garde-formulaire";
 import { apostrophes } from "@/lib/typographie";
 import type { PageVerificateur } from "@/lib/types-contenu";
-import { hote, phraseAccompagnement, pied, remplir, remplirAvecAdresse, sansWww, synthese, texteResultat } from "@/lib/verificateur/textes";
+import {
+  blocSanctions,
+  hote,
+  morceauxMontants,
+  phraseAccompagnement,
+  pied,
+  remplir,
+  remplirAvecAdresse,
+  sansWww,
+  synthese,
+  texteResultat,
+} from "@/lib/verificateur/textes";
 import {
   CHAMP_ADRESSE,
   CHAMP_COURRIEL,
@@ -109,6 +120,8 @@ export function Verificateur({ t, lienRendezVous, adressePostale }: { t: PageVer
 
   const ETATS: Record<Etat, string> = { "a-corriger": t.etatACorriger, "a-verifier": t.etatAVerifier, "en-place": t.etatEnPlace };
   const rapport = phase.nom === "resultat" ? phase.rapport : null;
+  // « Ce que ça peut coûter » : allumé au Studio ET un point à corriger qui peut mener à une sanction.
+  const sanctions = rapport ? blocSanctions(rapport, t) : null;
   // Fonction fermée, ou textes pas encore semés : le formulaire de la V1, sans champ de courriel.
   const rc = t.rapportCourriel?.afficher ? t.rapportCourriel : null;
   // La case : son interrupteur ET l'adresse postale, qui doit figurer dans la demande elle-même.
@@ -457,6 +470,33 @@ export function Verificateur({ t, lienRendezVous, adressePostale }: { t: PageVer
               );
             })}
           </ol>
+          {/* Ce que ça peut coûter : entre le résultat et l'invitation, seulement s'il y a à corriger. */}
+          {sanctions ? (
+            <div className="nv-verif-sanctions">
+              <h3>{sanctions.titre}</h3>
+              <ul>
+                {sanctions.montants.map((ligne) => (
+                  <li key={ligne}>
+                    <Montants texte={ligne} />
+                  </li>
+                ))}
+              </ul>
+              {sanctions.resume ? (
+                <>
+                  <p>
+                    <Montants texte={sanctions.resume} />
+                  </p>
+                  {/* Même repli que « Pourquoi ça compte » : texte dans la page, fermé à l'arrivée. */}
+                  <details className="nv-repli nv-verif-sanctions-repli">
+                    <summary>{sanctions.repliLibelle}</summary>
+                    <DetailsSanctions notes={sanctions.notes} source={sanctions.source} />
+                  </details>
+                </>
+              ) : (
+                <DetailsSanctions notes={sanctions.notes} source={sanctions.source} />
+              )}
+            </div>
+          ) : null}
           {/* L'invitation suit les huit lignes : sur téléphone, le résultat passe avant elle. */}
           {rapport ? (
             <div className="nv-verif-appel">
@@ -496,6 +536,37 @@ export function Verificateur({ t, lienRendezVous, adressePostale }: { t: PageVer
       <p className="sr-only" aria-live="polite">
         {annonce}
       </p>
+    </>
+  );
+}
+
+/** Les paragraphes sous la liste et la ligne Sources : dépliés, ou dans le repli. */
+function DetailsSanctions({ notes, source }: { notes: string[]; source: string }) {
+  return (
+    <>
+      {notes.map((note) => (
+        <p key={note}>
+          <Montants texte={note} />
+        </p>
+      ))}
+      {source ? <p className="nv-verif-sanctions-source">{source}</p> : null}
+    </>
+  );
+}
+
+/** Un texte dont les montants (15 000$, 2%) ne se coupent jamais en fin de ligne. */
+function Montants({ texte }: { texte: string }) {
+  return (
+    <>
+      {morceauxMontants(texte).map((m, i) =>
+        m.montant ? (
+          <span key={i} className="nv-montant">
+            {m.texte}
+          </span>
+        ) : (
+          m.texte
+        ),
+      )}
     </>
   );
 }

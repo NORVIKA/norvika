@@ -95,6 +95,52 @@ export function phraseAccompagnement(rapport: Rapport, t: PageVerificateur): str
   return t.phraseTout;
 }
 
+/**
+ * « Ce que ça peut coûter », pour la page et le courriel (déclaré une fois). `null` s'il est éteint
+ * au Studio, s'il manque son titre ou ses montants, ou si aucun point n'est à corriger : un site
+ * sans point à corriger ne reçoit pas de montants d'amende.
+ * ⛔ La vérification 4 (responsable) ne compte PAS (Martin, 2026-11-24) : la CAI écrit elle-même que
+ * ce manquement ne peut pas mener à une sanction administrative (rapport quinquennal 2026, 4.3.3.2),
+ * et ce n'est pas une infraction de l'art. 91. Afficher des montants à ce site-là serait faux.
+ */
+export function blocSanctions(
+  rapport: Rapport,
+  t: PageVerificateur,
+): { titre: string; montants: string[]; notes: string[]; source: string; resume: string; repliLibelle: string } | null {
+  const s = t.sanctions;
+  const sanctionnable = rapport.resultats.some((r) => r.etat === "a-corriger" && r.id !== "responsable");
+  if (!s?.afficher || !sanctionnable) return null;
+  const garder = (liste: string[] | null | undefined) => (liste ?? []).map((x) => x.trim()).filter(Boolean);
+  const titre = s.titre?.trim() ?? "";
+  const montants = garder(s.montants);
+  if (!titre || montants.length === 0) return null;
+  const resume = s.resume?.trim() ?? "";
+  const repliLibelle = s.repliLibelle?.trim() ?? "";
+  // Les deux, ou aucun : un repli sans phrase visible cacherait la mise en garde.
+  const couches = Boolean(resume && repliLibelle);
+  return { titre, montants, notes: garder(s.notes), source: s.source?.trim() ?? "", resume: couches ? resume : "", repliLibelle: couches ? repliLibelle : "" };
+}
+
+/** Un montant écrit à la québécoise : 15 000$, 10 000 000$, 2% (espaces ordinaires ou insécables). */
+const MONTANT = /\d{1,3}(?:[   ]\d{3})*(?:,\d+)?(?:\$|%)/g;
+
+/**
+ * Le texte en morceaux, les montants à part, pour qu'ils ne se coupent jamais en fin de ligne (page et
+ * courriel). Jamais en gras ni en rouge (Martin) : un ton d'information, pas d'alarme.
+ */
+export function morceauxMontants(texte: string): { texte: string; montant: boolean }[] {
+  const morceaux: { texte: string; montant: boolean }[] = [];
+  let fin = 0;
+  for (const m of texte.matchAll(MONTANT)) {
+    const debut = m.index ?? 0;
+    if (debut > fin) morceaux.push({ texte: texte.slice(fin, debut), montant: false });
+    morceaux.push({ texte: m[0], montant: true });
+    fin = debut + m[0].length;
+  }
+  if (fin < texte.length) morceaux.push({ texte: texte.slice(fin), montant: false });
+  return morceaux;
+}
+
 const FUSEAU = { timeZone: "America/Toronto" } as const;
 
 /** « 23 novembre 2026 » et « 9 h 05 », à l'heure du Québec (jamais « 09 h 05 »). */

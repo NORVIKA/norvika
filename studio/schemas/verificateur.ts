@@ -14,6 +14,9 @@
  * (contenu/verificateur-courriel-textes.md), semés par scripts/verificateur-courriel-semer.ts.
  * Mention par couches (2026-11-23) : phrase visible et libellé du repli (mentionResume,
  * mentionRepliLibelle, rapportCourriel.mentionResume), semés par scripts/verificateur-mention-semer.ts.
+ * « Ce que ça peut coûter » (2026-11-24, demande de William) : groupe `sanctions`, textes et sources
+ * de Martin (contenu/verificateur-loi25-textes.md, § « Montants des sanctions »), semés par
+ * scripts/verificateur-sanctions-semer.ts. Affiché seulement si au moins un point est à corriger.
  */
 import { defineField, defineType, type FieldDefinition } from 'sanity'
 
@@ -74,6 +77,13 @@ function texteCourriel(name: string, title: string, description: string, o: { ro
         return true
       }),
   })
+}
+
+/** Obligatoire seulement quand le bloc est allumé : une case vide ne bloque rien tant qu'il est éteint. */
+const siAffiche = (message: string) => (valeur: unknown, contexte: { parent?: unknown }) => {
+  const allume = (contexte.parent as { afficher?: boolean } | undefined)?.afficher
+  const vide = Array.isArray(valeur) ? valeur.every((x) => !String(x ?? '').trim()) : !String(valeur ?? '').trim()
+  return allume && vide ? message : true
 }
 
 export const pageVerificateurLoi25 = defineType({
@@ -238,6 +248,43 @@ export const pageVerificateurLoi25 = defineType({
       group: 'resultat',
     }),
     ligne('boutonRefaire', 'Lien pour vérifier une autre adresse', 'Sous le résultat (ex. : « Vérifier une autre adresse »).', { group: 'resultat' }),
+    defineField({
+      name: 'sanctions',
+      title: 'Ce que ça peut coûter',
+      type: 'object',
+      group: 'resultat',
+      description:
+        'Un encadré sous les huit lignes, juste avant l’invitation, et dans le rapport par courriel : les montants prévus par la loi. Il ne paraît QUE si au moins un point est à corriger. Textes et sources de Martin (contenu/verificateur-loi25-textes.md) : un montant ou un article ne change jamais sans lui.',
+      options: { collapsible: true, collapsed: false },
+      fields: [
+        defineField({
+          name: 'afficher',
+          title: 'Afficher l’encadré',
+          type: 'boolean',
+          initialValue: false,
+          description: 'Décochez pour retirer l’encadré de la page et du courriel, sans perdre ces textes. Le changement paraît en ligne après la reconstruction du site (quelques minutes).',
+        }),
+        defineField({
+          ...ligne('titre', 'Titre de l’encadré', 'Ex. : « Ce que la loi prévoit comme sanctions ».', { requis: false }),
+          validation: (r) => r.custom(siAffiche('L’encadré est affiché : il lui faut un titre.')),
+        }),
+        defineField({
+          ...phrases('montants', 'Les montants', 'Une ligne par sanction. Les montants (15 000$, 2%) passent en gras tout seuls ; écrivez-les sans espace avant $ et %.'),
+          validation: (r) => r.custom(siAffiche('L’encadré est affiché : ajoutez au moins une ligne.')),
+        }),
+        paragraphes('notes', 'Sous la liste', 'Ce que ces montants veulent dire, et quoi faire. Un paragraphe par case.', { requis: false }),
+        ligne('source', 'Source', 'Les articles de loi, en petit (ex. : « Loi sur le privé, art. 90.12, 91 et 93.1 »).', { requis: false }),
+        paragraphe(
+          'resume',
+          'Phrase visible sous la liste',
+          'Sur la page seulement : affichée sous les montants, et « Sous la liste » et « Source » passent dans un repli fermé. Elle doit garder la mise en garde (« pas une estimation pour votre site »). Vide : pas de repli, tout reste affiché. Le courriel affiche toujours tout.',
+          { requis: false, rows: 2 },
+        ),
+        ligne('repliLibelle', 'Libellé du repli', 'Le texte cliquable qui ouvre « Sous la liste » et « Source » (ex. : « Détails et sources »). Vide : pas de repli.', {
+          requis: false,
+        }),
+      ],
+    }),
 
     /* ---------------------------------------------------------------- les 8 vérifications */
     verification('temoins', '1. Témoins de suivi', 'Témoins de mesure ou de publicité déposés, et données envoyées, avant tout clic.', [

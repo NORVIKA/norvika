@@ -1,4 +1,4 @@
-import type { PageVerificateur, RapportCourriel } from "@/lib/types-contenu";
+import type { PageVerificateur, RapportCourriel, SanctionsVerificateur } from "@/lib/types-contenu";
 
 /**
  * POSTE LOCAL SEULEMENT : les textes provisoires du rapport par courriel, tant qu'ils ne sont pas
@@ -12,13 +12,22 @@ import type { PageVerificateur, RapportCourriel } from "@/lib/types-contenu";
  * puis verificateur-mention-textes.json pour la mention par couches (plus bas).
  * Lu sur le disque, jamais importé : le site n'embarque rien du dossier studio/.
  */
-export async function avecTextesLocaux<T extends Pick<PageVerificateur, "rapportCourriel" | "mentionResume" | "mentionRepliLibelle">>(
+export async function avecTextesLocaux<T extends Pick<PageVerificateur, "rapportCourriel" | "mentionResume" | "mentionRepliLibelle" | "sanctions" | "introRisque">>(
   page: T,
 ): Promise<T> {
   if (process.env.NODE_ENV !== "development") return page;
   if (process.env.VERIFICATEUR_TEXTES_LOCAUX !== "1") return page;
   const avecCourriel = page.rapportCourriel ? page : { ...page, rapportCourriel: await lireJson<RapportCourriel>("verificateur-courriel-textes.json") };
-  return avecMentionParCouches(avecCourriel);
+  const avecMention = await avecMentionParCouches(avecCourriel);
+  // « Ce que ça peut coûter » et la phrase sous l'introduction (2026-11-24) : verificateur-sanctions-
+  // textes.json, même fichier que le semis verificateur-sanctions-semer.ts, champ par champ, tant que le
+  // Studio ne les a pas.
+  const locaux = await lireJson<{ introRisque: string; sanctions: SanctionsVerificateur }>("verificateur-sanctions-textes.json");
+  return {
+    ...avecMention,
+    introRisque: avecMention.introRisque?.trim() ? avecMention.introRisque : locaux.introRisque,
+    sanctions: avecMention.sanctions ?? locaux.sanctions,
+  };
 }
 
 /**

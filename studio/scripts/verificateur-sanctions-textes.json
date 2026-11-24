@@ -1,0 +1,19 @@
+{
+  "introRisque": "Depuis la Loi 25, la Commission d'accès à l'information peut imposer des sanctions administratives pécuniaires à une entreprise qui, par exemple, n'informe pas les gens au moment de recueillir leurs renseignements.",
+  "sanctions": {
+    "afficher": true,
+    "titre": "Ce que ça peut coûter",
+    "montants": [
+      "Sanction administrative de la Commission d'accès à l'information : montant de départ de 1 000$ à 15 000$ selon la gravité, puis ajusté, jusqu'à 10 000 000$.",
+      "Amende, si la Commission vous poursuit devant le tribunal : de 15 000$ à 25 000 000$, et le double en cas de récidive.",
+      "Poursuite d'une personne touchée : au moins 1 000$ en dommages-intérêts punitifs, si l'atteinte lui cause un préjudice et qu'elle est intentionnelle ou due à une faute lourde."
+    ],
+    "notes": [
+      "Ce sont les montants que prévoient la loi et la Commission pour une entreprise incorporée ou une société (plus bas pour un travailleur autonome ; plafonds plus hauts pour une très grande entreprise), pas une estimation pour votre site. S'il y a sanction, le montant tient compte notamment de la durée du manquement, du nombre de personnes touchées et de la capacité de payer de l'entreprise.",
+      "Corriger rapidement joue en votre faveur, et un engagement accepté par la Commission, puis respecté, évite la sanction administrative."
+    ],
+    "source": "Sources : Loi sur la protection des renseignements personnels dans le secteur privé, art. 90.1 à 90.4, 90.12, 91, 92.1 et 93.1 ; Commission d'accès à l'information, Cadre général d'application des sanctions administratives pécuniaires (2023).",
+    "resume": "Ce sont les montants prévus pour une entreprise incorporée ou une société, pas une estimation pour votre site. Avant une sanction administrative, la Commission doit d'abord vous aviser.",
+    "repliLibelle": "Détails et sources"
+  }
+}
