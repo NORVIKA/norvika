@@ -1484,6 +1484,16 @@
   .nv-verif-resultat .nv-verif-cadre,
   .nv-verif-limites .nv-verif-cadre { grid-template-columns: minmax(0, 1fr); gap: 28px; }
   .nv-verif-synthese { position: static; }
+  /* Une seule colonne : le test monte juste sous le titre, le texte explicatif descend
+     dessous. Quatre visiteurs sur cinq ne lancaient pas l'analyse (compteur Supabase du
+     2026-11-26) ; le formulaire etait sous deux paragraphes, hors de l'ecran au telephone.
+     `display: contents` sort le titre et les paragraphes de leur div pour que l'ordre de la
+     grille puisse les separer : l'ordre du HTML ne bouge pas (titre d'abord pour Google et
+     les lecteurs d'ecran), seul l'ordre visuel change, et seulement sous 1024 px. */
+  .nv-verif-entete .nv-verif-cadre > div { display: contents; }
+  .nv-verif-entete .nv-verif-cadre > div > h1 { order: 1; }
+  .nv-verif-entete .nv-verif-formulaire { order: 2; }
+  .nv-verif-entete .nv-verif-cadre > div > .nv-verif-intro { order: 3; margin-top: 0; }
 }
 @media (max-width: 680px) {
   .nv-verif-cadre { padding-left: 16px; padding-right: 16px; }
