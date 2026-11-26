@@ -62,6 +62,24 @@ const GROUPES = [
  * ne bloque pas la publication tant que l'interrupteur est éteint). `variable` : une {variable} que
  * le texte doit garder (ex. {adresse_postale}, sans laquelle la demande de consentement serait illégale).
  */
+/**
+ * Les deux textes du bloc « après résultat » (2026-11-26). Comme texteCourriel(), mais exigés par
+ * l'interrupteur `apresResultat` et non par `afficher` : tant que le bloc n'est pas allumé, les
+ * laisser vides n'est pas une erreur, et le formulaire garde son champ de courriel.
+ */
+function texteApres(name: string, title: string, description: string) {
+  return defineField({
+    ...ligne(name, title, description, { requis: false }),
+    validation: (r) =>
+      r.custom((valeur, contexte) => {
+        const texte = String(valeur ?? '').trim()
+        if ((contexte.parent as { apresResultat?: boolean } | undefined)?.apresResultat && !texte)
+          return 'Ce texte paraît sous le résultat quand la demande différée est cochée : il ne peut pas être vide.'
+        return true
+      }),
+  })
+}
+
 function texteCourriel(name: string, title: string, description: string, o: { rows?: number; variable?: string } = {}) {
   const base = o.rows
     ? paragraphe(name, title, description, { requis: false, rows: o.rows })
@@ -370,8 +388,8 @@ export const pageVerificateurLoi25 = defineType({
           description:
             'Décoché : le champ de courriel est dans le formulaire, avant l’analyse. Coché : il en sort et reparaît sous le résultat, une fois que la personne a vu ses signaux. Le formulaire ne demande alors plus que l’adresse du site. Ne fait rien tant que les deux textes ci-dessous sont vides.',
         }),
-        texteCourriel('apresTitre', 'Titre du bloc sous le résultat', 'La phrase qui invite à recevoir le rapport (ex. : « Recevez ce rapport par courriel »). Vide : le bloc ne paraît pas.', { requis: false }),
-        texteCourriel('apresBouton', 'Bouton du bloc sous le résultat', 'Le texte du bouton d’envoi (ex. : « Envoyer mon rapport »). Vide : le bloc ne paraît pas.', { requis: false }),
+        texteApres('apresTitre', 'Titre du bloc sous le résultat', 'La phrase qui invite à recevoir le rapport (ex. : « Recevez ce rapport par courriel »). Vide : le bloc ne paraît pas, même si l’interrupteur est coché.'),
+        texteApres('apresBouton', 'Bouton du bloc sous le résultat', 'Le texte du bouton d’envoi (ex. : « Envoyer mon rapport »). Vide : le bloc ne paraît pas, même si l’interrupteur est coché.'),
         texteCourriel('champLibelle', 'Étiquette du champ de courriel', 'Au-dessus du champ (ex. : « Votre courriel (facultatif) »). Le mot « facultatif » doit rester : le courriel ne peut pas être exigé.'),
         texteCourriel('champExemple', 'Exemple dans le champ', 'Le texte pâle dans le champ vide (ex. : « vous@exemple.ca »).'),
         texteCourriel('champAide', 'Aide sous le champ', 'Sous le champ de courriel : à quoi il sert, et que le résultat s’affiche quand même.', { rows: 2 }),
