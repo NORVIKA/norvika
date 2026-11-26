@@ -379,11 +379,7 @@ export function Verificateur({ t, lienRendezVous, adressePostale }: { t: PageVer
     <>
       <section className="nv-verif-entete">
         <div className="nv-verif-cadre">
-          <div>
-            <h1>{t.h1}</h1>
-            <p className="nv-verif-intro">{t.intro}</p>
-            {t.introRisque ? <p className="nv-verif-intro">{t.introRisque}</p> : null}
-          </div>
+          <h1>{t.h1}</h1>
 
           <form className="nv-verif-formulaire" onSubmit={lancer} noValidate>
             <label htmlFor="verif-adresse" className="nv-verif-etiquette">
@@ -442,6 +438,14 @@ export function Verificateur({ t, lienRendezVous, adressePostale }: { t: PageVer
               )}
             </div>
           </form>
+
+          {/* L'explication passe SOUS le test (2026-11-26) : les gens qui arrivent de la publicité
+              doivent voir le champ et le bouton sans rien lire avant. Les deux paragraphes restent
+              sur la page, pour Google et pour qui veut comprendre, mais après le geste. */}
+          <div className="nv-verif-explication">
+            <p className="nv-verif-intro">{t.intro}</p>
+            {t.introRisque ? <p className="nv-verif-intro">{t.introRisque}</p> : null}
+          </div>
         </div>
       </section>
 

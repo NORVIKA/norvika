@@ -1183,14 +1183,20 @@
    leur « pourquoi » sont deja dans le HTML (lus par Google et les assistants). */
 .nv-verif-cadre { max-width: 1240px; margin: 0 auto; padding-left: 32px; padding-right: 32px; }
 .nv-verif-entete { background: var(--brand-soft); border-bottom: 1px solid rgba(12,25,47,.1); }
+/* Une seule colonne centree (2026-11-26) : le titre, le test, puis l'explication. Avant, le test
+   etait dans une deuxieme colonne a droite et, au telephone, sous deux paragraphes : sur 82
+   arrivees de la campagne, 5 analyses ont ete lancees. Le geste passe donc avant la lecture. */
 .nv-verif-entete .nv-verif-cadre {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(0, 1.05fr);
-  gap: 56px;
-  align-items: start;
+  grid-template-columns: minmax(0, 1fr);
+  justify-items: center;
+  gap: 28px;
   padding-top: 64px;
-  padding-bottom: 64px;
+  padding-bottom: 56px;
 }
+.nv-verif-entete h1 { max-width: 20ch; text-align: center; }
+.nv-verif-entete .nv-verif-formulaire { width: 100%; max-width: 620px; }
+.nv-verif-explication { width: 100%; max-width: 620px; }
 .nv-verif-entete h1 {
   margin: 0;
   font-size: clamp(32px, 4vw, 52px);
@@ -1198,6 +1204,7 @@
   letter-spacing: -.035em;
   text-wrap: balance;
 }
+.nv-verif-explication .nv-verif-intro:first-child { margin-top: 0; }
 .nv-verif-intro { margin: 20px 0 0; max-width: 56ch; font-size: 17px; line-height: 1.62; color: rgba(12,25,47,.72); text-wrap: pretty; }
 .nv-verif-intro + .nv-verif-intro { margin-top: 12px; }
 
@@ -1497,16 +1504,6 @@
   .nv-verif-resultat .nv-verif-cadre,
   .nv-verif-limites .nv-verif-cadre { grid-template-columns: minmax(0, 1fr); gap: 28px; }
   .nv-verif-synthese { position: static; }
-  /* Une seule colonne : le test monte juste sous le titre, le texte explicatif descend
-     dessous. Quatre visiteurs sur cinq ne lancaient pas l'analyse (compteur Supabase du
-     2026-11-26) ; le formulaire etait sous deux paragraphes, hors de l'ecran au telephone.
-     `display: contents` sort le titre et les paragraphes de leur div pour que l'ordre de la
-     grille puisse les separer : l'ordre du HTML ne bouge pas (titre d'abord pour Google et
-     les lecteurs d'ecran), seul l'ordre visuel change, et seulement sous 1024 px. */
-  .nv-verif-entete .nv-verif-cadre > div { display: contents; }
-  .nv-verif-entete .nv-verif-cadre > div > h1 { order: 1; }
-  .nv-verif-entete .nv-verif-formulaire { order: 2; }
-  .nv-verif-entete .nv-verif-cadre > div > .nv-verif-intro { order: 3; margin-top: 0; }
 }
 @media (max-width: 680px) {
   .nv-verif-cadre { padding-left: 16px; padding-right: 16px; }
