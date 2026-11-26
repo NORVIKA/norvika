@@ -80,8 +80,12 @@ export default async function PolitiquePage() {
             ) : null}
             <li>
               27 novembre : ajout de l’espace client (section 5), durées de conservation précises (section 7),
-              ajout de Slack parmi nos fournisseurs (section 10) et liste complète des données recueillies par
-              nos formulaires (section 2).
+              ajout de Slack parmi nos fournisseurs (section 10){courriel ? ", " : " et "}liste complète des
+              données recueillies par nos formulaires (section 2)
+              {courriel
+                ? " et précision sur l’adresse du site analysé, qui figure aussi dans le rapport envoyé par courriel (section 4)"
+                : ""}
+              .
             </li>
           </ul>
           <p className="mt-2">Les versions précédentes vous sont transmises sur demande à info@norvika.ca.</p>
@@ -158,10 +162,14 @@ export default async function PolitiquePage() {
           <ul className="mt-3 list-disc pl-5 text-[var(--muted-foreground)]">
             <li>
               <strong className="text-[var(--foreground)]">Adresse du site analysé.</strong> Elle sert
-              uniquement à faire l’analyse et à afficher le résultat. Elle n’est enregistrée dans aucune de
-              nos bases de données. Cloudflare, qui fait l’analyse, garde la trace de chaque
-              vérification dans notre tableau de bord : la date, la durée et un identifiant de session.
-              L’adresse du site vérifié n’y figure pas.
+              à faire l’analyse et à afficher le résultat. Elle n’est enregistrée dans aucune de nos bases de
+              données
+              {courriel
+                ? " ; si vous demandez le rapport par courriel, elle figure aussi dans ce rapport" +
+                  (avecCase ? " et, si vous cochez la case, dans la copie décrite plus bas" : "")
+                : ""}
+              . Cloudflare, qui fait l’analyse, garde la trace de chaque vérification dans notre tableau de
+              bord : la date, la durée et un identifiant de session. L’adresse du site vérifié n’y figure pas.
             </li>
             <li>
               <strong className="text-[var(--foreground)]">Adresse IP.</strong> Nous la gardons sous une
