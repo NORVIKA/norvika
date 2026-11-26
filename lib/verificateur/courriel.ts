@@ -5,7 +5,7 @@ import { reserverCourrielsVerificateur, type ReserveCourriels } from "@/lib/rate
 
 import { recoitDuCourriel } from "./adresse";
 import { nomTemoinReconnu } from "./analyse";
-import { blocSanctions, dateEtHeure, hote, morceauxMontants, phraseAccompagnement, pied, remplir, synthese, texteResultat } from "./textes";
+import { dateEtHeure, hote, phraseAccompagnement, pied, remplir, synthese, texteResultat } from "./textes";
 import type { TextesCourriel } from "./textes-serveur";
 import { VERIFICATIONS, type Etat, type EtatEnvoi, type Rapport } from "./types";
 
@@ -36,21 +36,37 @@ import { VERIFICATIONS, type Etat, type EtatEnvoi, type Rapport } from "./types"
 /** Préfixe FIXE de l'objet de la copie interne : le filtre Gmail de William s'y fie (C6). Jamais au Studio. */
 export const PREFIXE_CONSENTEMENT = "[Vérificateur Loi 25] Consentement";
 
-/** Couleurs du site (app/globals.css), en dur : un courriel ne lit pas les variables CSS. */
-const C = {
-  navy: "#0C192F",
-  texte: "#3B4659",
-  pale: "#5F6878",
-  trait: "#E3E7EE",
-  fond: "#F4F6FA",
-  creme: "#F5F3EE",
-  etat: {
-    "a-corriger": { texte: "#B3261E", fond: "#FCEDEB" },
-    "a-verifier": { texte: "#7A4A00", fond: "#FBF1DE" },
-    "en-place": { texte: "#33496C", fond: "#EEF2FA" },
-  } satisfies Record<Etat, { texte: string; fond: string }>,
+/**
+ * Couleurs de la maquette A (2026-11-26, approuvée par Lau). Elle est plus vive que celle du site
+ * (bleu #2340E8 et lime au lieu du marine #0C192F) : c'est un choix assumé pour le courriel, pas
+ * un oubli. Les états gardent les couleurs de la page.
+ */
+const A = {
+  bleu: "#2340E8",
+  lime: "#D8F35A",
+  encre: "#14205C",
+  texte: "#4A5684",
+  fond: "#E9EEFF",
+  trait: "#E6E9F2",
+  doux: "#F3F6FF",
+  pied: "#7A85A8",
+  bordurePastille: "#C9D2F2",
+  pastilleTexte: "#6A76A6",
 };
-const POLICE = "Helvetica, Arial, sans-serif";
+// La police de la marque est impossible ici : il faudrait la charger depuis un serveur, donc une
+// requête partante à l'ouverture (même règle que C4). Pile système : SF Pro, Segoe UI, Roboto.
+const POLICE = "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif";
+/**
+ * La signature, en dur comme le préfixe d'objet : deux phrases de marque, pas du contenu qui change
+ * avec un résultat. ⚠️ À remonter au Studio au prochain déploiement du Studio (même lot que la ligne
+ * du haut de la page), pour que William puisse les changer sans toucher au code.
+ */
+const SIGNATURE_NOM = "Will et Lau, Norvika";
+const SIGNATURE_LIGNE = "Une question? Répondez à ce courriel, on le lit.";
+
+/** Les deux images, servies par notre propre domaine : aucun tiers, aucun paramètre de suivi. */
+const LOGO = "https://norvika.ca/images/courriel-logo.png";
+const SIGNATURE = "https://norvika.ca/images/courriel-signature.jpg";
 
 export type Message = { objet: string; html: string; texte?: string };
 
@@ -78,14 +94,17 @@ export function courrielVisiteur(rapport: Rapport, textes: TextesCourriel, conse
     enPlace: compte(n["en-place"], t.enPlaceAucun, t.enPlacePlusieurs),
   });
   const preEntete = apercu.charAt(0).toUpperCase() + apercu.slice(1);
-  const intro = remplir(rc.intro, { domaine, ...dateEtHeure(rapport.date) });
+  // ⚠️ `rc.salutation` (« Bonjour, ») et `rc.intro` (« Voici le rapport demandé... ») ne paraissent
+  //    plus depuis la refonte du 2026-11-26 : la maquette entre dans le résultat dès le titre, et la
+  //    date de l'analyse est au pied (pied()). Les deux champs restent au Studio, inutilisés, le
+  //    temps de confirmer la nouvelle allure ; à retirer du schéma ensuite.
   const phraseSynthese = synthese(rapport, t);
   const accompagnement = remplir(phraseAccompagnement(rapport, t), {});
   const appelTexte = n["a-corriger"] > 0 ? t.appelTexte : t.appelTexteSansCorrection;
-  // Ce que ça peut coûter : mêmes conditions et mêmes textes que la page (blocSanctions), placé
-  // entre les huit points et « ce que le test ne voit pas » (Martin). Tout déplié : la phrase visible
-  // de la page, puis ce que la page met dans son repli.
-  const sanctions = blocSanctions(rapport, t);
+  // ⛔ « Ce que ça peut coûter » (blocSanctions) n'est PLUS dans le courriel depuis la refonte du
+  //    2026-11-26 : il faisait à lui seul un tiers de la longueur, et le courriel ne se lisait plus.
+  //    Le bloc vit toujours sur la page du vérificateur, avec ses montants et sa source. Pour le
+  //    remettre ici, reprendre `blocSanctions(rapport, t)` depuis ./textes.
   // Le premier paragraphe de l'avertissement complet de la page : celui que Martin reprend au courriel.
   const avertissement = t.avertissement[0] ?? t.avertissementCourt;
   const paragrapheCase = consentement ? rc.paragrapheAvecCase : rc.paragrapheSansCase;
@@ -102,45 +121,46 @@ export function courrielVisiteur(rapport: Rapport, textes: TextesCourriel, conse
   }).filter((l): l is { nom: string; article: string; etat: Etat; texte: string } => l !== null);
 
   const p = (contenu: string, style = "") =>
-    `<p style="margin: 0; font-family: ${POLICE}; font-size: 15px; line-height: 1.6; color: ${C.texte}; ${style}">${contenu}</p>`;
+    `<p style="margin: 0; font-size: 15px; line-height: 1.55; color: ${A.texte}; ${style}">${contenu}</p>`;
 
-  const points = lignes
-    .map(
-      (l) => `
-            <tr>
-              <td style="padding: 16px 0; border-top: 1px solid ${C.trait};">
-                <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
-                  <tr>
-                    <td style="font-family: ${POLICE}; font-size: 16px; line-height: 1.35; font-weight: bold; color: ${C.navy}; vertical-align: top;">${esc(l.nom)}</td>
-                    <td align="right" style="padding-left: 12px; vertical-align: top; white-space: nowrap;">
-                      <span style="display: inline-block; padding: 3px 10px; border-radius: 999px; background: ${C.etat[l.etat].fond}; color: ${C.etat[l.etat].texte}; font-family: ${POLICE}; font-size: 13px; line-height: 1.4; font-weight: bold;">${esc(etats[l.etat])}</span>
-                    </td>
-                  </tr>
-                </table>
-                ${p(esc(l.texte), "margin-top: 6px; font-size: 14.5px; line-height: 1.55;")}
-                ${p(esc(l.article), `margin-top: 6px; font-size: 13px; color: ${C.pale};`)}
-              </td>
-            </tr>`,
-    )
+  /**
+   * Un constat par ligne : pastille, nom du constat, puis le geste à faire (textes du Studio).
+   * Seuls les constats qui demandent un geste sont détaillés ; ceux qui sont en place tiennent sur
+   * une seule ligne, juste en dessous. C'est la maquette A : le courriel parle d'abord de ce qu'il
+   * y a à faire.
+   */
+  const aRegler = lignes.filter((l) => l.etat !== "en-place");
+  const enPlace = lignes.filter((l) => l.etat === "en-place");
+  let rang = 0;
+  const points = aRegler
+    .map((l, i) => {
+      const aCorriger = l.etat === "a-corriger";
+      if (aCorriger) rang += 1;
+      // Pastille pleine et numérotée pour « à corriger », pastille creuse « ? » pour « à vérifier ».
+      const pastille = aCorriger
+        ? `<div style="background: ${A.lime}; color: ${A.encre}; width: 24px; height: 24px; line-height: 24px; text-align: center; border-radius: 50%; font-weight: bold; font-size: 12px;">${rang}</div>`
+        : `<div style="border: 2px solid ${A.bordurePastille}; color: ${A.pastilleTexte}; width: 20px; height: 20px; line-height: 20px; text-align: center; border-radius: 50%; font-weight: bold; font-size: 12px;">?</div>`;
+      // Pas de colonne d'état : « À vérifier » se dit dans le titre, le reste est à corriger.
+      const titre = aCorriger ? l.nom : `${etats[l.etat]} : ${l.nom}`;
+      const trait = i === aRegler.length - 1 ? "" : `border-bottom: 1px solid ${A.trait};`;
+      return `
+                <tr>
+                  <td width="34" valign="top" style="padding: 16px 0;">${pastille}</td>
+                  <td style="padding: 16px 0; ${trait}">
+                    ${p(esc(titre), `font-size: 16px; font-weight: bold; color: ${A.encre};`)}
+                    ${p(esc(l.texte), "margin-top: 4px;")}
+                    ${l.article ? p(esc(l.article), `margin-top: 6px; font-size: 12px; color: ${A.pied};`) : ""}
+                  </td>
+                </tr>`;
+    })
     .join("");
 
-  // Les montants jamais coupés en fin de ligne (ni gras ni rouge : information, pas alarme).
-  const insecable = (texte: string) =>
-    morceauxMontants(texte)
-      .map((m) => (m.montant ? `<span style="white-space: nowrap;">${esc(m.texte)}</span>` : esc(m.texte)))
-      .join("");
-  const blocCout = sanctions
+  // « En place : politique accessible, connexion sécurisée, ... » : les noms du Studio mis bout à
+  // bout, première lettre en minuscule puisqu'ils suivent les deux points.
+  const sansMajuscule = (nom: string) => nom.charAt(0).toLocaleLowerCase("fr-CA") + nom.slice(1);
+  const blocEnPlace = enPlace.length
     ? `
-            <tr>
-              <td style="padding: 8px 28px 12px;">
-                ${p(esc(sanctions.titre), `font-size: 16px; font-weight: bold; color: ${C.navy};`)}
-                ${sanctions.montants.map((m) => p(`&bull;&nbsp;${insecable(m)}`, "margin-top: 8px; font-size: 14.5px; line-height: 1.55;")).join("")}
-                ${sanctions.resume ? p(insecable(sanctions.resume), "margin-top: 10px; font-size: 14.5px; line-height: 1.55;") : ""}
-                ${sanctions.resume ? p(esc(sanctions.repliLibelle), `margin-top: 14px; font-size: 14px; font-weight: bold; color: ${C.navy};`) : ""}
-                ${sanctions.notes.map((note) => p(insecable(note), "margin-top: 10px; font-size: 14.5px; line-height: 1.55;")).join("")}
-                ${sanctions.source ? p(esc(sanctions.source), `margin-top: 8px; font-size: 13px; color: ${C.pale};`) : ""}
-              </td>
-            </tr>`
+              <p style="margin: 10px 0 0; padding: 14px 16px; background: ${A.doux}; border-radius: 12px; font-size: 14px; line-height: 1.5; color: ${A.texte};"><strong style="color: ${A.encre};">${esc(etats["en-place"])}&nbsp;:</strong> ${enPlace.map((l) => esc(sansMajuscule(l.nom))).join(", ")}</p>`
     : "";
 
   const html = `<!doctype html>
@@ -149,61 +169,49 @@ export function courrielVisiteur(rapport: Rapport, textes: TextesCourriel, conse
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>${esc(remplir(rc.objet, { domaine }))}</title>
+    <style>@media (max-width: 520px) { .pad { padding-left: 20px !important; padding-right: 20px !important; } .titre { font-size: 26px !important; } }</style>
   </head>
-  <body style="margin: 0; padding: 0; background: ${C.fond};">
+  <body style="margin: 0; padding: 0; background: ${A.fond}; font-family: ${POLICE};">
     <div style="display: none; max-height: 0; overflow: hidden;">${esc(preEntete)}</div>
-    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background: ${C.fond};">
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background: ${A.fond};">
       <tr>
-        <td align="center" style="padding: 24px 12px;">
-          <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="max-width: 600px; background: #ffffff; border: 1px solid ${C.trait}; border-radius: 16px;">
+        <td align="center" style="padding: 28px 12px;">
+          <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="max-width: 560px;">
             <tr>
-              <td style="padding: 28px 28px 8px;">
-                ${p(esc(textes.nom), `font-size: 17px; font-weight: bold; letter-spacing: -0.01em; color: ${C.navy};`)}
-                ${p(esc(rc.salutation), "margin-top: 20px;")}
-                ${p(esc(intro), "margin-top: 8px;")}
-                <h1 style="margin: 18px 0 0; font-family: ${POLICE}; font-size: 22px; line-height: 1.25; letter-spacing: -0.02em; color: ${C.navy};">${esc(phraseSynthese)}</h1>
-                ${p(esc(t.avertissementCourt), `margin-top: 10px; font-size: 14px; font-weight: bold; color: ${C.pale};`)}
-                ${p(esc(accompagnement), "margin-top: 12px;")}
+              <td style="padding: 0 6px 18px;"><img src="${LOGO}" width="84" alt="${esc(textes.nom)}" style="display: block; border: 0;"></td>
+            </tr>
+            <tr>
+              <td class="pad" style="background: ${A.bleu}; border-radius: 22px 22px 0 0; padding: 32px 30px 30px;">
+                <p class="titre" style="margin: 0; font-size: 30px; line-height: 1.15; font-weight: bold; letter-spacing: -0.02em; color: #ffffff;">${esc(phraseSynthese)}</p>
+                <p style="margin: 12px 0 0; font-size: 16px; line-height: 1.5; color: #D3DBFF;">${esc(accompagnement)}</p>
               </td>
             </tr>
             <tr>
-              <td style="padding: 12px 28px 8px;">
+              <td class="pad" style="background: #ffffff; padding: 8px 30px 0;">
                 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">${points}
-                </table>
-              </td>
-            </tr>${blocCout}
-            <tr>
-              <td style="padding: 8px 28px 4px;">
-                ${p(esc(t.invisibleTitre), `font-size: 16px; font-weight: bold; color: ${C.navy};`)}
-                ${p(esc(rc.invisibleCourriel), "margin-top: 6px; font-size: 14.5px; line-height: 1.55;")}
+                </table>${blocEnPlace}
               </td>
             </tr>
             <tr>
-              <td style="padding: 20px 28px 8px;">
-                <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background: ${C.navy}; border-radius: 14px;">
+              <td class="pad" style="background: #ffffff; border-radius: 0 0 22px 22px; padding: 28px 30px 32px;">
+                ${p(esc(t.appelTitre), `font-size: 20px; font-weight: bold; letter-spacing: -0.01em; color: ${A.encre};`)}
+                ${p(esc(appelTexte), "margin-top: 6px;")}
+                <a href="${esc(textes.lienRendezVous)}" style="display: block; margin-top: 20px; padding: 17px; border-radius: 14px; background: ${A.bleu}; color: #ffffff; font-size: 16px; font-weight: bold; text-align: center; text-decoration: none;">${esc(t.appelBouton)}</a>
+                <table role="presentation" cellpadding="0" cellspacing="0" border="0" style="margin-top: 22px;">
                   <tr>
-                    <td style="padding: 24px;">
-                      <p style="margin: 0; font-family: ${POLICE}; font-size: 18px; line-height: 1.3; font-weight: bold; color: #ffffff;">${esc(t.appelTitre)}</p>
-                      <p style="margin: 8px 0 0; font-family: ${POLICE}; font-size: 15px; line-height: 1.6; color: ${C.creme};">${esc(appelTexte)}</p>
-                      <p style="margin: 18px 0 0;"><a href="${esc(textes.lienRendezVous)}" style="display: inline-block; padding: 13px 22px; border-radius: 12px; background: ${C.creme}; color: ${C.navy}; font-family: ${POLICE}; font-size: 15px; font-weight: bold; text-decoration: none;">${esc(t.appelBouton)}</a></p>
-                    </td>
+                    <td width="64" style="width: 64px;"><img src="${SIGNATURE}" width="64" height="64" alt="${esc(SIGNATURE_NOM)}" style="display: block; width: 64px; height: 64px; border: 0; border-radius: 50%; background: ${A.bleu};"></td>
+                    <td style="padding-left: 12px; font-size: 14px; line-height: 1.4; color: ${A.texte};"><strong style="color: ${A.encre};">${esc(SIGNATURE_NOM)}</strong><br>${esc(SIGNATURE_LIGNE)}</td>
                   </tr>
                 </table>
               </td>
             </tr>
             <tr>
-              <td style="padding: 16px 28px 28px;">
-                ${p(esc(avertissement), `font-size: 13.5px; line-height: 1.55; color: ${C.pale};`)}
-                ${p(esc(pied(rapport, t)), `margin-top: 10px; font-size: 13.5px; color: ${C.pale};`)}
-              </td>
-            </tr>
-          </table>
-          <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="max-width: 600px;">
-            <tr>
-              <td style="padding: 18px 28px 0; font-family: ${POLICE}; font-size: 12.5px; line-height: 1.6; color: ${C.pale};">
+              <td class="pad" style="padding: 20px 30px 0; font-size: 12px; line-height: 1.6; color: ${A.pied};">
+                ${esc(avertissement)}<br><br>
+                <strong>${esc(t.invisibleTitre)}&nbsp;:</strong> ${esc(rc.invisibleCourriel)}<br><br>
+                ${esc(pied(rapport, t))}<br><br>
                 ${esc(paragrapheCase)}<br><br>
-                ${lignesPied.map(esc).join(" · ")}<br>
-                ${esc(rc.libellePolitique)}&nbsp;: <a href="https://norvika.ca/politique-de-confidentialite" style="color: ${C.pale};">norvika.ca/politique-de-confidentialite</a>
+                ${lignesPied.map(esc).join(" · ")} · <a href="https://norvika.ca/politique-de-confidentialite" style="color: ${A.pied};">${esc(rc.libellePolitique)}</a>
               </td>
             </tr>
           </table>
@@ -213,36 +221,24 @@ export function courrielVisiteur(rapport: Rapport, textes: TextesCourriel, conse
   </body>
 </html>`;
 
+  // Même contenu, même ordre que le HTML : un client qui refuse le HTML lit la même chose.
   const texte = [
-    rc.salutation,
-    "",
-    intro,
-    "",
     phraseSynthese,
-    t.avertissementCourt,
     "",
     accompagnement,
     "",
-    ...lignes.flatMap((l) => [`${etats[l.etat]} : ${l.nom}`, l.texte, l.article, ""]),
-    ...(sanctions
-      ? [
-          sanctions.titre,
-          ...sanctions.montants.map((m) => `• ${m}`),
-          // Le libellé du repli en intertitre (Martin) : résumé, puis détail, comme sur la page.
-          ...(sanctions.resume ? [sanctions.resume, "", sanctions.repliLibelle] : []),
-          ...sanctions.notes,
-          ...(sanctions.source ? [sanctions.source] : []),
-          "",
-        ]
-      : []),
-    t.invisibleTitre,
-    rc.invisibleCourriel,
-    "",
+    ...aRegler.flatMap((l) => [`${l.etat === "a-corriger" ? "À corriger" : etats[l.etat]} : ${l.nom}`, l.texte, ...(l.article ? [l.article] : []), ""]),
+    ...(enPlace.length ? [`${etats["en-place"]} : ${enPlace.map((l) => sansMajuscule(l.nom)).join(", ")}`, ""] : []),
     t.appelTitre,
     appelTexte,
     `${t.appelBouton} : ${textes.lienRendezVous}`,
     "",
+    SIGNATURE_NOM,
+    SIGNATURE_LIGNE,
+    "",
     avertissement,
+    "",
+    `${t.invisibleTitre} : ${rc.invisibleCourriel}`,
     "",
     pied(rapport, t),
     "",
