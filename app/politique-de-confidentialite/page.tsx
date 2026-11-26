@@ -108,9 +108,9 @@ export default async function PolitiquePage() {
             <li>
               <strong className="text-[var(--foreground)]">Adresse du site analysé.</strong> Elle sert
               uniquement à faire l’analyse et à afficher le résultat. Elle n’est enregistrée dans aucune de
-              nos bases de données. Cloudflare, qui fait l’analyse, garde toutefois la liste des adresses
-              visitées (le site analysé et sa page de politique) dans notre tableau de bord, pour une durée
-              qu’il ne précise pas. Nous ne nous servons pas de cette liste.
+              nos bases de données. Cloudflare, qui fait l’analyse, garde la trace de chaque
+              vérification dans notre tableau de bord : la date, la durée et un identifiant de session.
+              L’adresse du site vérifié n’y figure pas.
             </li>
             <li>
               <strong className="text-[var(--foreground)]">Adresse IP.</strong> Nous la gardons sous une
@@ -279,8 +279,9 @@ export default async function PolitiquePage() {
             </li>
             <li>
               <strong className="text-[var(--foreground)]">Cloudflare Browser Run</strong> : visite
-              automatique des sites soumis au vérificateur Loi 25. La liste des adresses visitées reste
-              affichée dans notre tableau de bord Cloudflare, pour une durée que Cloudflare ne précise pas.
+              automatique des sites soumis au vérificateur Loi 25. Notre tableau de bord Cloudflare garde la date, la durée et un
+              identifiant de session pour chaque vérification, pour une durée que Cloudflare ne précise pas.
+              L’adresse du site vérifié n’y figure pas.
             </li>
             <li>
               <strong className="text-[var(--foreground)]">Sanity</strong> : gestion du contenu du site. Les
