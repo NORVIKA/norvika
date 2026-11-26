@@ -32,11 +32,13 @@ import {
  */
 
 /**
- * Le widget Turnstile du vérificateur. Même action et mêmes hôtes que la route voisine : c'est le
- * MÊME widget, réinitialisé par la page pour produire un deuxième jeton. À garder en phase avec
- * app/api/verificateur-loi-25/route.ts.
+ * Le deuxième widget Turnstile, celui du bloc sous le résultat. Son action lui est PROPRE
+ * (« verificateur-rapport », posée par <AntiRobot action=…> dans components/verificateur/
+ * Verificateur.tsx) : un jeton pris sur le formulaire d'analyse ne sert pas ici, et le compte des
+ * arrivées dans Turnstile n'est pas gonflé par le deuxième widget. À garder en phase avec le
+ * composant : si l'action change d'un côté, l'envoi est refusé 403 de l'autre.
  */
-const JETON_ATTENDU = { action: "verificateur", hotes: ["norvika.ca", "www.norvika.ca"] } as const;
+const JETON_ATTENDU = { action: "verificateur-rapport", hotes: ["norvika.ca", "www.norvika.ca"] } as const;
 
 export const dynamic = "force-dynamic";
 
