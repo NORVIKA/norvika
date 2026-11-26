@@ -70,8 +70,21 @@ export type Rapport = {
 export const ETATS_ENVOI = ["envoye", "simule", "echec", "aucun"] as const;
 export type EtatEnvoi = (typeof ETATS_ENVOI)[number];
 
-/** Réponse de la route /api/verificateur-loi-25. */
-export type ReponseVerificateur = { ok: true; rapport: Rapport; envoi: EtatEnvoi } | { ok?: false; error: string; code?: string };
+/**
+ * Réponse de la route /api/verificateur-loi-25. `jeton` accompagne le rapport quand aucune adresse
+ * courriel n'a été fournie : c'est le rapport signé par le serveur (lib/verificateur/signature.ts),
+ * que la page renvoie à /api/verificateur-loi-25/rapport si la personne demande son rapport APRÈS
+ * avoir vu son résultat. Absent quand le secret de signature manque (poste local).
+ */
+export type ReponseVerificateur =
+  | { ok: true; rapport: Rapport; envoi: EtatEnvoi; jeton?: string }
+  | { ok?: false; error: string; code?: string };
+
+/** Réponse de la route /api/verificateur-loi-25/rapport (envoi différé du rapport). */
+export type ReponseRapport = { ok: true; envoi: EtatEnvoi } | { ok?: false; error: string; code?: string };
+
+/** Nom du champ qui porte le rapport signé, pour l'envoi différé. */
+export const CHAMP_JETON_RAPPORT = "rapport";
 
 /** L'adresse de la page : une affaire de code, déclarée une fois (page, bloc de Sites web, pied de page, sitemap). */
 export const CHEMIN_VERIFICATEUR = "/verificateur-loi-25";

@@ -1289,6 +1289,19 @@
 .nv-repli.nv-verif-mention-repli summary { font-size: 13.5px; }
 .nv-verif-envoi { margin: 12px 0 0; font-size: 14.5px; line-height: 1.5; color: rgba(12,25,47,.74); overflow-wrap: anywhere; }
 
+/* Le bloc qui demande le courriel SOUS le résultat (2026-11-26) : une carte, pour qu'il se
+   distingue du rapport qu'on vient de lire sans voler la vedette aux huit signaux. */
+.nv-verif-apres {
+  margin: 24px 0 0;
+  padding: 20px 22px 22px;
+  border-radius: 16px;
+  border: 1px solid rgba(12,25,47,.12);
+  background: var(--brand-soft);
+}
+.nv-verif-apres-titre { margin: 0; font-family: var(--font-display); font-weight: 600; font-size: 17px; letter-spacing: -.01em; color: var(--navy); }
+.nv-verif-apres .nv-verif-courriel { margin-top: 12px; }
+.nv-verif-apres .nv-verif-bouton { width: 100%; }
+
 /* Le resultat. */
 .nv-verif-resultat .nv-verif-cadre {
   display: grid;

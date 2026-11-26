@@ -7,6 +7,7 @@ import { normaliserAdresse, recoitDuCourriel, resoudrePublic } from "@/lib/verif
 import { analyser } from "@/lib/verificateur/analyse";
 import { domaineDuCourriel, envoyerRapport, type ResultatEnvoi } from "@/lib/verificateur/courriel";
 import { ErreurMoteur, observer, type CodeMoteur } from "@/lib/verificateur/moteur";
+import { signerRapport } from "@/lib/verificateur/signature";
 import { lireTextesCourriel } from "@/lib/verificateur/textes-serveur";
 import { CHAMP_ADRESSE, CHAMP_COURRIEL, CHAMP_SUIVI, LONGUEUR_MAX_COURRIEL, type ReponseVerificateur } from "@/lib/verificateur/types";
 
@@ -126,7 +127,14 @@ export async function POST(req: Request) {
       "[verificateur] analyse terminée",
       JSON.stringify({ ...rapport.synthese, duree: rapport.duree, courriel: envoi.visiteur, suivi: envoi.interne, motif: envoi.motif }),
     );
-    return NextResponse.json<ReponseVerificateur>({ ok: true, rapport, envoi: envoi.visiteur }, { headers: { "Cache-Control": "no-store" } });
+    // Sans courriel, le rapport repart signé : la personne peut le demander APRÈS avoir vu son
+    // résultat, sans relancer une analyse. La signature est ce qui tient C7 : seul un rapport
+    // calculé ici peut partir par courriel. Null (poste local, pas de secret) : pas d'offre différée.
+    const jeton = courriel ? null : await signerRapport(rapport);
+    return NextResponse.json<ReponseVerificateur>(
+      { ok: true, rapport, envoi: envoi.visiteur, ...(jeton ? { jeton } : {}) },
+      { headers: { "Cache-Control": "no-store" } },
+    );
   } catch (e) {
     const code: CodeMoteur = e instanceof ErreurMoteur ? e.code : "indisponible";
     // Au journal : le code d'erreur et un code technique court (net::ERR_..., HTTP 404), JAMAIS

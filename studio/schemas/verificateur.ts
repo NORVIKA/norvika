@@ -362,6 +362,16 @@ export const pageVerificateurLoi25 = defineType({
           description:
             'La case de consentement, sous le champ de courriel. Elle ne paraît JAMAIS tant que l’adresse postale est vide dans « Infos de l’entreprise », même cochée ici : la loi exige l’adresse postale dans la demande elle-même. La politique de confidentialité suit toute seule.',
         }),
+        defineField({
+          name: 'apresResultat',
+          title: 'Demander le courriel APRÈS le résultat',
+          type: 'boolean',
+          initialValue: false,
+          description:
+            'Décoché : le champ de courriel est dans le formulaire, avant l’analyse. Coché : il en sort et reparaît sous le résultat, une fois que la personne a vu ses signaux. Le formulaire ne demande alors plus que l’adresse du site. Ne fait rien tant que les deux textes ci-dessous sont vides.',
+        }),
+        texteCourriel('apresTitre', 'Titre du bloc sous le résultat', 'La phrase qui invite à recevoir le rapport (ex. : « Recevez ce rapport par courriel »). Vide : le bloc ne paraît pas.', { requis: false }),
+        texteCourriel('apresBouton', 'Bouton du bloc sous le résultat', 'Le texte du bouton d’envoi (ex. : « Envoyer mon rapport »). Vide : le bloc ne paraît pas.', { requis: false }),
         texteCourriel('champLibelle', 'Étiquette du champ de courriel', 'Au-dessus du champ (ex. : « Votre courriel (facultatif) »). Le mot « facultatif » doit rester : le courriel ne peut pas être exigé.'),
         texteCourriel('champExemple', 'Exemple dans le champ', 'Le texte pâle dans le champ vide (ex. : « vous@exemple.ca »).'),
         texteCourriel('champAide', 'Aide sous le champ', 'Sous le champ de courriel : à quoi il sert, et que le résultat s’affiche quand même.', { rows: 2 }),

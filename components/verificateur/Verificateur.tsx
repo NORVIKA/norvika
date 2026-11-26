@@ -22,6 +22,7 @@ import {
 } from "@/lib/verificateur/textes";
 import {
   CHAMP_ADRESSE,
+  CHAMP_JETON_RAPPORT,
   CHAMP_COURRIEL,
   CHAMP_SUIVI,
   LONGUEUR_MAX_ADRESSE,
@@ -31,6 +32,7 @@ import {
   type EtatEnvoi,
   type IdVerification,
   type Rapport,
+  type ReponseRapport,
   type ReponseVerificateur,
 } from "@/lib/verificateur/types";
 
@@ -67,7 +69,7 @@ import {
 type Phase =
   | { nom: "repos" }
   | { nom: "analyse" }
-  | { nom: "resultat"; rapport: Rapport; saisie: string; envoi: EtatEnvoi; courriel: string; caseCochee: boolean };
+  | { nom: "resultat"; rapport: Rapport; saisie: string; envoi: EtatEnvoi; courriel: string; caseCochee: boolean; jeton: string };
 
 /** Le champ qui porte une erreur : son message s'affiche sous lui, et le focus y revient. */
 type Champ = "adresse" | "courriel";
@@ -115,6 +117,7 @@ export function Verificateur({ t, lienRendezVous, adressePostale }: { t: PageVer
   const [erreur, setErreur] = useState<{ texte: string; n: number; champ: Champ } | null>(null);
   const [annonce, setAnnonce] = useState("");
   const champ = useRef<HTMLInputElement>(null);
+  const [envoiEnCours, setEnvoiEnCours] = useState(false);
   const champCourriel = useRef<HTMLInputElement>(null);
   const titreResultat = useRef<HTMLHeadingElement>(null);
 
@@ -126,16 +129,24 @@ export function Verificateur({ t, lienRendezVous, adressePostale }: { t: PageVer
   const rc = t.rapportCourriel?.afficher ? t.rapportCourriel : null;
   // La case : son interrupteur ET l'adresse postale, qui doit figurer dans la demande elle-même.
   const caseEnLigne = Boolean(rc?.afficherCase && adressePostale.trim());
+  // Demande différée (2026-11-26) : le champ de courriel quitte le formulaire et reparaît SOUS le
+  // résultat, au moment où la personne a ses signaux devant elle. Quatre visiteurs sur cinq ne
+  // lançaient pas l'analyse quand le formulaire montrait deux champs vides, et aucun de ceux qui
+  // l'ont lancée n'a laissé son adresse. S'éteint tout seul si l'interrupteur du Studio est à off
+  // ou si l'un de ses deux textes manque : on retombe alors exactement sur le formulaire d'avant.
+  const apresResultat = Boolean(rc?.apresResultat && rc.apresTitre?.trim() && rc.apresBouton?.trim());
   const enAnalyse = phase.nom === "analyse";
   // Mention par couches (2026-11-23, avis de Martin) : la phrase visible, avec ou sans le courriel,
   // puis les mentions complètes dans un repli fermé. Une phrase ou un libellé absent du Studio :
   // pas de repli, les mentions restent affichées en entier (jamais cachées sans premier niveau).
-  const resume = (rc ? rc.mentionResume : t.mentionResume)?.trim() ?? "";
+  // Quand le courriel est demandé après le résultat, le formulaire ne recueille que l'adresse :
+  // la phrase visible est alors celle SANS courriel, et celle avec courriel descend dans le bloc.
+  const resume = (rc && !apresResultat ? rc.mentionResume : t.mentionResume)?.trim() ?? "";
   const libelleRepli = t.mentionRepliLibelle?.trim() ?? "";
   const repli = Boolean(resume && libelleRepli);
   // Ce que les champs annoncent aux lecteurs d'écran : la phrase visible, pas les 25 lignes repliées.
   const idMention = repli ? "verif-mention-resume" : "verif-mention";
-  const idMentionCourriel = repli ? "verif-mention-resume" : "verif-mention-courriel";
+  const idMentionCourriel = apresResultat ? "verif-mention-apres" : repli ? "verif-mention-resume" : "verif-mention-courriel";
 
   function montrerErreur(message: string, champ: Champ = "adresse") {
     setErreur((avant) => ({ texte: message, n: (avant?.n ?? 0) + 1, champ }));
@@ -202,7 +213,7 @@ export function Verificateur({ t, lienRendezVous, adressePostale }: { t: PageVer
 
     if (donnees?.ok) {
       const envoi: EtatEnvoi = adresseCourriel ? (donnees.envoi ?? "aucun") : "aucun";
-      setPhase({ nom: "resultat", rapport: donnees.rapport, saisie, envoi, courriel: adresseCourriel, caseCochee });
+      setPhase({ nom: "resultat", rapport: donnees.rapport, saisie, envoi, courriel: adresseCourriel, caseCochee, jeton: donnees.jeton ?? "" });
       setAnnonce(`${synthese(donnees.rapport, t)} ${apostrophes(t.avertissementCourt)} ${texteEnvoi(envoi, adresseCourriel, caseCochee)}`.trim());
       // Le titre du résultat prend le focus (lecteurs d'écran) et remonte en haut de l'écran.
       requestAnimationFrame(() => {
@@ -221,6 +232,55 @@ export function Verificateur({ t, lienRendezVous, adressePostale }: { t: PageVer
     montrerErreur(adresseCourriel && rc ? `${message} ${remplir(rc.sansResultat, {})}` : message);
   }
 
+  /**
+   * Envoi du rapport APRÈS le résultat. Aucune analyse n'est relancée : la page renvoie le rapport
+   * signé par le serveur (champ `jeton` de la réponse), et la route le refuse s'il ne revient pas
+   * intact. Son propre formulaire, donc son propre widget anti-robot, avec une action à part
+   * (« verificateur-rapport ») pour ne pas gonfler le compte des arrivées dans Turnstile.
+   */
+  async function envoyerApres(e: FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    if (phase.nom !== "resultat" || envoiEnCours || !rc) return;
+    const formulaire = e.currentTarget;
+    const adresseCourriel = courriel.trim();
+    const caseCochee = caseEnLigne && Boolean(adresseCourriel) && suivi;
+    if (!adresseCourriel || adresseCourriel.length > LONGUEUR_MAX_COURRIEL || !ligneSimpleValide(adresseCourriel) || !formeCourrielValide(adresseCourriel)) {
+      return montrerErreur(rc.erreurCourriel, "courriel");
+    }
+    const jetonRobot = lireJetonAntiRobot(formulaire);
+    if (!jetonRobot) return montrerErreur(t.erreurAntiRobot, "courriel");
+
+    setErreur(null);
+    setEnvoiEnCours(true);
+    let donnees: ReponseRapport | null = null;
+    try {
+      const reponse = await fetch("/api/verificateur-loi-25/rapport", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          [CHAMP_JETON_RAPPORT]: phase.jeton,
+          [CHAMP_JETON]: jetonRobot,
+          [CHAMP_COURRIEL]: adresseCourriel,
+          [CHAMP_SUIVI]: caseCochee,
+        }),
+      });
+      donnees = (await reponse.json().catch(() => null)) as ReponseRapport | null;
+    } catch {
+      donnees = null;
+    } finally {
+      setEnvoiEnCours(false);
+      reinitialiserAntiRobot(formulaire);
+    }
+
+    if (!donnees?.ok) {
+      // Un seul message, comme ailleurs : la phrase d'échec d'envoi du Studio.
+      return montrerErreur(rc.envoiEchec, "courriel");
+    }
+    // Le résultat affiché ne change pas ; seule la ligne d'envoi apparaît sous lui.
+    setPhase({ ...phase, envoi: donnees.envoi ?? "aucun", courriel: adresseCourriel, caseCochee });
+    setAnnonce(texteEnvoi(donnees.envoi ?? "aucun", adresseCourriel, caseCochee));
+  }
+
   function recommencer() {
     setPhase({ nom: "repos" });
     setAnnonce("");
@@ -235,6 +295,69 @@ export function Verificateur({ t, lienRendezVous, adressePostale }: { t: PageVer
       {enAnalyse ? t.analyseTitre : t.bouton}
     </button>
   );
+
+  // Les champs du courriel, écrits une fois : dans le formulaire (V2) ou sous le résultat (V3,
+  // 2026-11-26). Un seul des deux est rendu à la fois, donc les identifiants restent uniques.
+  const champsCourriel = rc ? (
+    <>
+      <label htmlFor="verif-courriel" className="nv-verif-etiquette">
+        {rc.champLibelle}
+      </label>
+      <input
+        ref={champCourriel}
+        id="verif-courriel"
+        name={CHAMP_COURRIEL}
+        className="nv-champ"
+        type="email"
+        inputMode="email"
+        autoComplete="email"
+        autoCapitalize="none"
+        autoCorrect="off"
+        spellCheck={false}
+        maxLength={LONGUEUR_MAX_COURRIEL}
+        placeholder={rc.champExemple}
+        value={courriel}
+        onChange={(e) => {
+          setCourriel(e.target.value);
+          // Sans adresse, la case disparaît ET se décoche : un consentement suit une adresse.
+          if (!e.target.value.trim()) setSuivi(false);
+          // Le champ est facultatif : dès qu'on le corrige (ou le vide), l'erreur n'a plus lieu d'être.
+          if (erreur?.champ === "courriel") setErreur(null);
+        }}
+        aria-invalid={erreur?.champ === "courriel" ? true : undefined}
+        aria-describedby={`${erreur?.champ === "courriel" ? "verif-erreur-courriel " : ""}verif-aide-courriel ${idMentionCourriel}`}
+        readOnly={enAnalyse}
+      />
+      <p id="verif-aide-courriel" className="nv-verif-aide">
+        {rc.champAide}
+      </p>
+      {erreur?.champ === "courriel" ? (
+        <p key={erreur.n} id="verif-erreur-courriel" role="alert" className="nv-verif-erreur">
+          {erreur.texte}
+        </p>
+      ) : null}
+      {caseEnLigne && courriel.trim() ? (
+        <div className="nv-verif-consentement">
+          <label className="nv-verif-case">
+            <input
+              type="checkbox"
+              name={CHAMP_SUIVI}
+              checked={suivi}
+              onChange={(e) => {
+                if (!enAnalyse) setSuivi(e.target.checked);
+              }}
+              aria-describedby="verif-case-identification"
+              aria-disabled={enAnalyse || undefined}
+            />
+            <span>{rc.caseTexte}</span>
+          </label>
+          <p id="verif-case-identification" className="nv-verif-aide">
+            {remplir(rc.caseIdentification, { adresse_postale: adressePostale.trim() })}
+          </p>
+        </div>
+      ) : null}
+    </>
+  ) : null;
 
   // Les mentions complètes (textes de Martin, mot pour mot) : dans le repli, ou seules sans lui.
   const mentions = (
@@ -286,7 +409,7 @@ export function Verificateur({ t, lienRendezVous, adressePostale }: { t: PageVer
                 aria-describedby={`${erreur?.champ === "adresse" ? "verif-erreur " : ""}${idMention}`}
                 readOnly={enAnalyse}
               />
-              {rc ? null : bouton}
+              {rc && !apresResultat ? null : bouton}
             </div>
             {erreur?.champ === "adresse" ? (
               <p key={erreur.n} id="verif-erreur" role="alert" className="nv-verif-erreur">
@@ -294,64 +417,9 @@ export function Verificateur({ t, lienRendezVous, adressePostale }: { t: PageVer
               </p>
             ) : null}
 
-            {rc ? (
+            {rc && !apresResultat ? (
               <div className="nv-verif-courriel">
-                <label htmlFor="verif-courriel" className="nv-verif-etiquette">
-                  {rc.champLibelle}
-                </label>
-                <input
-                  ref={champCourriel}
-                  id="verif-courriel"
-                  name={CHAMP_COURRIEL}
-                  className="nv-champ"
-                  type="email"
-                  inputMode="email"
-                  autoComplete="email"
-                  autoCapitalize="none"
-                  autoCorrect="off"
-                  spellCheck={false}
-                  maxLength={LONGUEUR_MAX_COURRIEL}
-                  placeholder={rc.champExemple}
-                  value={courriel}
-                  onChange={(e) => {
-                    setCourriel(e.target.value);
-                    // Sans adresse, la case disparaît ET se décoche : un consentement suit une adresse.
-                    if (!e.target.value.trim()) setSuivi(false);
-                    // Le champ est facultatif : dès qu'on le corrige (ou le vide), l'erreur n'a plus lieu d'être.
-                    if (erreur?.champ === "courriel") setErreur(null);
-                  }}
-                  aria-invalid={erreur?.champ === "courriel" ? true : undefined}
-                  aria-describedby={`${erreur?.champ === "courriel" ? "verif-erreur-courriel " : ""}verif-aide-courriel ${idMentionCourriel}`}
-                  readOnly={enAnalyse}
-                />
-                <p id="verif-aide-courriel" className="nv-verif-aide">
-                  {rc.champAide}
-                </p>
-                {erreur?.champ === "courriel" ? (
-                  <p key={erreur.n} id="verif-erreur-courriel" role="alert" className="nv-verif-erreur">
-                    {erreur.texte}
-                  </p>
-                ) : null}
-                {caseEnLigne && courriel.trim() ? (
-                  <div className="nv-verif-consentement">
-                    <label className="nv-verif-case">
-                      <input
-                        type="checkbox"
-                        name={CHAMP_SUIVI}
-                        checked={suivi}
-                        onChange={(e) => {
-                          if (!enAnalyse) setSuivi(e.target.checked);
-                        }}
-                        aria-describedby="verif-case-identification"
-                        aria-disabled={enAnalyse || undefined}
-                      />
-                      <span>{rc.caseTexte}</span>
-                    </label>
-                    <p id="verif-case-identification" className="nv-verif-aide">
-                      {remplir(rc.caseIdentification, { adresse_postale: adressePostale.trim() })}
-                    </p>
-                  </div>
-                ) : null}
+                {champsCourriel}
                 {bouton}
               </div>
             ) : null}
@@ -416,6 +484,23 @@ export function Verificateur({ t, lienRendezVous, adressePostale }: { t: PageVer
                   <p className="nv-verif-envoi" data-envoi={phase.envoi}>
                     {texteEnvoi(phase.envoi, phase.courriel, phase.caseCochee)}
                   </p>
+                ) : null}
+                {rc && apresResultat && phase.nom === "resultat" && phase.jeton && phase.envoi === "aucun" ? (
+                  <form className="nv-verif-apres" onSubmit={envoyerApres} noValidate>
+                    <p className="nv-verif-apres-titre">{rc.apresTitre}</p>
+                    <div className="nv-verif-courriel">
+                      {champsCourriel}
+                      <button type="submit" className="nv-verif-bouton nv-btn-primary" aria-disabled={envoiEnCours || undefined}>
+                        {rc.apresBouton}
+                      </button>
+                    </div>
+                    <MentionVerificateur
+                      id="verif-mention-apres"
+                      texte={caseEnLigne ? rc.mention : rc.mentionSansCase}
+                      lien={t.mentionLien}
+                    />
+                    <AntiRobot action="verificateur-rapport" />
+                  </form>
                 ) : null}
                 <button type="button" className="nv-verif-refaire" onClick={recommencer}>
                   {t.boutonRefaire}

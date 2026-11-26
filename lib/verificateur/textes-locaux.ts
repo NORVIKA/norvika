@@ -18,7 +18,8 @@ export async function avecTextesLocaux<T extends Pick<PageVerificateur, "rapport
   if (process.env.NODE_ENV !== "development") return page;
   if (process.env.VERIFICATEUR_TEXTES_LOCAUX !== "1") return page;
   const avecCourriel = page.rapportCourriel ? page : { ...page, rapportCourriel: await lireJson<RapportCourriel>("verificateur-courriel-textes.json") };
-  const avecMention = await avecMentionParCouches(avecCourriel);
+  const avecApres = await avecDemandeApres(avecCourriel);
+  const avecMention = await avecMentionParCouches(avecApres);
   // « Ce que ça peut coûter » et la phrase sous l'introduction (2026-11-24) : verificateur-sanctions-
   // textes.json, même fichier que le semis verificateur-sanctions-semer.ts, champ par champ, tant que le
   // Studio ne les a pas.
@@ -27,6 +28,29 @@ export async function avecTextesLocaux<T extends Pick<PageVerificateur, "rapport
     ...avecMention,
     introRisque: avecMention.introRisque?.trim() ? avecMention.introRisque : locaux.introRisque,
     sanctions: avecMention.sanctions ?? locaux.sanctions,
+  };
+}
+
+/**
+ * Demande du courriel APRÈS le résultat (2026-11-26) : les trois champs, CHAMP PAR CHAMP, tant que
+ * le Studio ne les a pas (studio/scripts/verificateur-apres-textes.json). Permet d'essayer le bloc
+ * sur le poste local avant de l'allumer en ligne. Un champ déjà rempli au Studio gagne toujours.
+ */
+type TextesApres = { apresResultat: boolean; apresTitre: string; apresBouton: string };
+
+async function avecDemandeApres<T extends Pick<PageVerificateur, "rapportCourriel">>(page: T): Promise<T> {
+  if (!page.rapportCourriel) return page;
+  const locaux = await lireJson<TextesApres>("verificateur-apres-textes.json");
+  const rc = page.rapportCourriel;
+  const vide = (texte: string | null | undefined) => !texte?.trim();
+  return {
+    ...page,
+    rapportCourriel: {
+      ...rc,
+      apresResultat: rc.apresResultat ?? locaux.apresResultat,
+      apresTitre: vide(rc.apresTitre) ? locaux.apresTitre : rc.apresTitre,
+      apresBouton: vide(rc.apresBouton) ? locaux.apresBouton : rc.apresBouton,
+    },
   };
 }
 

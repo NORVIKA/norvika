@@ -375,6 +375,14 @@ export type TextesVerification = { nom: string; pourquoi: string; article: strin
 export type RapportCourriel = {
   afficher?: boolean | null;
   afficherCase?: boolean | null;
+  /**
+   * La demande du courriel passe SOUS le résultat (2026-11-26) : le formulaire ne demande plus que
+   * l'adresse du site, et le bloc de courriel reparaît une fois les signaux affichés. Sans
+   * `apresTitre` ni `apresBouton`, l'interrupteur ne fait rien : on garde le formulaire d'avant.
+   */
+  apresResultat?: boolean | null;
+  apresTitre?: string | null;
+  apresBouton?: string | null;
   champLibelle: string;
   champExemple: string;
   champAide: string;
