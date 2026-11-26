@@ -12,15 +12,17 @@ const TITRE = "Politique de confidentialité";
 // seraient faux tant qu'il n'est pas en ligne.
 // Date de la version EN LIGNE aujourd'hui. Elle se fixe le jour de la mise en ligne (Pixel,
 // 2026-11-19), pas avant : c'est cette ligne qui change à ce moment-là.
-const MISE_A_JOUR = "21 novembre 2026";
+// Une seule date, jamais soumise à un réglage du Studio (Martin, 2026-11-26, correctif 7) :
+// la section 5 est datée du 27 même quand le rapport par courriel est coupé.
+const MISE_A_JOUR = "27 novembre 2026";
 // ⚠️ Rapport par courriel du vérificateur (textes de Martin, contenu/verificateur-courriel-textes.md,
 // section 6) : les passages sur le courriel paraissent SEULEMENT quand le Studio active l'envoi, et
 // ceux marqués « (case) » seulement quand la case est en ligne (interrupteur ET adresse postale).
 // La page est rebâtie à chaque publication du Studio : la politique suit l'outil toute seule.
 // ⚠️ À FIXER au jour du déploiement qui publie la fonction courriel (Martin, 6.6), puis à changer
 // encore le jour où la case s'allume.
-// 27 novembre 2026 : section 5 « Espace client » et retouches du même jour (Martin, L2, lot 1).
-const MISE_A_JOUR_COURRIEL = "27 novembre 2026";
+// 27 novembre 2026 : section 5 « Espace client », retouches du même jour (Martin, L2, lot 1) et
+// correctifs de la relecture du 2026-11-26, avec l'avis de modification de l'art. 8.2.
 // Jamais « conforme à la Loi 25 » : c'est l'auto-attestation que le vérificateur Loi 25 refuse de
 // faire, sur le site qui l'offre (Martin, 2026-11-18, point B).
 const DESCRIPTION = "Politique de confidentialité de Norvika : renseignements recueillis, utilisation, fournisseurs, conservation et vos droits.";
@@ -52,22 +54,56 @@ export default async function PolitiquePage() {
           Politique de confidentialité
         </h1>
         <p className="mt-4 text-sm text-[var(--muted-foreground)]">
-          Dernière mise à jour et entrée en vigueur : {courriel ? MISE_A_JOUR_COURRIEL : MISE_A_JOUR}
+          Dernière mise à jour et entrée en vigueur : {MISE_A_JOUR}
         </p>
+        {/* Avis de modification (art. 8.2 de la loi sur le secteur privé), texte de Martin du
+            2026-11-26. Jamais soumis à un réglage du Studio. Recommandation : en haut 90 jours
+            (jusqu'au 25 février 2027), puis dans un historique au bas de la page. Les lignes du
+            23 novembre suivent les interrupteurs, parce que ces passages n'existent qu'avec eux. */}
+        <div id="avis-modification" className="mt-6 rounded-lg bg-[var(--muted)] p-5 text-sm text-[var(--muted-foreground)]">
+          <p>
+            <strong className="text-[var(--foreground)]">Avis de modification (27 novembre 2026).</strong> Cette
+            politique a été modifiée les 14, 21{courriel ? ", 23" : ""} et 27 novembre 2026.
+          </p>
+          <ul className="mt-2 list-disc pl-5">
+            <li>14 novembre : ajout de la vérification anti-robot Cloudflare Turnstile sur nos formulaires (section 10).</li>
+            <li>
+              21 novembre : ajout du vérificateur Loi 25 (section 4), de l’adresse IP brouillée gardée au plus 24
+              heures (section 2), du droit à la portabilité et de notre délai de réponse de 30 jours (section 8), et
+              de nouveaux fournisseurs (section 10) : Cloudflare Browser Run, Sanity, YouTube et Google Workspace.
+            </li>
+            {courriel ? (
+              <li>
+                23 novembre : rapport du vérificateur par courriel, facultatif
+                {avecCase ? ", et case distincte pour accepter que nous vous écrivions" : ""} (section 4).
+              </li>
+            ) : null}
+            <li>
+              27 novembre : ajout de l’espace client (section 5), durées de conservation précises (section 7),
+              ajout de Slack parmi nos fournisseurs (section 10) et liste complète des données recueillies par
+              nos formulaires (section 2).
+            </li>
+          </ul>
+          <p className="mt-2">Les versions précédentes vous sont transmises sur demande à info@norvika.ca.</p>
+        </div>
 
         <div className="prose prose-sm mt-10 max-w-none text-[var(--foreground)]">
           <h2 className="mt-8 text-xl font-semibold">1. Qui sommes-nous</h2>
           <p className="mt-3 text-[var(--muted-foreground)]">
-            Norvika est une entreprise québécoise de services numériques. Nous offrons la création de
+            {parametres.nomLegal} est une entreprise québécoise de services numériques. Nous offrons la création de
             sites web, l’automatisation de processus et des services de photo et vidéo pour les
             entreprises et les travailleurs autonomes. Pour nous joindre : info@norvika.ca
           </p>
 
           <h2 className="mt-8 text-xl font-semibold">2. Données collectées</h2>
           <p className="mt-3 text-[var(--muted-foreground)]">
-            Nous collectons seulement les données suivantes :
+            Nous collectons les données suivantes :
           </p>
           <ul className="mt-3 list-disc pl-5 text-[var(--muted-foreground)]">
+            <li>
+              Nom, courriel, numéro de téléphone (facultatif) et votre message, quand vous nous écrivez par le
+              formulaire de contact ; pour une demande de diagnostic, vos réponses au questionnaire et son résultat
+            </li>
             <li>Prénom, courriel et numéro de téléphone (via le formulaire de la page Bienvenue)</li>
             <li>
               Votre adresse IP, gardée sous une forme brouillée au plus 24 heures, quand vous envoyez un
@@ -79,6 +115,7 @@ export default async function PolitiquePage() {
               Si vous êtes client de Norvika : vos renseignements de connexion à l’espace client, et le contenu
               des demandes de changement que vous y faites ou que vous nous faites par un autre moyen (section 5)
             </li>
+            <li>Si vous acceptez la mesure d’audience : les pages consultées et des données techniques sur votre navigation (section 6)</li>
           </ul>
 
           <h2 className="mt-8 text-xl font-semibold">3. Utilisation des données</h2>
@@ -86,7 +123,7 @@ export default async function PolitiquePage() {
             Vos données personnelles sont utilisées uniquement pour :
           </p>
           <ul className="mt-3 list-disc pl-5 text-[var(--muted-foreground)]">
-            <li>Vous recontacter suite à votre demande</li>
+            <li>Vous recontacter à la suite de votre demande</li>
             <li>Gérer la relation client dans le cadre d’un projet</li>
             <li>
               Vous donner accès à votre espace client et traiter les demandes de changement que vous y faites
@@ -96,6 +133,11 @@ export default async function PolitiquePage() {
             {avecCase ? (
               <li>Vous écrire au sujet de ce rapport et de nos services, seulement si vous avez coché la case prévue à cette fin</li>
             ) : null}
+            <li>
+              Bloquer les abus et les robots sur nos formulaires et le vérificateur (adresse IP brouillée,
+              vérification anti-robot)
+            </li>
+            <li>Mesurer l’audience du site, seulement si vous l’acceptez (section 6)</li>
           </ul>
           <p className="mt-3 text-[var(--muted-foreground)]">
             Nous ne vendons, ne louons et ne partageons jamais vos données avec des tiers à des fins
@@ -229,8 +271,8 @@ export default async function PolitiquePage() {
             aucune autre fin.
           </p>
           <p className="mt-3 text-[var(--muted-foreground)]">
-            <strong className="text-[var(--foreground)]">Qui y a accès.</strong> Chez Norvika, seuls les deux
-            associés, qui administrent notre outil de gestion de la clientèle, lisent vos demandes et vos
+            <strong className="text-[var(--foreground)]">Qui y a accès.</strong> Chez Norvika, seules les deux
+            personnes qui administrent notre outil de gestion de la clientèle lisent vos demandes et vos
             captures. Dans votre entreprise, toutes les personnes qui ont accès à l’espace voient les demandes de
             l’entreprise, leurs captures et nos réponses, sans le nom de la personne qui les a écrites.
           </p>
@@ -328,7 +370,7 @@ export default async function PolitiquePage() {
           </p>
           <p className="mt-3 text-[var(--muted-foreground)]">
             La bannière de consentement est fournie par CookieYes. La mesure d’audience est
-            fournie par Google Analytics 4, avec l’anonymisation des adresses IP activée.
+            fournie par Google Analytics 4, qui ne conserve pas les adresses IP.
           </p>
 
           <h2 className="mt-8 text-xl font-semibold">7. Conservation des données</h2>
@@ -350,8 +392,8 @@ export default async function PolitiquePage() {
 
           <h2 className="mt-8 text-xl font-semibold">8. Vos droits (Loi 25 Québec)</h2>
           <p className="mt-3 text-[var(--muted-foreground)]">
-            Conformément à la Loi modernisant des dispositions législatives en matière de protection des
-            renseignements personnels (Loi 25), vous avez le droit de :
+            Conformément à la Loi sur la protection des renseignements personnels dans le secteur privé,
+            modifiée par la Loi 25, vous avez le droit de :
           </p>
           <ul className="mt-3 list-disc pl-5 text-[var(--muted-foreground)]">
             <li>Accéder à vos renseignements personnels</li>
@@ -380,7 +422,8 @@ export default async function PolitiquePage() {
             9. Responsable de la protection des renseignements personnels
           </h2>
           <p className="mt-3 text-[var(--muted-foreground)]">
-            Conformément à l’article 3.1 de la Loi 25, la personne responsable de la protection
+            Conformément à l’article 3.1 de la Loi sur la protection des renseignements personnels dans le
+            secteur privé, la personne responsable de la protection
             des renseignements personnels chez {parametres.nomLegal} est :
           </p>
           <ul className="mt-3 list-disc pl-5 text-[var(--muted-foreground)]">
@@ -403,7 +446,8 @@ export default async function PolitiquePage() {
             10. Hébergement et communication hors du Québec
           </h2>
           <p className="mt-3 text-[var(--muted-foreground)]">
-            Conformément à l’article 17 de la Loi 25, nous vous informons que vos renseignements
+            Conformément aux articles 8 et 17 de la Loi sur la protection des renseignements personnels dans le
+            secteur privé, nous vous informons que vos renseignements
             sont hébergés et traités par des fournisseurs situés à l’extérieur du Québec,
             principalement aux États-Unis :
           </p>
