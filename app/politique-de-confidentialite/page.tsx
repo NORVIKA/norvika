@@ -19,7 +19,8 @@ const MISE_A_JOUR = "21 novembre 2026";
 // La page est rebâtie à chaque publication du Studio : la politique suit l'outil toute seule.
 // ⚠️ À FIXER au jour du déploiement qui publie la fonction courriel (Martin, 6.6), puis à changer
 // encore le jour où la case s'allume.
-const MISE_A_JOUR_COURRIEL = "23 novembre 2026";
+// 27 novembre 2026 : section 5 « Espace client » et retouches du même jour (Martin, L2, lot 1).
+const MISE_A_JOUR_COURRIEL = "27 novembre 2026";
 // Jamais « conforme à la Loi 25 » : c'est l'auto-attestation que le vérificateur Loi 25 refuse de
 // faire, sur le site qui l'offre (Martin, 2026-11-18, point B).
 const DESCRIPTION = "Politique de confidentialité de Norvika : renseignements recueillis, utilisation, fournisseurs, conservation et vos droits.";
@@ -67,13 +68,17 @@ export default async function PolitiquePage() {
             Nous collectons seulement les données suivantes :
           </p>
           <ul className="mt-3 list-disc pl-5 text-[var(--muted-foreground)]">
-            <li>Prénom, courriel et numéro de téléphone (via le formulaire Espace client)</li>
+            <li>Prénom, courriel et numéro de téléphone (via le formulaire de la page Bienvenue)</li>
             <li>
               Votre adresse IP, gardée sous une forme brouillée au plus 24 heures, quand vous envoyez un
               formulaire ou lancez le vérificateur Loi 25, pour limiter le nombre d’envois et bloquer les abus
             </li>
             <li>L’adresse d’un site web, quand vous utilisez le vérificateur Loi 25</li>
             {courriel ? <li>Votre courriel, si vous demandez le rapport du vérificateur Loi 25 par courriel (facultatif)</li> : null}
+            <li>
+              Si vous êtes client de Norvika : vos renseignements de connexion à l’espace client, et le contenu
+              des demandes de changement que vous y faites ou que vous nous faites par un autre moyen (section 5)
+            </li>
           </ul>
 
           <h2 className="mt-8 text-xl font-semibold">3. Utilisation des données</h2>
@@ -83,6 +88,10 @@ export default async function PolitiquePage() {
           <ul className="mt-3 list-disc pl-5 text-[var(--muted-foreground)]">
             <li>Vous recontacter suite à votre demande</li>
             <li>Gérer la relation client dans le cadre d’un projet</li>
+            <li>
+              Vous donner accès à votre espace client et traiter les demandes de changement que vous y faites
+              ou que vous nous faites autrement
+            </li>
             {courriel ? <li>Vous envoyer le rapport du vérificateur Loi 25, si vous le demandez par courriel</li> : null}
             {avecCase ? (
               <li>Vous écrire au sujet de ce rapport et de nos services, seulement si vous avez coché la case prévue à cette fin</li>
@@ -161,7 +170,143 @@ export default async function PolitiquePage() {
             </li>
           </ul>
 
-          <h2 className="mt-8 text-xl font-semibold">5. Témoins (cookies) et mesure d’audience</h2>
+          {/* Espace client (Martin, _admin/ticket-info/loi25/L2-politique-espace-client.md, lot 1). Les
+              ancres #espace-client et #demandes sont visées par l'espace client : ne pas les renommer. */}
+          <h2 id="espace-client" className="mt-8 text-xl font-semibold">5. Espace client (mon-espace.norvika.ca)</h2>
+          <p className="mt-3 text-[var(--muted-foreground)]">
+            L’espace client est réservé aux clients de Norvika et aux personnes qu’ils désignent. Il vous donne
+            accès à votre projet, aux outils et aux guides de votre site, et vous permet de nous faire vos
+            demandes de changement. Norvika y est responsable des renseignements recueillis : elle les recueille
+            pour ses propres services.
+          </p>
+
+          <h3 className="mt-6 text-lg font-semibold">Votre compte</h3>
+          <p className="mt-3 text-[var(--muted-foreground)]">
+            Pour vous donner accès, nous conservons votre courriel de connexion, l’entreprise à laquelle votre
+            accès est rattaché, la façon dont vous vous connectez (code reçu par courriel, ou compte Google,
+            Microsoft ou GitHub), la date de votre invitation, celle de votre dernière connexion et le fait que
+            vous avez terminé la visite guidée. Si vous vous connectez avec Google, Microsoft ou GitHub, ce
+            fournisseur nous confirme votre courriel ; il peut aussi nous transmettre votre nom et votre photo de
+            profil, dont nous ne nous servons pas. Pour bloquer les abus, chaque demande de code de connexion est
+            notée avec le courriel saisi et l’adresse IP, puis effacée après 7 jours.
+          </p>
+          <p className="mt-3 text-[var(--muted-foreground)]">
+            Votre compte est conservé tant que votre accès est actif. Quand votre accès est retiré, votre compte
+            est effacé ; les demandes que vous avez écrites restent à votre entreprise, sans lien avec vous.
+          </p>
+
+          <h3 id="demandes" className="mt-6 text-lg font-semibold">Demandes de changement</h3>
+          <p className="mt-3 text-[var(--muted-foreground)]">Ce que nous recueillons :</p>
+          <ul className="mt-3 list-disc pl-5 text-[var(--muted-foreground)]">
+            <li>le texte de chaque changement demandé et, si vous l’indiquez, la page concernée ;</li>
+            <li>
+              les captures que vous joignez (images PNG, JPEG ou WEBP, ou PDF, 5 par demande au plus). Les
+              renseignements cachés dans une photo, comme la position GPS de la prise, sont retirés à l’envoi ;
+              ceux d’un PDF, comme le nom de son auteur, ne le sont pas ;
+            </li>
+            <li>l’urgence choisie, la date d’envoi et la personne qui a envoyé la demande ;</li>
+            <li>
+              ce que nous y ajoutons : l’état de chaque changement, nos réponses et nos notes de traitement
+              (classement du changement, réponse en préparation, indication qu’il sera facturé) ;
+            </li>
+            <li>
+              un journal des gestes faits sur la demande (qui a fait quoi, et quand). Il ne contient jamais le
+              texte de votre demande.
+            </li>
+          </ul>
+          <p className="mt-3 text-[var(--muted-foreground)]">
+            Quand vous nous faites une demande par texto, par courriel ou au téléphone, nous pouvons l’inscrire
+            dans votre espace à votre place. Elle y paraît avec la mention qu’elle a été saisie par Norvika, et
+            les mêmes règles s’appliquent.
+          </p>
+          <p className="mt-3 text-[var(--muted-foreground)]">
+            Tant que vous n’avez pas envoyé votre demande, son brouillon reste seulement dans votre navigateur.
+            Il s’efface à l’envoi et quand vous vous déconnectez.
+          </p>
+          <p className="mt-3 text-[var(--muted-foreground)]">
+            <strong className="text-[var(--foreground)]">Pourquoi.</strong> Pour faire les changements demandés
+            à votre site, vous répondre, et savoir ce qui a été fait, par qui et quand. Nous ne nous en servons à
+            aucune autre fin.
+          </p>
+          <p className="mt-3 text-[var(--muted-foreground)]">
+            <strong className="text-[var(--foreground)]">Qui y a accès.</strong> Chez Norvika, seuls les deux
+            associés, qui administrent notre outil de gestion de la clientèle, lisent vos demandes et vos
+            captures. Dans votre entreprise, toutes les personnes qui ont accès à l’espace voient les demandes de
+            l’entreprise, leurs captures et nos réponses, sans le nom de la personne qui les a écrites.
+          </p>
+          <p className="mt-3 text-[var(--muted-foreground)]">
+            <strong className="text-[var(--foreground)]">Ce que nous vous demandons.</strong> N’écrivez jamais un
+            mot de passe ni un code d’accès dans une demande. Sur vos captures, cachez ce qui concerne vos clients
+            ou vos employés, sauf si c’est le sujet de la demande. Si un tel renseignement nous parvient quand
+            même, nous retirons la capture ou nous effaçons le passage ; s’il s’agit d’un mot de passe, nous vous
+            demandons aussi de le changer.
+          </p>
+          <p className="mt-3 text-[var(--muted-foreground)]">
+            <strong className="text-[var(--foreground)]">Les avis.</strong> Quand une demande est envoyée, notre
+            équipe reçoit un avis dans sa messagerie interne (Slack). Cet avis contient le nom de votre
+            entreprise, le nombre de changements demandés, l’urgence et un lien vers notre outil ; jamais le texte
+            de la demande ni le nom de la personne qui l’a écrite. Quand nous vous répondons ou qu’un changement
+            est fait, la personne qui a envoyé la demande reçoit un courriel qui l’invite à consulter l’espace
+            (pour une demande saisie par Norvika, les personnes qui ont accès à l’espace de l’entreprise). Ce
+            courriel ne contient ni la demande ni notre réponse.
+          </p>
+          <p className="mt-3 text-[var(--muted-foreground)]">
+            <strong className="text-[var(--foreground)]">Où.</strong> Les demandes et les captures sont hébergées
+            aux États-Unis, chez Supabase (base de données et fichiers) et chez Cloudflare (hébergement de
+            l’espace). Les avis passent par Slack et par Resend, aux États-Unis. Voir la section 10.
+          </p>
+          <p className="mt-3 text-[var(--muted-foreground)]">
+            <strong className="text-[var(--foreground)]">Combien de temps.</strong>
+          </p>
+          <ul className="mt-3 list-disc pl-5 text-[var(--muted-foreground)]">
+            <li>
+              Le texte des demandes, nos réponses, nos notes et le journal : 24 mois après la fermeture de la
+              demande. Une demande restée ouverte : 24 mois après le dernier geste fait sur elle.
+            </li>
+            <li>
+              Les captures : 12 mois après la fermeture de la demande (une demande restée ouverte : 12 mois après
+              le dernier geste fait sur elle).
+            </li>
+            <li>
+              Un changement que vous retirez avant que nous l’ayons commencé : son texte et ses captures sont
+              effacés tout de suite ; le journal garde seulement le fait qu’il a été retiré.
+            </li>
+            <li>Le courriel d’avis : une copie reste 30 jours chez Resend.</li>
+            <li>L’avis interne dans Slack : effacé après un an.</li>
+          </ul>
+          <p className="mt-3 text-[var(--muted-foreground)]">
+            L’effacement se fait automatiquement chaque nuit. Les captures sont effacées de l’espace de stockage
+            lui-même, pas seulement de notre base de données. Si votre entreprise cesse de faire affaire avec
+            Norvika, ses demandes suivent les mêmes délais ; vous pouvez en demander une copie ou l’effacement
+            avant.
+          </p>
+          <p className="mt-3 text-[var(--muted-foreground)]">
+            <strong className="text-[var(--foreground)]">Vos droits sur vos demandes.</strong> Dans votre espace,
+            vous voyez en tout temps vos demandes, leurs captures et nos réponses, et vous pouvez retirer un
+            changement tant que nous ne l’avons pas commencé. En écrivant à info@norvika.ca, vous pouvez aussi :
+          </p>
+          <ul className="mt-3 list-disc pl-5 text-[var(--muted-foreground)]">
+            <li>
+              obtenir une copie de tout ce que nous détenons sur vos demandes, y compris nos notes de traitement
+              et le journal ;
+            </li>
+            <li>faire corriger ou compléter une demande ;</li>
+            <li>
+              faire effacer une demande avant ces délais : nous effaçons son texte et ses captures ; seul le
+              journal des gestes, qui ne contient pas votre texte, reste jusqu’à la fin des 24 mois ;
+            </li>
+            <li>recevoir vos demandes dans un format structuré et couramment utilisé (JSON ou CSV) ;</li>
+            <li>
+              retirer votre consentement : vous pouvez cesser en tout temps d’utiliser le formulaire, nous joindre
+              autrement, et demander l’effacement de vos demandes.
+            </li>
+          </ul>
+          <p className="mt-3 text-[var(--muted-foreground)]">
+            Nous répondons dans les 30 jours (section 8). Ces demandes s’adressent à William Simard, responsable
+            de la protection des renseignements personnels, info@norvika.ca (section 9).
+          </p>
+
+          <h2 className="mt-8 text-xl font-semibold">6. Témoins (cookies) et mesure d’audience</h2>
           <p className="mt-3 text-[var(--muted-foreground)]">
             Ce site utilise deux catégories de témoins. Les témoins <strong>nécessaires</strong> font
             fonctionner le site et mémorisent votre choix de consentement : ils sont déposés sans votre
@@ -186,10 +331,12 @@ export default async function PolitiquePage() {
             fournie par Google Analytics 4, avec l’anonymisation des adresses IP activée.
           </p>
 
-          <h2 className="mt-8 text-xl font-semibold">6. Conservation des données</h2>
+          <h2 className="mt-8 text-xl font-semibold">7. Conservation des données</h2>
           <p className="mt-3 text-[var(--muted-foreground)]">
-            Vos données sont conservées aussi longtemps que nécessaire pour la gestion de votre projet,
-            puis supprimées dans un délai raisonnable.
+            Messages et demandes de rappel envoyés par les formulaires du site : 24 mois après leur envoi, puis
+            effacés automatiquement. Adresse IP brouillée : 24 heures au plus. Renseignements de l’espace client :
+            selon la section 5. Renseignements liés à un projet (soumissions, contrats, factures) : 6 ans après la
+            fin de l’année d’imposition visée, comme l’exigent les lois fiscales.
           </p>
           {courriel ? (
             <p className="mt-3 text-[var(--muted-foreground)]">
@@ -201,7 +348,7 @@ export default async function PolitiquePage() {
             </p>
           ) : null}
 
-          <h2 className="mt-8 text-xl font-semibold">7. Vos droits (Loi 25 Québec)</h2>
+          <h2 className="mt-8 text-xl font-semibold">8. Vos droits (Loi 25 Québec)</h2>
           <p className="mt-3 text-[var(--muted-foreground)]">
             Conformément à la Loi modernisant des dispositions législatives en matière de protection des
             renseignements personnels (Loi 25), vous avez le droit de :
@@ -230,7 +377,7 @@ export default async function PolitiquePage() {
           </p>
 
           <h2 className="mt-8 text-xl font-semibold">
-            8. Responsable de la protection des renseignements personnels
+            9. Responsable de la protection des renseignements personnels
           </h2>
           <p className="mt-3 text-[var(--muted-foreground)]">
             Conformément à l’article 3.1 de la Loi 25, la personne responsable de la protection
@@ -253,7 +400,7 @@ export default async function PolitiquePage() {
           </p>
 
           <h2 className="mt-8 text-xl font-semibold">
-            9. Hébergement et communication hors du Québec
+            10. Hébergement et communication hors du Québec
           </h2>
           <p className="mt-3 text-[var(--muted-foreground)]">
             Conformément à l’article 17 de la Loi 25, nous vous informons que vos renseignements
@@ -263,19 +410,22 @@ export default async function PolitiquePage() {
           <ul className="mt-3 list-disc pl-5 text-[var(--muted-foreground)]">
             <li>
               <strong className="text-[var(--foreground)]">Supabase</strong> : conservation des
-              messages envoyés par les formulaires du site, et de l’adresse IP brouillée qui sert à limiter
-              le nombre d’envois et d’analyses (24 heures au plus)
+              messages envoyés par les formulaires du site, de l’adresse IP brouillée qui sert à limiter le
+              nombre d’envois et d’analyses (24 heures au plus), et des renseignements de l’espace client :
+              comptes, demandes de changement et leurs captures (section 5)
             </li>
             <li>
               <strong className="text-[var(--foreground)]">Resend</strong> : acheminement des
               courriels de notification qui nous préviennent de votre message
               {courriel
                 ? ", et des rapports du vérificateur Loi 25 demandés par courriel. Resend garde une copie de chaque courriel envoyé (destinataire et contenu) pendant 30 jours."
-                : null}
+                : "."}{" "}
+              Resend envoie aussi les avis de l’espace client, qui ne contiennent ni vos demandes ni nos réponses.
             </li>
             <li>
               <strong className="text-[var(--foreground)]">Cloudflare</strong> : hébergement et
-              diffusion du site. Ses journaux techniques gardent l’adresse IP des visiteurs jusqu’à 7 jours.
+              diffusion du site et de l’espace client. Ses journaux techniques gardent l’adresse IP des
+              visiteurs jusqu’à 7 jours.
             </li>
             <li>
               <strong className="text-[var(--foreground)]">Cloudflare Browser Run</strong> : visite
@@ -298,6 +448,11 @@ export default async function PolitiquePage() {
               {avecCase ? " et, quand vous acceptez que nous vous écrivions, la copie de votre demande de rapport." : "."}
             </li>
             <li>
+              <strong className="text-[var(--foreground)]">Slack</strong> : notre messagerie interne, qui reçoit
+              un avis à chaque nouvelle demande de l’espace client (nom de l’entreprise, nombre de changements,
+              urgence), jamais le texte de la demande
+            </li>
+            <li>
               <strong className="text-[var(--foreground)]">Cloudflare Turnstile</strong> : vérification
               anti-robot des formulaires. Pendant que vous remplissez un formulaire, votre navigateur
               transmet à Cloudflare des signaux techniques (adresse IP, type de navigateur et
@@ -315,20 +470,21 @@ export default async function PolitiquePage() {
           </ul>
           <p className="mt-3 text-[var(--muted-foreground)]">
             Avant de recourir à ces fournisseurs, nous avons évalué que les renseignements en cause
-            bénéficient d’une protection adéquate, compte tenu de leur nature (coordonnées
-            d’affaires), de la finalité limitée de leur utilisation et des mesures de sécurité
-            contractuelles et techniques mises en place. Nous ne transmettons aucun renseignement
-            sensible à ces fournisseurs.
+            bénéficient d’une protection adéquate, compte tenu de leur nature (surtout des coordonnées
+            d’affaires et le contenu des demandes que vous nous faites), de la finalité limitée de leur
+            utilisation et des mesures de sécurité contractuelles et techniques mises en place. Nous ne vous
+            demandons aucun renseignement sensible, et nous vous demandons de ne pas en inclure dans vos
+            demandes.
           </p>
 
-          <h2 className="mt-8 text-xl font-semibold">10. Sécurité</h2>
+          <h2 className="mt-8 text-xl font-semibold">11. Sécurité</h2>
           <p className="mt-3 text-[var(--muted-foreground)]">
             Vos données sont stockées de manière sécurisée via Supabase et protégées par des mesures
             de sécurité reconnues dans l’industrie (chiffrement, authentification, contrôle
             d’accès).
           </p>
 
-          <h2 className="mt-8 text-xl font-semibold">11. Contact</h2>
+          <h2 className="mt-8 text-xl font-semibold">12. Contact</h2>
           <p className="mt-3 text-[var(--muted-foreground)]">
             Pour toute question relative à cette politique :{" "}
             <a href="mailto:info@norvika.ca" className="underline">
