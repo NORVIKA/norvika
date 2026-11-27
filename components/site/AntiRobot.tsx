@@ -45,38 +45,6 @@ export function lireJetonAntiRobot(formulaire: HTMLFormElement): string {
   return champ?.value ?? "";
 }
 
-/** Combien de temps on attend le jeton, et à quel rythme on regarde s'il est arrivé. */
-const DELAI_JETON_MS = 15000;
-const PAS_JETON_MS = 120;
-
-/**
- * Le jeton du formulaire, en l'ATTENDANT s'il n'est pas encore là (2026-11-26).
- *
- * Pourquoi : Turnstile met une dizaine de secondes à émettre son jeton (le script se charge, puis
- * le widget résout son épreuve). Mesuré sur norvika.ca : champ vide à 5 s, jeton de 794 caractères
- * à 10 s. Qui cliquait avant recevait « La vérification anti-robot n'a pas abouti. Rechargez la
- * page et réessayez. » et devait tout recommencer, alors que rien n'avait échoué : le jeton
- * n'était pas encore né.
- *
- * Rend le jeton dès qu'il paraît, ou une chaîne vide au bout de `delaiMs` (ou tout de suite si le
- * script de Cloudflare n'a pas pu être chargé : inutile d'attendre un jeton qui ne viendra pas).
- * Le widget, lui, est déjà parti quand on arrive ici : le composant le lance au premier
- * `pointerdown` ou `focusin` sur le formulaire, donc au plus tard au clic qui envoie.
- *
- * ⛔ Ne remplace RIEN côté serveur : le jeton reste vérifié par lib/anti-robot.ts avant toute
- *    écriture et tout courriel. On attend un jeton, on n'en invente pas.
- */
-export async function attendreJetonAntiRobot(formulaire: HTMLFormElement, delaiMs = DELAI_JETON_MS): Promise<string> {
-  const zone = () => formulaire.querySelector<HTMLElement>(".zone-turnstile");
-  const fin = Date.now() + delaiMs;
-  let jeton = lireJetonAntiRobot(formulaire);
-  while (!jeton && !zone()?.dataset.echec && Date.now() < fin) {
-    await new Promise((suite) => setTimeout(suite, PAS_JETON_MS));
-    jeton = lireJetonAntiRobot(formulaire);
-  }
-  return jeton;
-}
-
 /** Un jeton ne sert qu'une fois : à appeler après chaque envoi au serveur, réussi ou non. */
 export function reinitialiserAntiRobot(formulaire: HTMLFormElement): void {
   const id = formulaire.querySelector<HTMLElement>(".zone-turnstile")?.dataset.widget;
@@ -132,9 +100,7 @@ export function AntiRobot({ theme = "light", action = "formulaire" }: { theme?: 
           conteneur.dataset.widget = idWidget;
         })
         .catch(() => {
-          // Script bloqué : le formulaire affiche un message qui donne le courriel. Le repère dit
-          // à attendreJetonAntiRobot de ne pas attendre un jeton qui ne viendra jamais.
-          conteneur.dataset.echec = "1";
+          // Script bloqué : le formulaire affiche un message qui donne le courriel.
         });
     };
 
