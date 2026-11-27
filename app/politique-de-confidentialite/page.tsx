@@ -399,9 +399,10 @@ export default async function PolitiquePage() {
 
           <h2 className="mt-8 text-xl font-semibold">7. Conservation des données</h2>
           <p className="mt-3 text-[var(--muted-foreground)]">
-            Messages et demandes de rappel envoyés par les formulaires du site : 24 mois après leur envoi, puis
-            effacés automatiquement. Adresse IP brouillée : 24 heures au plus. Renseignements de l’espace client :
-            selon la section 5. Renseignements liés à un projet (soumissions, contrats, factures) : 6 ans après la
+            Messages et demandes de rappel envoyés par les formulaires du site : 24 mois après leur envoi dans
+            notre base de données, puis effacés automatiquement ; la copie que nous recevons dans notre
+            messagerie (Google Workspace) est effacée au plus tard 24 mois après l’envoi. Adresse IP brouillée :
+            24 heures au plus. Renseignements de l’espace client : selon la section 5. Renseignements liés à un projet (soumissions, contrats, factures) : 6 ans après la
             fin de l’année d’imposition visée, comme l’exigent les lois fiscales.
           </p>
           {courriel ? (
