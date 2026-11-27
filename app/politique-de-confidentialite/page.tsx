@@ -59,7 +59,8 @@ export default async function PolitiquePage() {
         {/* Avis de modification (art. 8.2 de la loi sur le secteur privé), texte de Martin du
             2026-11-26. Jamais soumis à un réglage du Studio. Recommandation : en haut 90 jours
             (jusqu'au 25 février 2027), puis dans un historique au bas de la page. La ligne du
-            23 novembre (courriel) et la partie « case » de celle du 25 suivent les interrupteurs, parce
+            23 novembre (courriel), la partie « case » de celle du 25 et la copie de consentement de celle
+            du 27 (Martin, 2026-11-27, après la relecture en ligne) suivent les interrupteurs, parce
             que ces passages n'existent qu'avec eux. La ligne du 25 s'affiche toujours : elle porte aussi
             la correction de Lau sur Browser Run (c7ec161, 25 nov. 22 h 40 ; Martin, 2026-11-27). Dates
             tirées de l'historique des transactions Sanity : case en ligne le 23 de 11 h 19 à 13 h 10
@@ -94,7 +95,11 @@ export default async function PolitiquePage() {
               ajout de Slack parmi nos fournisseurs (section 10){courriel ? ", " : " et "}liste complète des
               données recueillies par nos formulaires (section 2)
               {courriel
-                ? " et précision sur l’adresse du site analysé, qui figure aussi dans le rapport envoyé par courriel (section 4)"
+                ? (avecCase ? ", " : " et ") +
+                  "précision sur l’adresse du site analysé, qui figure aussi dans le rapport envoyé par courriel (section 4)"
+                : ""}
+              {avecCase
+                ? " et copie de consentement gardée comme preuve après un retrait, toujours au plus 24 mois (sections 4 et 7)"
                 : ""}
               .
             </li>
@@ -210,8 +215,9 @@ export default async function PolitiquePage() {
                 courriel au sujet de ce rapport et de ses services. Si vous la cochez, une copie de votre demande
                 (votre courriel, le site analysé, le résultat, la date et le texte de la case) arrive dans notre
                 messagerie. Elle sert seulement à vous écrire personnellement et à garder la preuve de votre
-                consentement. Nous la gardons jusqu’à ce que vous retiriez votre consentement, et au plus 24 mois
-                après la date de votre demande. Vous pouvez le retirer en tout temps en répondant « désabonnement »
+                consentement. Nous la gardons au plus 24 mois après la date de votre demande ; si vous retirez
+                votre consentement, nous cessons de vous écrire et elle sert seulement de preuve jusqu’à cette
+                date. Vous pouvez le retirer en tout temps en répondant « désabonnement »
                 à l’un de nos courriels ou en écrivant à info@norvika.ca ; nous y donnons suite au plus tard dans
                 les 10 jours ouvrables. Votre courriel n’est ajouté à aucune liste d’envoi et n’est communiqué à
                 aucune autre entreprise que celles nommées dans cette politique.
@@ -410,7 +416,7 @@ export default async function PolitiquePage() {
               Courriels envoyés par notre site (avis de vos messages, rapports du vérificateur Loi 25) : une copie
               reste 30 jours chez Resend, notre fournisseur d’envoi.
               {avecCase
-                ? " Copie d’une demande de rapport quand vous acceptez que nous vous écrivions : jusqu’au retrait de votre consentement, et au plus 24 mois."
+                ? " Copie d’une demande de rapport quand vous acceptez que nous vous écrivions : au plus 24 mois, même après le retrait de votre consentement (elle sert alors seulement de preuve)."
                 : null}
             </p>
           ) : null}
