@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState, type CSSProperties, type FormEvent } from "react";
 
-import { AntiRobot, lireJetonAntiRobot, reinitialiserAntiRobot } from "@/components/site/AntiRobot";
+import { AntiRobot, attendreJetonAntiRobot, reinitialiserAntiRobot } from "@/components/site/AntiRobot";
 import { MentionVerificateur } from "@/components/verificateur/MentionVerificateur";
 import { CHAMP_JETON } from "@/lib/anti-robot-commun";
 import { formeCourrielValide, ligneSimpleValide } from "@/lib/garde-formulaire";
@@ -181,12 +181,19 @@ export function Verificateur({ t, lienRendezVous, adressePostale }: { t: PageVer
     if (adresseCourriel && (adresseCourriel.length > LONGUEUR_MAX_COURRIEL || !ligneSimpleValide(adresseCourriel) || !formeCourrielValide(adresseCourriel))) {
       return montrerErreur(rc!.erreurCourriel, "courriel");
     }
-    const jeton = lireJetonAntiRobot(formulaire);
-    if (!jeton) return montrerErreur(t.erreurAntiRobot);
-
     setErreur(null);
     setPhase({ nom: "analyse" });
     setAnnonce(t.analyseAnnonce);
+
+    // Le jeton anti-robot met quelques secondes à naître (voir attendreJetonAntiRobot) : on
+    // l'ATTEND, l'écran montrant déjà l'analyse en cours, au lieu de renvoyer une erreur au
+    // visiteur trop rapide. L'analyse ne part qu'une fois le jeton en main.
+    const jeton = await attendreJetonAntiRobot(formulaire);
+    if (!jeton) {
+      setPhase({ nom: "repos" });
+      setAnnonce("");
+      return montrerErreur(t.erreurAntiRobot);
+    }
 
     const controle = new AbortController();
     const minuterie = setTimeout(() => controle.abort(), DELAI_NAVIGATEUR_MS);
@@ -248,11 +255,16 @@ export function Verificateur({ t, lienRendezVous, adressePostale }: { t: PageVer
     if (!adresseCourriel || adresseCourriel.length > LONGUEUR_MAX_COURRIEL || !ligneSimpleValide(adresseCourriel) || !formeCourrielValide(adresseCourriel)) {
       return montrerErreur(rc.erreurCourriel, "courriel");
     }
-    const jetonRobot = lireJetonAntiRobot(formulaire);
-    if (!jetonRobot) return montrerErreur(t.erreurAntiRobot, "courriel");
-
     setErreur(null);
     setEnvoiEnCours(true);
+    // Même attente que pour l'analyse : ce bloc paraît avec le résultat, donc son widget vient
+    // tout juste de se lancer, et son jeton arrive après le premier clic.
+    const jetonRobot = await attendreJetonAntiRobot(formulaire);
+    if (!jetonRobot) {
+      setEnvoiEnCours(false);
+      return montrerErreur(t.erreurAntiRobot, "courriel");
+    }
+
     let donnees: ReponseRapport | null = null;
     try {
       const reponse = await fetch("/api/verificateur-loi-25/rapport", {
