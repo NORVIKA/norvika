@@ -227,7 +227,12 @@ export const pageVerificateurLoi25 = defineType({
         ['erreurRefusee', 'Visite refusée par le site', 'Le site a bloqué la visite automatique (protection contre les robots).'],
         ['erreurDelai', 'Analyse expirée', 'L’analyse a dépassé 30 secondes.'],
         ['erreurLimite', 'Limite atteinte', 'Trois analyses dans la dernière heure depuis le même appareil.'],
-        ['erreurAntiRobot', 'Vérification anti-robot échouée', 'La vérification anti-robot n’a pas abouti.'],
+        ['erreurAntiRobot', 'Vérification anti-robot refusée', 'Notre serveur a refusé la vérification anti-robot (jeton expiré, déjà utilisé ou rejeté par Cloudflare).'],
+        [
+          'erreurAntiRobotAbsent',
+          'Vérification anti-robot pas prête',
+          'Le navigateur n’a pas reçu son jeton anti-robot après 15 secondes d’attente, ou le script de Cloudflare a été bloqué (bloqueur de publicité, réseau d’entreprise). Rien n’a été envoyé au serveur. Un message distinct de « refusée » : c’est ce qui permet de savoir lequel des deux arrive.',
+        ],
         ['erreurIndisponible', 'Vérificateur indisponible', 'Panne, quota de Cloudflare atteint, trop d’analyses en même temps.'],
         [
           'erreurIncompatible',
@@ -497,8 +502,8 @@ export const pageVerificateurLoi25 = defineType({
           'La ligne grise que la boîte de réception montre après l’objet. {corriger}, {verifier} et {enPlace} : les comptes de la phrase de synthèse, déjà accordés.',
           { rows: 2 },
         ),
-        texteCourriel('salutation', 'Salutation', 'La première ligne du courriel (ex. : « Bonjour, »).'),
-        texteCourriel('intro', 'Première phrase du courriel', '{date}, {heure} et {domaine} sont remplacés.', { rows: 2 }),
+        texteCourriel('signatureNom', 'Signature : nom', 'En bas du courriel, à côté de la photo (ex. : « Will et Lau, Norvika »). Sert aussi de texte de remplacement de la photo.'),
+        texteCourriel('signatureLigne', 'Signature : ligne sous le nom', 'Ex. : « Une question? Répondez à ce courriel, on le lit. »'),
         texteCourriel(
           'invisibleCourriel',
           'Ce que le test ne voit pas (courriel)',

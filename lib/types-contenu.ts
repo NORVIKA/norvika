@@ -418,9 +418,9 @@ export type RapportCourriel = {
   schemaLibelle?: string | null;
   schemaBanniere?: string | null;
   schemaBanniereBouton?: string | null;
-  salutation: string;
-  /** {date}, {heure} et {domaine} sont remplacés. */
-  intro: string;
+  /** Signature du courriel (2026-11-27, sortie du code) : le nom, puis la ligne en dessous. Vide : celle d'avant. */
+  signatureNom?: string;
+  signatureLigne?: string;
   invisibleCourriel: string;
   paragrapheSansCase: string;
   paragrapheAvecCase: string;
@@ -487,7 +487,10 @@ export type PageVerificateur = DocumentPage & {
   erreurRefusee: string;
   erreurDelai: string;
   erreurLimite: string;
+  /** Le SERVEUR a refusé le jeton anti-robot (codes anti-robot-400 et anti-robot-403). */
   erreurAntiRobot: string;
+  /** Le NAVIGATEUR n'a pas eu de jeton (15 s d'attente, ou script de Cloudflare bloqué). Vide : erreurAntiRobot. */
+  erreurAntiRobotAbsent?: string;
   erreurIndisponible: string;
   erreurIncompatible: string;
   erreurSansHttps: string;

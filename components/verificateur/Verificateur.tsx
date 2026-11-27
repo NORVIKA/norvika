@@ -192,7 +192,7 @@ export function Verificateur({ t, lienRendezVous, adressePostale }: { t: PageVer
     if (!jeton) {
       setPhase({ nom: "repos" });
       setAnnonce("");
-      return montrerErreur(t.erreurAntiRobot);
+      return montrerErreur(t.erreurAntiRobotAbsent?.trim() || t.erreurAntiRobot);
     }
 
     const controle = new AbortController();
@@ -262,7 +262,7 @@ export function Verificateur({ t, lienRendezVous, adressePostale }: { t: PageVer
     const jetonRobot = await attendreJetonAntiRobot(formulaire);
     if (!jetonRobot) {
       setEnvoiEnCours(false);
-      return montrerErreur(t.erreurAntiRobot, "courriel");
+      return montrerErreur(t.erreurAntiRobotAbsent?.trim() || t.erreurAntiRobot, "courriel");
     }
 
     let donnees: ReponseRapport | null = null;

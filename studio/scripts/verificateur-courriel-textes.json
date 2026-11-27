@@ -15,8 +15,6 @@
   "sansResultat": "Aucun courriel n'a été envoyé, puisqu'il n'y a pas de résultat.",
   "objet": "Votre rapport Loi 25 pour {domaine}",
   "preEntete": "{corriger}, {verifier}, {enPlace}. Test automatique, pas un avis juridique.",
-  "salutation": "Bonjour,",
-  "intro": "Voici le rapport demandé sur norvika.ca le {date} à {heure}, pour {domaine}.",
   "invisibleCourriel": "Ce test ne voit pas vos documents et pratiques internes (évaluation des facteurs relatifs à la vie privée, registre des incidents, gouvernance), ni ce qui se passe après un clic dans votre bannière, ni vos autres pages et formulaires. La liste complète est sur la page du vérificateur : norvika.ca/verificateur-loi-25",
   "paragrapheSansCase": "Vous recevez ce courriel parce que ce rapport a été demandé sur norvika.ca avec votre adresse. Norvika ne la garde pas (seul Resend, qui fait l'envoi, garde une copie de ce courriel 30 jours) et ne vous écrira pas d'autre courriel à la suite de cette demande. Si vous n'avez rien demandé, vous pouvez simplement ignorer ce message.",
   "paragrapheAvecCase": "Vous avez aussi accepté que Norvika inc. vous écrive par courriel au sujet de ce rapport et de ses services. Nous gardons une copie de votre demande, comme preuve de cet accord, jusqu'à ce que vous le retiriez, et au plus 24 mois. Si ce n'est pas vous qui avez fait cette demande, ou si vous changez d'idée, répondez « désabonnement » à ce courriel ou écrivez à info@norvika.ca : nous effaçons la copie et personne ne vous écrira.",

@@ -65,12 +65,11 @@ const A = {
 // requête partante à l'ouverture (même règle que C4). Pile système : SF Pro, Segoe UI, Roboto.
 const POLICE = "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif";
 /**
- * La signature, en dur comme le préfixe d'objet : deux phrases de marque, pas du contenu qui change
- * avec un résultat. ⚠️ À remonter au Studio au prochain déploiement du Studio (même lot que la ligne
- * du haut de la page), pour que William puisse les changer sans toucher au code.
+ * La signature vient du Studio depuis le 2026-11-27 (rapportCourriel.signatureNom et signatureLigne).
+ * Ces deux valeurs ne servent que si le champ est vide : un courriel ne part jamais sans signature.
  */
-const SIGNATURE_NOM = "Will et Lau, Norvika";
-const SIGNATURE_LIGNE = "Une question? Répondez à ce courriel, on le lit.";
+const SIGNATURE_NOM_DEFAUT = "Will et Lau, Norvika";
+const SIGNATURE_LIGNE_DEFAUT = "Une question? Répondez à ce courriel, on le lit.";
 
 /** Les deux images, servies par notre propre domaine : aucun tiers, aucun paramètre de suivi. */
 const LOGO = "https://norvika.ca/images/courriel-logo.png";
@@ -91,6 +90,8 @@ export function texteIdentification(textes: TextesCourriel): string {
 export function courrielVisiteur(rapport: Rapport, textes: TextesCourriel, consentement: boolean): Message {
   const { t } = textes;
   const rc = t.rapportCourriel!;
+  const signatureNom = rc.signatureNom?.trim() || SIGNATURE_NOM_DEFAUT;
+  const signatureLigne = rc.signatureLigne?.trim() || SIGNATURE_LIGNE_DEFAUT;
   const etats = libellesEtats(t);
   const domaine = hote(rapport.adresseFinale);
   const n = rapport.synthese;
@@ -102,10 +103,6 @@ export function courrielVisiteur(rapport: Rapport, textes: TextesCourriel, conse
     enPlace: compte(n["en-place"], t.enPlaceAucun, t.enPlacePlusieurs),
   });
   const preEntete = apercu.charAt(0).toUpperCase() + apercu.slice(1);
-  // ⚠️ `rc.salutation` (« Bonjour, ») et `rc.intro` (« Voici le rapport demandé... ») ne paraissent
-  //    plus depuis la refonte du 2026-11-26 : la maquette entre dans le résultat dès le titre, et la
-  //    date de l'analyse est au pied (pied()). Les deux champs restent au Studio, inutilisés, le
-  //    temps de confirmer la nouvelle allure ; à retirer du schéma ensuite.
   const phraseSynthese = synthese(rapport, t);
   const accompagnement = remplir(phraseAccompagnement(rapport, t), {});
   const appelTexte = n["a-corriger"] > 0 ? t.appelTexte : t.appelTexteSansCorrection;
@@ -319,8 +316,8 @@ export function courrielVisiteur(rapport: Rapport, textes: TextesCourriel, conse
                 <a href="${esc(textes.lienRendezVous)}" style="display: block; margin-top: 20px; padding: 17px; border-radius: 14px; background: ${A.bleu}; color: #ffffff; font-size: 16px; font-weight: bold; text-align: center; text-decoration: none;">${esc(t.appelBouton)}</a>
                 <table role="presentation" cellpadding="0" cellspacing="0" border="0" style="margin-top: 22px;">
                   <tr>
-                    <td width="64" style="width: 64px;"><img src="${SIGNATURE}" width="64" height="64" alt="${esc(SIGNATURE_NOM)}" style="display: block; width: 64px; height: 64px; border: 0; border-radius: 50%; background: ${A.bleu};"></td>
-                    <td style="padding-left: 12px; font-size: 14px; line-height: 1.4; color: ${A.texte};"><strong style="color: ${A.encre};">${esc(SIGNATURE_NOM)}</strong><br>${esc(SIGNATURE_LIGNE)}</td>
+                    <td width="64" style="width: 64px;"><img src="${SIGNATURE}" width="64" height="64" alt="${esc(signatureNom)}" style="display: block; width: 64px; height: 64px; border: 0; border-radius: 50%; background: ${A.bleu};"></td>
+                    <td style="padding-left: 12px; font-size: 14px; line-height: 1.4; color: ${A.texte};"><strong style="color: ${A.encre};">${esc(signatureNom)}</strong><br>${esc(signatureLigne)}</td>
                   </tr>
                 </table>
               </td>
@@ -353,8 +350,8 @@ export function courrielVisiteur(rapport: Rapport, textes: TextesCourriel, conse
     appelTexte,
     `${t.appelBouton} : ${textes.lienRendezVous}`,
     "",
-    SIGNATURE_NOM,
-    SIGNATURE_LIGNE,
+    signatureNom,
+    signatureLigne,
     "",
     avertissement,
     "",
@@ -402,7 +399,10 @@ export function courrielInterne(rapport: Rapport, textes: TextesCourriel, courri
       note: [
         "Avant d’écrire : signature avec l’adresse postale et la ligne de désabonnement.",
         "Désabonnement reçu : effacer ce courriel dans les 10 jours ouvrables (le jour même, idéalement).",
-        "Sinon : effacé automatiquement après 24 mois.",
+        // Rien n'efface ce courriel tout seul : la date limite est écrite dans chaque copie (2026-11-27).
+        // 670 jours : avec les 30 jours de corbeille et les 25 jours de restauration de Google Workspace,
+        // la copie disparaît vraiment avant 24 mois (EFVP, note 10).
+        `À effacer au plus tard le ${dateEtHeure(new Date(Date.parse(rapport.date) + 670 * 86_400_000).toISOString()).date} (limite de 24 mois, corbeille comprise).`,
       ].join("<br>"),
     }),
   };

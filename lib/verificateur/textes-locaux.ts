@@ -12,14 +12,14 @@ import type { PageVerificateur, RapportCourriel, SanctionsVerificateur } from "@
  * puis verificateur-mention-textes.json pour la mention par couches (plus bas).
  * Lu sur le disque, jamais importé : le site n'embarque rien du dossier studio/.
  */
-export async function avecTextesLocaux<T extends Pick<PageVerificateur, "rapportCourriel" | "mentionResume" | "mentionRepliLibelle" | "sanctions" | "introRisque">>(
+export async function avecTextesLocaux<T extends Pick<PageVerificateur, "rapportCourriel" | "mentionResume" | "mentionRepliLibelle" | "sanctions" | "introRisque" | "erreurAntiRobotAbsent">>(
   page: T,
 ): Promise<T> {
   if (process.env.NODE_ENV !== "development") return page;
   if (process.env.VERIFICATEUR_TEXTES_LOCAUX !== "1") return page;
   const avecCourriel = page.rapportCourriel ? page : { ...page, rapportCourriel: await lireJson<RapportCourriel>("verificateur-courriel-textes.json") };
   const avecApres = await avecDemandeApres(avecCourriel);
-  const avecMention = await avecMentionParCouches(avecApres);
+  const avecMention = await avecLot1127(await avecMentionParCouches(avecApres));
   // « Ce que ça peut coûter » et la phrase sous l'introduction (2026-11-24) : verificateur-sanctions-
   // textes.json, même fichier que le semis verificateur-sanctions-semer.ts, champ par champ, tant que le
   // Studio ne les a pas.
@@ -28,6 +28,30 @@ export async function avecTextesLocaux<T extends Pick<PageVerificateur, "rapport
     ...avecMention,
     introRisque: avecMention.introRisque?.trim() ? avecMention.introRisque : locaux.introRisque,
     sanctions: avecMention.sanctions ?? locaux.sanctions,
+  };
+}
+
+/**
+ * Liste de Lau du 2026-11-27 : message « anti-robot pas prête » et signature du courriel, CHAMP PAR
+ * CHAMP, tant que le Studio ne les a pas (studio/scripts/verificateur-lot-2026-11-27-textes.json, même
+ * fichier que le semis verificateur-lot-2026-11-27-semer.ts).
+ */
+type TextesLot1127 = { erreurAntiRobotAbsent: string; signatureNom: string; signatureLigne: string };
+
+async function avecLot1127<T extends Pick<PageVerificateur, "rapportCourriel" | "erreurAntiRobotAbsent">>(page: T): Promise<T> {
+  const locaux = await lireJson<TextesLot1127>("verificateur-lot-2026-11-27-textes.json");
+  const vide = (texte: string | null | undefined) => !texte?.trim();
+  const rc = page.rapportCourriel;
+  return {
+    ...page,
+    erreurAntiRobotAbsent: vide(page.erreurAntiRobotAbsent) ? locaux.erreurAntiRobotAbsent : page.erreurAntiRobotAbsent,
+    rapportCourriel: rc
+      ? {
+          ...rc,
+          signatureNom: vide(rc.signatureNom) ? locaux.signatureNom : rc.signatureNom,
+          signatureLigne: vide(rc.signatureLigne) ? locaux.signatureLigne : rc.signatureLigne,
+        }
+      : rc,
   };
 }
 

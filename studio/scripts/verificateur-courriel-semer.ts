@@ -68,8 +68,6 @@ const CHAMPS = [
   'sansResultat',
   'objet',
   'preEntete',
-  'salutation',
-  'intro',
   'invisibleCourriel',
   'paragrapheSansCase',
   'paragrapheAvecCase',
