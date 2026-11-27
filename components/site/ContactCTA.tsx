@@ -1,7 +1,7 @@
 "use client";
 
 import { useId, useState, type FormEvent } from "react";
-import { AntiRobot, MESSAGE_JETON_ABSENT, lireJetonAntiRobot, reinitialiserAntiRobot } from "@/components/site/AntiRobot";
+import { AntiRobot, MESSAGE_JETON_ABSENT, attendreJetonAntiRobot, reinitialiserAntiRobot } from "@/components/site/AntiRobot";
 import { MentionCollecte } from "@/components/site/MentionCollecte";
 import { useContenuGlobal } from "@/components/site/ContenuGlobal";
 import { CHAMP_JETON } from "@/lib/anti-robot-commun";
@@ -61,7 +61,6 @@ export function ContactCTA() {
     e.preventDefault();
     setErreur(null);
     const formulaire = e.currentTarget;
-    const jeton = lireJetonAntiRobot(formulaire);
     if (!nom.trim() || !courriel.trim() || !message.trim()) {
       setErreur("Votre nom, votre courriel et un mot suffisent.");
       return;
@@ -70,11 +69,15 @@ export function ContactCTA() {
       setErreur("Ce courriel ne semble pas valide.");
       return;
     }
+    setEnvoi(true);
+    // Le jeton anti-robot naît quelques secondes après l'arrivée sur le formulaire : on l'attend,
+    // le bouton montrant déjà l'envoi, plutôt que de refuser (voir attendreJetonAntiRobot).
+    const jeton = await attendreJetonAntiRobot(formulaire);
     if (!jeton) {
+      setEnvoi(false);
       setErreur(MESSAGE_JETON_ABSENT);
       return;
     }
-    setEnvoi(true);
     try {
       const res = await fetch("/api/contact", {
         method: "POST",

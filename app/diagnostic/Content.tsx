@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useEffect, useRef, useState, type FormEvent } from "react";
 
-import { AntiRobot, MESSAGE_JETON_ABSENT, lireJetonAntiRobot, reinitialiserAntiRobot } from "@/components/site/AntiRobot";
+import { AntiRobot, MESSAGE_JETON_ABSENT, attendreJetonAntiRobot, reinitialiserAntiRobot } from "@/components/site/AntiRobot";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { useContenuGlobal } from "@/components/site/ContenuGlobal";
 import { MentionCollecte } from "@/components/site/MentionCollecte";
@@ -122,7 +122,6 @@ function Page({ page }: { page: PageDiagnostic }) {
     if (envoi) return;
     setErreur(null);
     const formulaire = e.currentTarget;
-    const jeton = lireJetonAntiRobot(formulaire);
     if (!nom.trim() || !courriel.trim()) {
       setErreur("Votre nom et votre courriel suffisent.");
       return;
@@ -131,11 +130,15 @@ function Page({ page }: { page: PageDiagnostic }) {
       setErreur("Ce courriel ne semble pas valide.");
       return;
     }
+    setEnvoi(true);
+    // Le jeton anti-robot naît quelques secondes après l'arrivée sur le formulaire : on l'attend,
+    // le bouton montrant déjà l'envoi, plutôt que de refuser (voir attendreJetonAntiRobot).
+    const jeton = await attendreJetonAntiRobot(formulaire);
     if (!jeton) {
+      setEnvoi(false);
       setErreur(MESSAGE_JETON_ABSENT);
       return;
     }
-    setEnvoi(true);
     let messageErreur: string | null = null;
     try {
       const res = await fetch("/api/contact", {

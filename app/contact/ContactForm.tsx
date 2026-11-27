@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, type FormEvent } from "react";
-import { AntiRobot, MESSAGE_JETON_ABSENT, lireJetonAntiRobot, reinitialiserAntiRobot } from "@/components/site/AntiRobot";
+import { AntiRobot, MESSAGE_JETON_ABSENT, attendreJetonAntiRobot, reinitialiserAntiRobot } from "@/components/site/AntiRobot";
 import { MentionCollecte } from "@/components/site/MentionCollecte";
 import { CHAMP_JETON } from "@/lib/anti-robot-commun";
 import type { PageContact } from "@/lib/types-contenu";
@@ -21,7 +21,6 @@ export function ContactForm({ email, t }: { email: string; t: PageContact }) {
     e.preventDefault();
     setErreur(null);
     const formulaire = e.currentTarget;
-    const jeton = lireJetonAntiRobot(formulaire);
 
     if (!nom.trim() || !courriel.trim() || !message.trim()) {
       setErreur("Le nom, le courriel et le message sont requis.");
@@ -31,12 +30,15 @@ export function ContactForm({ email, t }: { email: string; t: PageContact }) {
       setErreur("Courriel invalide.");
       return;
     }
+    setEnvoi(true);
+    // Le jeton anti-robot naît quelques secondes après l'arrivée sur le formulaire : on l'attend,
+    // le bouton montrant déjà l'envoi, plutôt que de refuser (voir attendreJetonAntiRobot).
+    const jeton = await attendreJetonAntiRobot(formulaire);
     if (!jeton) {
+      setEnvoi(false);
       setErreur(MESSAGE_JETON_ABSENT);
       return;
     }
-
-    setEnvoi(true);
     const res = await fetch("/api/contact", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
