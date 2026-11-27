@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, type FormEvent } from "react";
-import { AntiRobot, MESSAGE_JETON_ABSENT, lireJetonAntiRobot, reinitialiserAntiRobot } from "@/components/site/AntiRobot";
+import { AntiRobot, MESSAGE_JETON_ABSENT, attendreJetonAntiRobot, reinitialiserAntiRobot } from "@/components/site/AntiRobot";
 import { MentionCollecte } from "@/components/site/MentionCollecte";
 import { CHAMP_JETON } from "@/lib/anti-robot-commun";
 import type { PageBienvenue } from "@/lib/types-contenu";
@@ -20,7 +20,6 @@ export function LeadForm({ t }: { t: PageBienvenue }) {
     e.preventDefault();
     setErreur(null);
     const formulaire = e.currentTarget;
-    const jeton = lireJetonAntiRobot(formulaire);
 
     if (!prenom.trim() || !courriel.trim() || !telephone.trim()) {
       setErreur("Tous les champs sont requis.");
@@ -30,12 +29,15 @@ export function LeadForm({ t }: { t: PageBienvenue }) {
       setErreur("Courriel invalide.");
       return;
     }
+    setEnvoi(true);
+    // Le jeton anti-robot naît quelques secondes après l'arrivée sur le formulaire : on l'attend,
+    // le bouton montrant déjà l'envoi, plutôt que de refuser (voir attendreJetonAntiRobot).
+    const jeton = await attendreJetonAntiRobot(formulaire);
     if (!jeton) {
+      setEnvoi(false);
       setErreur(MESSAGE_JETON_ABSENT);
       return;
     }
-
-    setEnvoi(true);
     // Passe par une route serveur (validation + limitation de débit) plutôt
     // que d'insérer directement dans Supabase depuis le navigateur.
     let messageErreur: string | null = null;
