@@ -169,11 +169,6 @@ export function AntiRobot({ theme = "light", action = "formulaire" }: { theme?: 
   return <div ref={zone} className="zone-turnstile" />;
 }
 
-/**
- * Message affiché quand le jeton n'est jamais arrivé : script de Cloudflare bloqué, ou attente
- * épuisée. Il ne dit plus « pas encore prête, réessayez dans quelques secondes » : le formulaire a
- * justement déjà attendu (attendreJetonAntiRobot), et renvoyer la personne à la même attente serait
- * lui faire perdre son temps. Le courriel est le vrai recours.
- */
+/** Message affiché quand le visiteur envoie avant que le jeton soit prêt (ou script bloqué). */
 export const MESSAGE_JETON_ABSENT =
-  "La vérification anti-robot n'a pas pu se faire. Rechargez la page pour réessayer, ou écrivez-nous à info@norvika.ca.";
+  "La vérification anti-robot n'est pas encore prête. Réessayez dans quelques secondes, ou écrivez-nous à info@norvika.ca.";
