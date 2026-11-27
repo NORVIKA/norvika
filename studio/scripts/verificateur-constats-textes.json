@@ -1,0 +1,177 @@
+{
+  "temoins": {
+    "enPlace": {
+      "titre": "Aucun témoin de suivi avant un clic",
+      "texte": "Rien à faire ici. Refaites le test le jour où vous ajoutez un outil de mesure ou un pixel publicitaire.",
+      "avant": "Pendant les 8 secondes de notre visite, sans aucun clic, votre site n'a déposé aucun témoin de suivi que nous reconnaissons et n'a rien envoyé à un outil de mesure ou de publicité connu."
+    },
+    "aCorriger": {
+      "titre": "Du suivi déposé avant tout clic",
+      "texte": "Votre site dépose {temoins} ({services}) dès l'arrivée. Réglez ces outils pour qu'ils se chargent seulement après un clic sur « Accepter », puis relancez le test.",
+      "avant": "Votre site dépose {temoins} ({services}) dès l'arrivée, avant tout clic. Réglez vos outils pour qu'ils se chargent seulement après un clic sur « Accepter » dans votre bannière, puis relancez le test."
+    },
+    "aVerifier": {
+      "titre": "Des données envoyées sans témoin",
+      "texte": "Aucun témoin de suivi connu, mais des envois vers {services} avant tout clic : l'adresse IP et des informations sur l'appareil partent déjà. Vérifiez le réglage : le mode consentement « de base » de Google n'envoie rien avant l'accord, le mode « avancé », oui.",
+      "avant": "Aucun témoin de suivi connu, mais votre site envoie déjà des données à {services} avant tout clic. Même sans témoin, ces envois transmettent l'adresse IP et des informations sur l'appareil. Vérifiez la configuration : par exemple, le mode consentement de Google en version « de base » n'envoie rien avant l'accord, la version « avancée », oui."
+    }
+  },
+  "banniere": {
+    "enPlace": {
+      "titre": "Refuser est offert au même niveau",
+      "texte": "Une bannière {outil} s'affiche dès l'arrivée, avec un bouton « {libelle_refus} » au même niveau que celui pour accepter. Gardez-le aussi visible.",
+      "avant": "Une bannière {outil} s'affiche dès l'arrivée, avec un bouton « {libelle_refus} » au même niveau que le bouton pour accepter."
+    },
+    "ajoutSansBlocage": {
+      "texte": "Elle ne bloque toutefois pas vos outils de mesure, voir le premier point.",
+      "avant": "Attention : elle ne bloque pas vos outils de mesure (voir les témoins de suivi plus haut)."
+    },
+    "enPlaceSansTraceur": {
+      "titre": "Aucune bannière, et rien à faire accepter",
+      "texte": "C'est cohérent : votre site ne dépose aucun témoin de suivi. Une bannière deviendra nécessaire le jour où vous ajouterez Google Analytics ou un pixel publicitaire.",
+      "avant": "Aucune bannière, et c'est cohérent : votre site ne dépose aucun témoin de suivi à faire accepter. Si vous ajoutez un jour Google Analytics ou un pixel publicitaire, une bannière deviendra nécessaire."
+    },
+    "aCorrigerSansRefus": {
+      "titre": "Aucun bouton pour refuser",
+      "texte": "Votre bannière {outil} s'affiche, mais le premier écran n'offre que d'accepter. Ajoutez un bouton « Tout refuser » à côté, de même taille et de même apparence.",
+      "avant": "Votre bannière {outil} s'affiche, mais aucun bouton pour refuser n'apparaît au premier écran. Dans les réglages de votre bannière, ajoutez un bouton « Tout refuser » à côté de « Accepter », de même taille et de même apparence."
+    },
+    "aCorrigerAbsente": {
+      "titre": "Du suivi, et aucune bannière",
+      "texte": "Installez une bannière, CookieYes ou Cookiebot par exemple, qui bloque vos outils de mesure jusqu'au clic sur « Accepter » et offre « Refuser » au même niveau.",
+      "avant": "Votre site dépose des témoins de suivi, mais aucune bannière de consentement n'apparaît. Installez une bannière (CookieYes, Cookiebot ou l'équivalent) qui bloque vos outils de mesure jusqu'au clic sur « Accepter » et offre « Refuser » au même niveau."
+    },
+    "aVerifier": {
+      "titre": "Une bannière, sans refus confirmé",
+      "texte": "Nous n'avons pu confirmer ni l'outil ni le bouton pour refuser. Ouvrez votre site en navigation privée et regardez si « Refuser » est offert dès le premier écran.",
+      "avant": "Nous avons repéré ce qui ressemble à une bannière, sans pouvoir confirmer l'outil ni la présence d'un bouton pour refuser. Ouvrez votre site en navigation privée et regardez si « Refuser » est offert dès le premier écran."
+    }
+  },
+  "politique": {
+    "enPlace": {
+      "titre": "Politique accessible depuis l'accueil",
+      "texte": "Le lien « {libelle_lien} » est sur votre accueil et la page s'ouvre. Gardez-le dans le pied de page, pour qu'il suive toutes vos pages.",
+      "avant": "Votre page d'accueil a un lien vers votre politique (« {libelle_lien} »), et la page s'ouvre."
+    },
+    "aCorrigerAbsente": {
+      "titre": "Aucun lien vers une politique",
+      "texte": "Publiez une page « Politique de confidentialité » et mettez son lien dans le pied de page, pour qu'il apparaisse sur toutes vos pages.",
+      "avant": "Nous n'avons trouvé aucun lien vers une politique de confidentialité sur votre page d'accueil. Publiez une page « Politique de confidentialité » et mettez son lien dans le pied de page, pour qu'il apparaisse sur toutes les pages."
+    },
+    "aCorrigerLienBrise": {
+      "titre": "Le lien vers la politique est brisé",
+      "texte": "Le lien « {libelle_lien} » mène à une page qui répond par une erreur {code}. Corrigez son adresse ou republiez la page.",
+      "avant": "Le lien « {libelle_lien} » mène à une page qui ne s'ouvre pas (erreur {code}). Corrigez l'adresse du lien ou republiez la page."
+    },
+    "aVerifier": {
+      "titre": "Politique trouvée, mais illisible pour nous",
+      "texte": "Document PDF, page trop lente ou contenu chargé autrement. Vérifiez vous-même les trois points qui se lisent dans la politique : le responsable, le traitement hors du Québec et les droits.",
+      "avant": "Nous avons trouvé un lien vers votre politique, sans pouvoir la lire (document PDF, page trop lente ou contenu chargé autrement). Les trois points qui la lisent (responsable, hors du Québec, droits) sont donc à vérifier vous-même."
+    }
+  },
+  "responsable": {
+    "enPlace": {
+      "titre": "Un responsable nommé et joignable",
+      "texte": "Rien à faire. Gardez ses coordonnées à jour s'il change de poste.",
+      "avant": "Votre politique désigne un responsable de la protection des renseignements personnels et donne un moyen de le joindre."
+    },
+    "aCorriger": {
+      "titre": "Aucun responsable nommé",
+      "texte": "Ajoutez dans votre politique son titre et un courriel ou un téléphone pour le joindre. C'est par défaut la personne qui a la plus haute autorité dans l'entreprise, qui peut déléguer ce rôle par écrit.",
+      "avant": "Votre politique ne désigne pas de responsable de la protection des renseignements personnels. Ajoutez son titre et un courriel ou un téléphone pour le joindre. Par défaut, c'est la personne qui a la plus haute autorité dans l'entreprise ; elle peut déléguer ce rôle par écrit."
+    },
+    "aCorrigerSansPolitique": {
+      "titre": "Aucun responsable, faute de politique",
+      "texte": "Nommez-le dans la politique à publier : son titre, et un courriel ou un téléphone pour le joindre.",
+      "avant": "Sans politique de confidentialité, nous n'avons trouvé aucun responsable désigné. Nommez-le dans la politique à publier : son titre, et un courriel ou un téléphone pour le joindre."
+    },
+    "aVerifier": {
+      "titre": "Un responsable, sans coordonnées claires",
+      "texte": "Vérifiez que son titre et un moyen de le joindre y sont tous les deux, écrits en clair : un courriel masqué par un script ne se lit pas toujours.",
+      "avant": "Votre politique parle d'un responsable, mais nous n'y avons pas trouvé à la fois son titre et un moyen de le joindre. Vérifiez que les deux y sont, écrits en clair : un courriel masqué par un script ne se lit pas toujours."
+    }
+  },
+  "transfert": {
+    "enPlace": {
+      "titre": "Le traitement hors du Québec est annoncé",
+      "texte": "Rien à faire. Gardez la liste de vos fournisseurs à jour quand vous en changez.",
+      "avant": "Votre politique dit que des renseignements peuvent être communiqués ou conservés à l'extérieur du Québec. Gardez la liste de vos fournisseurs à jour quand vous en changez."
+    },
+    "aCorriger": {
+      "titre": "Rien sur le traitement hors du Québec",
+      "texte": "Ajoutez vos fournisseurs d'hébergement, de courriel et de statistiques, le rôle de chacun, et le fait qu'ils peuvent traiter des renseignements hors du Québec.",
+      "avant": "Votre politique ne dit pas que des renseignements peuvent sortir du Québec. Ajoutez la liste de vos fournisseurs (hébergement, courriel, statistiques), le rôle de chacun, et le fait qu’ils peuvent traiter les renseignements hors du Québec."
+    },
+    "aCorrigerSansPolitique": {
+      "titre": "Rien d'annoncé, faute de politique",
+      "texte": "Prévoyez une section sur vos fournisseurs dans la politique à publier : qui ils sont, leur rôle, et le fait qu'ils peuvent traiter des renseignements hors du Québec.",
+      "avant": "Sans politique de confidentialité, rien n’informe vos visiteurs que leurs renseignements peuvent sortir du Québec. Prévoyez une section sur vos fournisseurs dans la politique à publier."
+    },
+    "aVerifier": {
+      "titre": "Des fournisseurs, sans la sortie du Québec",
+      "texte": "Votre politique nomme des fournisseurs ou parle d'hébergement, sans dire clairement que des renseignements peuvent sortir du Québec. Vérifiez la formulation, et que chaque fournisseur que vous utilisez y figure.",
+      "avant": "Votre politique nomme des fournisseurs ou parle d'hébergement, sans dire clairement que les renseignements peuvent être traités hors du Québec. Vérifiez la formulation, et que chaque fournisseur utilisé y figure."
+    }
+  },
+  "droits": {
+    "enPlace": {
+      "titre": "Les trois droits sont expliqués",
+      "texte": "Rien à faire. Vérifiez seulement que l'adresse donnée pour les exercer est encore la bonne.",
+      "avant": "Votre politique explique les droits d'accès, de rectification et de retrait du consentement."
+    },
+    "aCorriger": {
+      "titre": "Aucun droit expliqué",
+      "texte": "Ajoutez une section « Vos droits » qui nomme l'accès, la rectification et le retrait du consentement, et qui dit à qui écrire pour les exercer.",
+      "avant": "Votre politique n'explique pas les droits de vos clients. Ajoutez une section « Vos droits » qui nomme l'accès, la rectification et le retrait du consentement, et qui dit à qui écrire pour les exercer."
+    },
+    "aCorrigerSansPolitique": {
+      "titre": "Aucun droit expliqué, faute de politique",
+      "texte": "Prévoyez une section « Vos droits » dans la politique à publier : l'accès, la rectification, le retrait du consentement, et à qui écrire.",
+      "avant": "Sans politique de confidentialité, vos clients ne savent pas comment consulter, corriger ou retirer leurs renseignements. Prévoyez une section « Vos droits » dans la politique à publier."
+    },
+    "aVerifier": {
+      "titre": "Des droits manquent à l'appel",
+      "texte": "Nous n'avons pas trouvé {droits_manquants}. Vérifiez que les trois droits y sont, et à qui écrire pour les exercer.",
+      "avant": "Votre politique mentionne certains droits, mais nous n'y avons pas trouvé : {droits_manquants}. Vérifiez qu'elle explique l'accès, la rectification et le retrait du consentement, et à qui écrire pour les exercer."
+    }
+  },
+  "tiers": {
+    "enPlace": {
+      "titre": "Aucun service externe avant un clic",
+      "texte": "Ni police Google, ni vidéo, ni carte, ni bouton de réseau social ne se charge à l'arrivée. Rien à faire.",
+      "avant": "Votre page d'accueil ne charge, avant un clic, aucun des services externes que nous surveillons (polices Google, YouTube, Vimeo, Google Maps, réseaux sociaux)."
+    },
+    "aCorriger": {
+      "titre": "Des services externes non annoncés",
+      "texte": "Votre accueil charge {services} dès l'arrivée, et votre politique n'en parle pas. Nommez-les dans votre politique, ou faites-les charger au clic seulement : police hébergée chez vous, vidéo ou carte qui attend un clic.",
+      "avant": "Votre page d'accueil charge {services} dès l'arrivée, et votre politique n'en parle pas. Nommez ces services dans votre politique, ou faites-les charger seulement au besoin : police hébergée sur votre propre site, vidéo ou carte qui se charge au clic."
+    },
+    "aVerifier": {
+      "titre": "Des services externes à confirmer",
+      "texte": "Votre accueil charge {services}, que votre politique semble nommer. Vérifiez qu'elle dit à quoi ils servent et qu'ils peuvent recevoir l'adresse IP de vos visiteurs hors du Québec.",
+      "avant": "Votre page d'accueil charge {services} dès l'arrivée. Votre politique semble les nommer : vérifiez qu'elle dit à quoi ils servent et qu'ils peuvent recevoir l'adresse IP des visiteurs hors du Québec."
+    }
+  },
+  "https": {
+    "enPlace": {
+      "titre": "Connexion sécurisée, redirection en place",
+      "texte": "Rien à faire. Surveillez seulement la date d'expiration de votre certificat.",
+      "avant": "Votre site répond en HTTPS avec un certificat valide, et l’adresse en http:// mène automatiquement à la version sécurisée."
+    },
+    "aCorrigerSansHttps": {
+      "titre": "Pas de connexion sécurisée",
+      "texte": "Votre site ne répond pas en HTTPS, ou son certificat est expiré ou invalide. Activez un certificat chez votre hébergeur : la plupart l'offrent sans frais.",
+      "avant": "Votre site ne répond pas en HTTPS, ou son certificat est expiré ou invalide. Activez un certificat chez votre hébergeur : la plupart l’offrent sans frais."
+    },
+    "aCorrigerSansRedirection": {
+      "titre": "L'adresse en http:// reste ouverte",
+      "texte": "Activez la redirection automatique vers HTTPS chez votre hébergeur.",
+      "avant": "Votre site répond en HTTPS, mais l’adresse en http:// reste accessible sans passer à la version sécurisée. Activez la redirection automatique vers HTTPS chez votre hébergeur."
+    },
+    "aVerifier": {
+      "titre": "Redirection non confirmée",
+      "texte": "Tapez votre adresse avec http:// dans un navigateur et vérifiez qu'elle passe en https://.",
+      "avant": "Votre site répond en HTTPS, mais nous n’avons pas pu confirmer que l’adresse en http:// y mène. Tapez votre adresse avec http:// dans un navigateur et vérifiez qu’elle passe en https://."
+    }
+  }
+}

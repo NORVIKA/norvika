@@ -73,6 +73,26 @@ export function texteResultat(r: ResultatVerification, textes: TextesVerificatio
   });
 }
 
+/**
+ * Le titre court d'un résultat : la phrase du Studio qui dit, en quelques mots, ce que l'outil a vu
+ * pour CE cas (champ « <cas>Titre » de la vérification, 2026-11-26), ou `null` s'il n'est pas écrit.
+ * Un cas composé (« enPlace+ajoutSansBlocage ») prend le titre de son cas de tête : la phrase
+ * ajoutée à la fin n'est pas un constat à elle seule.
+ * Pourquoi un titre à part du nom de la vérification : le nom dit ce qui est VÉRIFIÉ, pas ce qui a
+ * été TROUVÉ. Dans le courriel, un site sans bouton de refus recevait un point intitulé « Bannière
+ * avec un vrai choix de refuser », qui se lit comme une bonne nouvelle.
+ * DÉCLARÉ UNE FOIS, comme texteResultat : le courriel en fait le titre de chaque point (à défaut, le
+ * nom de la vérification, comme avant), la page le met en tête du texte du résultat (à défaut, rien :
+ * le nom est déjà le titre de la ligne).
+ */
+export function titreConstat(r: ResultatVerification, textes: TextesVerification): string | null {
+  for (const cas of r.cas.split("+")) {
+    const titre = textes[`${cas}Titre`]?.trim();
+    if (titre) return apostrophes(titre);
+  }
+  return null;
+}
+
 /** « 3 points à corriger, 2 à vérifier, 3 en place », avec les accords du Studio. */
 export function synthese(rapport: Rapport, t: PageVerificateur): string {
   const n = rapport.synthese;

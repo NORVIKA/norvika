@@ -22,6 +22,9 @@ import { defineField, defineType, type FieldDefinition } from 'sanity'
 
 import { afficher, champsGoogle, GROUPES_PAGE, grandTitre, ligne, paragraphe, paragraphes, phrases } from './champs'
 
+const AIDE_TITRE =
+  'En quelques mots, ce que l’outil a vu, sans juger : « Aucun bouton pour refuser », pas « Vous n’êtes pas en règle ». Sert de titre à ce point dans le rapport par courriel, et de première ligne sur la page. Vide : le nom de la vérification sert de titre.'
+
 const AIDE_VARIABLES =
   'Les mots entre accolades sont remplacés par ce que l’outil a vu (ex. : {services} devient « Google Analytics, Meta »). Gardez-les tels quels.'
 
@@ -29,7 +32,38 @@ const AIDE_VARIABLES =
 const etat = (name: string, title: string, quand: string, rows = 3) =>
   paragraphe(name, title, `${quand} ${AIDE_VARIABLES}`, { rows })
 
-/** Une des huit vérifications : son nom, pourquoi elle compte, l'article, et un texte par cas. */
+/**
+ * Les cas qui N'ONT PAS de titre court à eux : ce sont des phrases ajoutées à la fin d'un autre cas
+ * (« enPlace+ajoutSansBlocage » dans lib/verificateur/analyse.ts), pas un constat autonome. Le titre
+ * affiché est alors celui du cas de tête.
+ */
+const CAS_SANS_TITRE = ['ajoutSansBlocage']
+
+/**
+ * Le titre court d'un cas (2026-11-26) : la phrase qui dit, en quelques mots, ce que l'outil a vu.
+ * Le courriel du rapport s'en sert comme titre de chaque point. Le nom de la vérification ne peut
+ * pas jouer ce rôle : il dit ce qui est VÉRIFIÉ, pas ce qui a été TROUVÉ. Un site sans bouton de
+ * refus recevait un point intitulé « Bannière avec un vrai choix de refuser », qui se lit comme une
+ * bonne nouvelle. Sur la page, le nom reste le titre de la ligne (les huit points s'affichent avant
+ * l'analyse) et le titre court vient en tête du texte du résultat.
+ * JAMAIS de {variable} : le titre paraît dans le courriel, où aucun texte pris sur le site analysé
+ * ne sort (règle de lib/verificateur/courriel.ts).
+ * Facultatif : tant qu'il est vide, le nom de la vérification sert de titre, comme avant.
+ */
+function titreConstat(champ: FieldDefinition) {
+  return defineField({
+    ...ligne(`${champ.name}Titre`, `${String(champ.title)} : titre court`, AIDE_TITRE, { requis: false }),
+    validation: (r) =>
+      r.custom((valeur) => {
+        const texte = String(valeur ?? '')
+        if (/\{\w+\}/.test(texte)) return 'Pas de {variable} dans un titre court : elles restent dans le texte en dessous.'
+        if (texte.length > 60) return 'Titre trop long : 60 caractères au plus, pour qu\u2019il tienne sur une ligne dans le courriel.'
+        return true
+      }),
+  })
+}
+
+/** Une des huit vérifications : son nom, pourquoi elle compte, l'article, et un titre + un texte par cas. */
 function verification(name: string, title: string, description: string, textes: FieldDefinition[]) {
   return defineField({
     name,
@@ -42,7 +76,8 @@ function verification(name: string, title: string, description: string, textes: 
       ligne('nom', 'Nom de la vérification', 'Le titre de la ligne dans le résultat.'),
       paragraphe('pourquoi', 'Pourquoi ça compte', 'Affiché quand la personne ouvre « Pourquoi ça compte » sous la ligne.', { rows: 3 }),
       ligne('article', 'Article de loi', 'Ex. : « Art. 8.1 et 14 ».'),
-      ...textes,
+      // Chaque cas arrive avec son titre court juste au-dessus de son texte.
+      ...textes.flatMap((champ) => (CAS_SANS_TITRE.includes(String(champ.name)) ? [champ] : [titreConstat(champ), champ])),
     ],
   })
 }

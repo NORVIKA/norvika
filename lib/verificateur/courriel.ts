@@ -5,7 +5,7 @@ import { reserverCourrielsVerificateur, type ReserveCourriels } from "@/lib/rate
 
 import { recoitDuCourriel } from "./adresse";
 import { nomTemoinReconnu } from "./analyse";
-import { dateEtHeure, hote, phraseAccompagnement, pied, remplir, synthese, texteResultat } from "./textes";
+import { dateEtHeure, hote, phraseAccompagnement, pied, remplir, synthese, texteResultat, titreConstat } from "./textes";
 import type { TextesCourriel } from "./textes-serveur";
 import { VERIFICATIONS, type Etat, type EtatEnvoi, type Rapport } from "./types";
 
@@ -117,8 +117,16 @@ export function courrielVisiteur(rapport: Rapport, textes: TextesCourriel, conse
     const preuves = r.preuves.map((p) =>
       p.type === "temoins" ? { ...p, valeurs: [...new Set(p.valeurs.map(nomTemoinReconnu).filter(Boolean))] } : p,
     );
-    return { nom: t[id].nom, article: t[id].article, etat: r.etat, texte: texteResultat({ ...r, preuves }, t[id], t, true) };
-  }).filter((l): l is { nom: string; article: string; etat: Etat; texte: string } => l !== null);
+    return {
+      // `titre` dit ce qui a été vu pour ce cas ; `nom` reste le nom court de la vérification, qui
+      // sert à la ligne « En place » (huit titres longs bout à bout ne se liraient pas).
+      titre: titreConstat(r, t[id]) ?? t[id].nom,
+      nom: t[id].nom,
+      article: t[id].article,
+      etat: r.etat,
+      texte: texteResultat({ ...r, preuves }, t[id], t, true),
+    };
+  }).filter((l): l is { titre: string; nom: string; article: string; etat: Etat; texte: string } => l !== null);
 
   const p = (contenu: string, style = "") =>
     `<p style="margin: 0; font-size: 15px; line-height: 1.55; color: ${A.texte}; ${style}">${contenu}</p>`;
@@ -141,7 +149,7 @@ export function courrielVisiteur(rapport: Rapport, textes: TextesCourriel, conse
         ? `<div style="background: ${A.lime}; color: ${A.encre}; width: 24px; height: 24px; line-height: 24px; text-align: center; border-radius: 50%; font-weight: bold; font-size: 12px;">${rang}</div>`
         : `<div style="border: 2px solid ${A.bordurePastille}; color: ${A.pastilleTexte}; width: 20px; height: 20px; line-height: 20px; text-align: center; border-radius: 50%; font-weight: bold; font-size: 12px;">?</div>`;
       // Pas de colonne d'état : « À vérifier » se dit dans le titre, le reste est à corriger.
-      const titre = aCorriger ? l.nom : `${etats[l.etat]} : ${l.nom}`;
+      const titre = aCorriger ? l.titre : `${etats[l.etat]} : ${l.titre}`;
       const trait = i === aRegler.length - 1 ? "" : `border-bottom: 1px solid ${A.trait};`;
       return `
                 <tr>
@@ -227,7 +235,7 @@ export function courrielVisiteur(rapport: Rapport, textes: TextesCourriel, conse
     "",
     accompagnement,
     "",
-    ...aRegler.flatMap((l) => [`${l.etat === "a-corriger" ? "À corriger" : etats[l.etat]} : ${l.nom}`, l.texte, ...(l.article ? [l.article] : []), ""]),
+    ...aRegler.flatMap((l) => [`${l.etat === "a-corriger" ? "À corriger" : etats[l.etat]} : ${l.titre}`, l.texte, ...(l.article ? [l.article] : []), ""]),
     ...(enPlace.length ? [`${etats["en-place"]} : ${enPlace.map((l) => sansMajuscule(l.nom)).join(", ")}`, ""] : []),
     t.appelTitre,
     appelTexte,

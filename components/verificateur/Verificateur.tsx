@@ -19,6 +19,7 @@ import {
   sansWww,
   synthese,
   texteResultat,
+  titreConstat,
 } from "@/lib/verificateur/textes";
 import {
   CHAMP_ADRESSE,
@@ -518,6 +519,10 @@ export function Verificateur({ t, lienRendezVous, adressePostale }: { t: PageVer
             {VERIFICATIONS.map((id: IdVerification, rang) => {
               const textes = t[id];
               const r = rapport?.resultats.find((x) => x.id === id);
+              // Le constat : ce que l'outil a vu pour ce cas, la MÊME phrase que le titre de ce
+              // point dans le rapport par courriel (titreConstat). Absente du Studio : rien ne
+              // s'affiche, le nom de la ligne reste le seul titre, comme avant le 2026-11-26.
+              const constat = r ? titreConstat(r, textes) : null;
               return (
                 <li key={id} className="nv-verif-ligne" data-etat={r?.etat} style={{ "--rang": rang } as CSSProperties}>
                   <div className="nv-verif-tete">
@@ -534,6 +539,7 @@ export function Verificateur({ t, lienRendezVous, adressePostale }: { t: PageVer
                   </div>
                   {r ? (
                     <>
+                      {constat ? <p className="nv-verif-constat">{constat}</p> : null}
                       <p className="nv-verif-texte">{texteResultat(r, textes, t)}</p>
                       {r.preuves
                         .filter((p) => p.type === "temoins" || p.type === "domaines")
