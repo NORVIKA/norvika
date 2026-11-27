@@ -411,6 +411,13 @@ export type RapportCourriel = {
   objet: string;
   /** Texte d'aperçu : {corriger}, {verifier} et {enPlace}, déjà accordés. */
   preEntete: string;
+  /**
+   * Le schéma de la page d'accueil dans le courriel (maquette A, 2026-11-27) : un DESSIN générique,
+   * jamais une capture ni un texte du site analysé. Vide : aucun schéma n'est dessiné.
+   */
+  schemaLibelle?: string | null;
+  schemaBanniere?: string | null;
+  schemaBanniereBouton?: string | null;
   salutation: string;
   /** {date}, {heure} et {domaine} sont remplacés. */
   intro: string;

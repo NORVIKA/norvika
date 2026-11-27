@@ -425,6 +425,28 @@ export const pageVerificateurLoi25 = defineType({
         }),
         texteApres('apresTitre', 'Titre du bloc sous le résultat', 'La phrase qui invite à recevoir le rapport (ex. : « Recevez ce rapport par courriel »). Vide : le bloc ne paraît pas, même si l’interrupteur est coché.'),
         texteApres('apresBouton', 'Bouton du bloc sous le résultat', 'Le texte du bouton d’envoi (ex. : « Envoyer mon rapport »). Vide : le bloc ne paraît pas, même si l’interrupteur est coché.'),
+        /* Le schéma de la page d'accueil dans le courriel (maquette A, construit le 2026-11-27).
+           Un DESSIN générique, jamais une capture ni un texte du site analysé : le courriel ne sort
+           aucun texte libre du site visité. Le cadre ne montre que ce qui a été relevé, et il ne
+           paraît pas du tout si aucun point repérable sur la page d'accueil n'est à signaler. */
+        ligne(
+          'schemaLibelle',
+          'Schéma : titre du cadre',
+          'Le petit titre gris au-dessus du dessin de la page d’accueil, dans le courriel (ex. : « Schéma de votre page d’accueil »). Vide : aucun schéma n’est dessiné, le courriel garde seulement la liste.',
+          { requis: false },
+        ),
+        ligne(
+          'schemaBanniere',
+          'Schéma : texte de la bannière dessinée',
+          'Le texte de la fausse bannière de témoins, en bas du dessin (ex. : « Ce site utilise des témoins. »). Générique : jamais le vrai texte du site analysé. La bannière n’est dessinée que si le site en a vraiment une.',
+          { requis: false },
+        ),
+        ligne(
+          'schemaBanniereBouton',
+          'Schéma : bouton de la bannière dessinée',
+          'Le bouton de la fausse bannière (ex. : « Accepter »). Vide : la bannière est dessinée sans bouton.',
+          { requis: false },
+        ),
         texteCourriel('champLibelle', 'Étiquette du champ de courriel', 'Au-dessus du champ (ex. : « Votre courriel (facultatif) »). Le mot « facultatif » doit rester : le courriel ne peut pas être exigé.'),
         texteCourriel('champExemple', 'Exemple dans le champ', 'Le texte pâle dans le champ vide (ex. : « vous@exemple.ca »).'),
         texteCourriel('champAide', 'Aide sous le champ', 'Sous le champ de courriel : à quoi il sert, et que le résultat s’affiche quand même.', { rows: 2 }),

@@ -52,6 +52,14 @@ const A = {
   pied: "#7A85A8",
   bordurePastille: "#C9D2F2",
   pastilleTexte: "#6A76A6",
+  // Les gris du schéma de la page d'accueil (maquette A) : un dessin neutre, qui ne doit pas tirer
+  // l'œil plus que les pastilles posées dessus.
+  schemaEntete: "#EEF0F5",
+  schemaEnteteTexte: "#7A8294",
+  schemaBarre: "#D9DEE8",
+  schemaBarrePale: "#E8EBF1",
+  schemaBloc: "#F1F3F7",
+  schemaBanniere: "#1E2433",
 };
 // La police de la marque est impossible ici : il faudrait la charger depuis un serveur, donc une
 // requête partante à l'ouverture (même règle que C4). Pile système : SF Pro, Segoe UI, Roboto.
@@ -118,6 +126,11 @@ export function courrielVisiteur(rapport: Rapport, textes: TextesCourriel, conse
       p.type === "temoins" ? { ...p, valeurs: [...new Set(p.valeurs.map(nomTemoinReconnu).filter(Boolean))] } : p,
     );
     return {
+      // `id` sert au schéma de la page d'accueil : il relie une pastille de la liste à l'endroit
+      // dessiné (la bannière, le haut de la page).
+      id,
+      // `cas` dit ce qui a été vu : le schéma ne dessine une bannière que si le site en a une.
+      cas: r.cas,
       // `titre` dit ce qui a été vu pour ce cas ; `nom` reste le nom court de la vérification, qui
       // sert à la ligne « En place » (huit titres longs bout à bout ne se liraient pas).
       titre: titreConstat(r, t[id]) ?? t[id].nom,
@@ -126,7 +139,19 @@ export function courrielVisiteur(rapport: Rapport, textes: TextesCourriel, conse
       etat: r.etat,
       texte: texteResultat({ ...r, preuves }, t[id], t, true),
     };
-  }).filter((l): l is { titre: string; nom: string; article: string; etat: Etat; texte: string } => l !== null);
+  }).filter(
+    (
+      l,
+    ): l is {
+      id: (typeof VERIFICATIONS)[number];
+      cas: string;
+      titre: string;
+      nom: string;
+      article: string;
+      etat: Etat;
+      texte: string;
+    } => l !== null,
+  );
 
   const p = (contenu: string, style = "") =>
     `<p style="margin: 0; font-size: 15px; line-height: 1.55; color: ${A.texte}; ${style}">${contenu}</p>`;
@@ -139,14 +164,25 @@ export function courrielVisiteur(rapport: Rapport, textes: TextesCourriel, conse
    */
   const aRegler = lignes.filter((l) => l.etat !== "en-place");
   const enPlace = lignes.filter((l) => l.etat === "en-place");
+
+  /**
+   * L'étiquette de la pastille de chaque constat : un numéro qui se suit pour « à corriger », un
+   * « ? » pour « à vérifier ». Calculée UNE FOIS, avant la liste : le schéma de la page d'accueil
+   * pose les mêmes pastilles sur le dessin, et les deux ne peuvent pas se contredire.
+   */
+  const numero = new Map<string, string>();
   let rang = 0;
+  for (const l of aRegler) {
+    if (l.etat === "a-corriger") rang += 1;
+    numero.set(l.id, l.etat === "a-corriger" ? String(rang) : "?");
+  }
+
   const points = aRegler
     .map((l, i) => {
       const aCorriger = l.etat === "a-corriger";
-      if (aCorriger) rang += 1;
       // Pastille pleine et numérotée pour « à corriger », pastille creuse « ? » pour « à vérifier ».
       const pastille = aCorriger
-        ? `<div style="background: ${A.lime}; color: ${A.encre}; width: 24px; height: 24px; line-height: 24px; text-align: center; border-radius: 50%; font-weight: bold; font-size: 12px;">${rang}</div>`
+        ? `<div style="background: ${A.lime}; color: ${A.encre}; width: 24px; height: 24px; line-height: 24px; text-align: center; border-radius: 50%; font-weight: bold; font-size: 12px;">${esc(numero.get(l.id) ?? "")}</div>`
         : `<div style="border: 2px solid ${A.bordurePastille}; color: ${A.pastilleTexte}; width: 20px; height: 20px; line-height: 20px; text-align: center; border-radius: 50%; font-weight: bold; font-size: 12px;">?</div>`;
       // Pas de colonne d'état : « À vérifier » se dit dans le titre, le reste est à corriger.
       const titre = aCorriger ? l.titre : `${etats[l.etat]} : ${l.titre}`;
@@ -171,6 +207,82 @@ export function courrielVisiteur(rapport: Rapport, textes: TextesCourriel, conse
               <p style="margin: 10px 0 0; padding: 14px 16px; background: ${A.doux}; border-radius: 12px; font-size: 14px; line-height: 1.5; color: ${A.texte};"><strong style="color: ${A.encre};">${esc(etats["en-place"])}&nbsp;:</strong> ${enPlace.map((l) => esc(sansMajuscule(l.nom))).join(", ")}</p>`
     : "";
 
+  /**
+   * LE SCHÉMA DE LA PAGE D'ACCUEIL (maquette A du 2026-11-26, construit le 2026-11-27). Un cadre
+   * dessiné en tableaux, posé au bas du bloc bleu : des barres grises pour la page, une bannière de
+   * témoins en bas, et les pastilles de la liste posées à l'endroit où le constat se trouve. Sans
+   * lui, les pastilles numérotées ne pointaient vers rien.
+   *
+   * ⛔ C'est un DESSIN GÉNÉRIQUE, jamais une capture : aucune image, aucune mesure du vrai site, et
+   *    ses trois mots viennent du Studio, pas du site analysé (règle C7).
+   *
+   * Règle de la maquette : on ne dessine que ce qui a été relevé.
+   *   - la bannière n'est dessinée que si le site en a VRAIMENT une (un site sans bannière, cas
+   *     « aCorrigerAbsente » ou « enPlaceSansTraceur », n'en reçoit pas une en dessin) et que son
+   *     constat porte une pastille ;
+   *   - la pastille du haut est celle des témoins de suivi, qui se déposent au chargement ;
+   *   - sans aucune pastille à poser, le cadre ne paraît pas : il n'aurait rien à montrer.
+   * Le libellé du Studio vide éteint le schéma au complet, comme les deux textes du bloc « après
+   * résultat ». La version texte du courriel ne change pas : le dessin n'ajoute aucune information.
+   */
+  const pastilleSchema = (etiquette: string) =>
+    `<span style="display: inline-block; background: ${A.lime}; color: ${A.encre}; width: 20px; height: 20px; line-height: 20px; text-align: center; border-radius: 50%; font-weight: bold; font-size: 11px;">${esc(etiquette)}</span>`;
+
+  const SANS_BANNIERE = ["aCorrigerAbsente", "enPlaceSansTraceur"];
+  const ligneBanniere = lignes.find((l) => l.id === "banniere");
+  const schemaLibelle = rc.schemaLibelle?.trim() ?? "";
+  const schemaBanniere = rc.schemaBanniere?.trim() ?? "";
+  const schemaBouton = rc.schemaBanniereBouton?.trim() ?? "";
+  const pastilleHaut = numero.get("temoins");
+  const pastilleBanniere =
+    ligneBanniere && !SANS_BANNIERE.includes(ligneBanniere.cas) && schemaBanniere ? numero.get("banniere") : undefined;
+  const montrerSchema = Boolean(schemaLibelle) && Boolean(pastilleHaut || pastilleBanniere);
+
+  const schema = !montrerSchema
+    ? ""
+    : `
+                <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-top: 24px; background: #ffffff; border-radius: 14px 14px ${pastilleBanniere ? "0 0" : "14px 14px"};">
+                  <tr>
+                    <td style="background: ${A.schemaEntete}; border-radius: 14px 14px 0 0; padding: 9px 14px;">
+                      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+                        <tr>
+                          <td style="font-size: 11px; line-height: 20px; color: ${A.schemaEnteteTexte};">${esc(schemaLibelle)}</td>
+                          ${pastilleHaut ? `<td width="20" align="right" style="width: 20px;">${pastilleSchema(pastilleHaut)}</td>` : ""}
+                        </tr>
+                      </table>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td style="padding: 18px 16px ${pastilleBanniere ? "0" : "18px"};">
+                      <div style="height: 12px; width: 55%; background: ${A.schemaBarre}; border-radius: 6px;"></div>
+                      <div style="height: 9px; width: 80%; background: ${A.schemaBarrePale}; border-radius: 6px; margin-top: 10px;"></div>
+                      <div style="height: 9px; width: 68%; background: ${A.schemaBarrePale}; border-radius: 6px; margin-top: 7px;"></div>
+                      <div style="height: 84px; background: ${A.schemaBloc}; border-radius: 10px; margin-top: 14px;"></div>
+                    </td>
+                  </tr>${
+                    !pastilleBanniere
+                      ? ""
+                      : `
+                  <tr>
+                    <td style="background: ${A.schemaBanniere}; padding: 12px 16px;">
+                      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+                        <tr>
+                          <td style="font-size: 12px; line-height: 20px; color: #ffffff;">${esc(schemaBanniere)}${
+                            schemaBouton
+                              ? `<span style="display: inline-block; margin-left: 8px; background: #ffffff; color: ${A.schemaBanniere}; padding: 4px 10px; border-radius: 6px; font-weight: bold;">${esc(schemaBouton)}</span>`
+                              : ""
+                          }</td>
+                          <td width="20" align="right" style="width: 20px;">${pastilleSchema(pastilleBanniere)}</td>
+                        </tr>
+                      </table>
+                    </td>
+                  </tr>`
+                  }
+                </table>`;
+  // Le cadre touche le bas du bloc bleu quand il se termine par la bannière foncée : c'est elle qui
+  // fait la limite avec la liste blanche. Sans bannière, le bloc bleu garde son espace du bas.
+  const basDuBleu = montrerSchema && pastilleBanniere ? "0" : "30px";
+
   const html = `<!doctype html>
 <html lang="fr">
   <head>
@@ -189,9 +301,9 @@ export function courrielVisiteur(rapport: Rapport, textes: TextesCourriel, conse
               <td style="padding: 0 6px 18px;"><img src="${LOGO}" width="84" alt="${esc(textes.nom)}" style="display: block; border: 0;"></td>
             </tr>
             <tr>
-              <td class="pad" style="background: ${A.bleu}; border-radius: 22px 22px 0 0; padding: 32px 30px 30px;">
+              <td class="pad" style="background: ${A.bleu}; border-radius: 22px 22px 0 0; padding: 32px 30px ${basDuBleu};">
                 <p class="titre" style="margin: 0; font-size: 30px; line-height: 1.15; font-weight: bold; letter-spacing: -0.02em; color: #ffffff;">${esc(phraseSynthese)}</p>
-                <p style="margin: 12px 0 0; font-size: 16px; line-height: 1.5; color: #D3DBFF;">${esc(accompagnement)}</p>
+                <p style="margin: 12px 0 0; font-size: 16px; line-height: 1.5; color: #D3DBFF;">${esc(accompagnement)}</p>${schema}
               </td>
             </tr>
             <tr>
