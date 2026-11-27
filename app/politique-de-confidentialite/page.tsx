@@ -453,7 +453,7 @@ export default async function PolitiquePage() {
           </p>
           <ul className="mt-3 list-disc pl-5 text-[var(--muted-foreground)]">
             <li>
-              <strong className="text-[var(--foreground)]">William Simard</strong>, associé
+              <strong className="text-[var(--foreground)]">William Simard</strong>, cofondateur
             </li>
             <li>
               Courriel :{" "}
