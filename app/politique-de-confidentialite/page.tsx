@@ -58,16 +58,18 @@ export default async function PolitiquePage() {
         </p>
         {/* Avis de modification (art. 8.2 de la loi sur le secteur privé), texte de Martin du
             2026-11-26. Jamais soumis à un réglage du Studio. Recommandation : en haut 90 jours
-            (jusqu'au 25 février 2027), puis dans un historique au bas de la page. Les lignes du
-            23 novembre (courriel) et du 25 novembre (case) suivent les interrupteurs, parce que ces
-            passages n'existent qu'avec eux. Dates tirées de l'historique des transactions Sanity : case
-            en ligne le 23 de 11 h 19 à 13 h 10 seulement (Martin : pas à mentionner), puis le 25 à 22 h 20.
+            (jusqu'au 25 février 2027), puis dans un historique au bas de la page. La ligne du
+            23 novembre (courriel) et la partie « case » de celle du 25 suivent les interrupteurs, parce
+            que ces passages n'existent qu'avec eux. La ligne du 25 s'affiche toujours : elle porte aussi
+            la correction de Lau sur Browser Run (c7ec161, 25 nov. 22 h 40 ; Martin, 2026-11-27). Dates
+            tirées de l'historique des transactions Sanity : case en ligne le 23 de 11 h 19 à 13 h 10
+            seulement (Martin : pas à mentionner), puis le 25 à 22 h 20.
             ⚠️ Si la case est coupée puis rallumée depuis le Studio, la ligne du 25 devient fausse : il
             faut alors une nouvelle ligne datée et une nouvelle MISE_A_JOUR. */}
         <div id="avis-modification" className="mt-6 rounded-lg bg-[var(--muted)] p-5 text-sm text-[var(--muted-foreground)]">
           <p>
             <strong className="text-[var(--foreground)]">Avis de modification (27 novembre 2026).</strong> Cette
-            politique a été modifiée les 14, 21{courriel ? ", 23" : ""}{avecCase ? ", 25" : ""} et 27 novembre 2026.
+            politique a été modifiée les 14, 21{courriel ? ", 23" : ""}, 25 et 27 novembre 2026.
           </p>
           <ul className="mt-2 list-disc pl-5">
             <li>14 novembre : ajout de la vérification anti-robot Cloudflare Turnstile sur nos formulaires (section 10).</li>
@@ -79,12 +81,14 @@ export default async function PolitiquePage() {
             {courriel ? (
               <li>23 novembre : rapport du vérificateur par courriel, facultatif (section 4).</li>
             ) : null}
-            {avecCase ? (
-              <li>
-                25 novembre : case distincte, jamais cochée d’avance, pour accepter que nous vous écrivions, et copie
-                de votre demande gardée au plus 24 mois si vous la cochez (sections 4 et 7).
-              </li>
-            ) : null}
+            <li>
+              25 novembre :{" "}
+              {avecCase
+                ? "case distincte, jamais cochée d’avance, pour accepter que nous vous écrivions, et copie de votre demande gardée au plus 24 mois si vous la cochez (sections 4 et 7) ; "
+                : ""}
+              correction sur Cloudflare Browser Run : l’adresse du site vérifié ne figure pas dans notre tableau
+              de bord (sections 4 et 10).
+            </li>
             <li>
               27 novembre : ajout de l’espace client (section 5), durées de conservation précises (section 7),
               ajout de Slack parmi nos fournisseurs (section 10){courriel ? ", " : " et "}liste complète des
